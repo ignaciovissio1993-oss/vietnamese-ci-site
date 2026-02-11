@@ -1,0 +1,43 @@
+name: yt-dlp (YouTube) download
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (needed for YouTube EJS challenges)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install yt-dlp + EJS solver scripts
+        run: |
+          python -m pip install --upgrade pip
+          # yt-dlp needs EJS scripts; for PyPI installs, the wiki recommends installing with default deps
+          # and/or installing the yt-dlp-ejs package (depending on install method).
+          pip install -U "yt-dlp[default]" yt-dlp-ejs
+
+      - name: Download (uses Node runtime + cookies.txt)
+        run: |
+          yt-dlp --version
+          node --version
+
+          # IMPORTANT:
+          # - cookies.txt must exist in the repo OR be downloaded as a secret/artifact before this step
+          # - Node runtime must be enabled for EJS with --js-runtimes node
+          yt-dlp \
+            --cookies cookies.txt \
+            --js-runtimes node \
+            --yes-playlist \
+            -o "%(playlist_title)s/%(title)s.%(ext)s" \
+            "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
