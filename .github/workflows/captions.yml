@@ -1,0 +1,103 @@
+name: Update YouTube Captions (VTT)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *" # daily at 06:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  captions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg (needed to convert to .vtt)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install yt-dlp
+        run: |
+          python -m pip install --upgrade pip
+          pip install yt-dlp
+
+      - name: Download subtitles + auto-subs and convert to VTT
+        run: |
+          mkdir -p captions
+
+          CHANNEL_URL="https://www.youtube.com/@VietnameseComprehensibleInput/playlists"
+
+          # Downloads captions for videos found in your channel playlists page.
+          # Prefers Vietnamese, then English.
+          # Tries VTT first; if not available, falls back to YouTube formats then converts to VTT.
+          yt-dlp \
+            --skip-download \
+            --write-subs --write-auto-subs \
+            --sub-langs "vi.*,vi,en.*,en" \
+            --sub-format "vtt/srv3/ttml" \
+            --convert-subs vtt \
+            -o "captions/%(id)s.%(language)s.%(ext)s" \
+            "$CHANNEL_URL"
+
+      - name: Create simple captions/<id>.vtt (prefer vi, else en)
+        run: |
+          python - << 'PY'
+          import os, re, glob, shutil
+
+          capdir = "captions"
+          os.makedirs(capdir, exist_ok=True)
+
+          # Pattern: <id>.<lang>.vtt
+          patt = re.compile(r"^([A-Za-z0-9_-]{11})\.(.+)\.vtt$", re.I)
+
+          by_id = {}
+          for path in glob.glob(os.path.join(capdir, "*.vtt")):
+            name = os.path.basename(path)
+            m = patt.match(name)
+            if m:
+              vid = m.group(1)
+              by_id.setdefault(vid, []).append(path)
+
+          def pick_best(files):
+            # Prefer Vietnamese, then English, else first
+            def score(p):
+              n = os.path.basename(p).lower()
+              if ".vi" in n: return 0
+              if ".en" in n: return 1
+              return 2
+            return sorted(files, key=score)[0]
+
+          created = 0
+          for vid, files in by_id.items():
+            dst = os.path.join(capdir, f"{vid}.vtt")
+            if os.path.exists(dst):
+              continue
+            src = pick_best(files)
+            shutil.copyfile(src, dst)
+            created += 1
+
+          print(f"Created {created} simplified <id>.vtt files")
+          PY
+
+      - name: Remove non-VTT caption files (optional cleanup)
+        run: |
+          find captions -type f ! -name "*.vtt" -delete
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add captions || true
+
+          if git diff --cached --quiet; then
+            echo "No caption changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update captions (VTT)"
+          git push
