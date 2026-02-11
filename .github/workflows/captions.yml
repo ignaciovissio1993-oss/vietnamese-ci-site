@@ -1,21 +1,34 @@
-name: Update YouTube Captions (VTT)
+name: Pull YouTube captions
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * *"  # daily at 06:00 UTC (change if you want)
+
+permissions:
+  contents: write
 
 jobs:
-  update:
+  captions:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js (for yt-dlp JS runtime)
+      # ✅ Install Node so yt-dlp can use it for JS-based extraction
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      # ✅ Sanity check: confirm node exists in PATH
+      - name: Check node
+        run: |
+          which node
+          node -v
+
+      # ✅ Install Python + yt-dlp
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -26,37 +39,52 @@ jobs:
           python -m pip install --upgrade pip
           pip install -U yt-dlp
 
+      # ✅ Recreate cookies.txt from your GitHub Secret
+      # Create a repo secret named: YOUTUBE_COOKIES_TXT
       - name: Write cookies.txt
         env:
           YOUTUBE_COOKIES_TXT: ${{ secrets.YOUTUBE_COOKIES_TXT }}
         run: |
           if [ -z "$YOUTUBE_COOKIES_TXT" ]; then
-            echo "Missing secret YOUTUBE_COOKIES_TXT"
+            echo "Missing secret: YOUTUBE_COOKIES_TXT"
             exit 1
           fi
           printf "%s" "$YOUTUBE_COOKIES_TXT" > cookies.txt
-          chmod 600 cookies.txt
-          head -n 2 cookies.txt
+          # tiny debug: show first 3 lines (won't expose full cookies)
+          head -n 3 cookies.txt || true
 
-      - name: Download subtitles (VTT)
+      # ✅ Download captions/subtitles for the channel/playlists
+      - name: Download captions
         run: |
           mkdir -p captions
+          NODE_BIN="$(command -v node)"
+
+          echo "Using node runtime: $NODE_BIN"
+
           yt-dlp \
             --cookies cookies.txt \
-            --js-runtimes node \
-            --sleep-interval 1 --max-sleep-interval 3 \
-            --retries 10 --fragment-retries 10 \
-            --write-subs --write-auto-subs \
-            --sub-langs "vi,en" \
-            --sub-format "vtt" \
+            --js-runtimes "node:${NODE_BIN}" \
+            --ignore-errors \
             --skip-download \
-            -o "captions/%(uploader)s/%(playlist_title)s/%(title)s [%(id)s].%(ext)s" \
+            --write-subs \
+            --write-auto-subs \
+            --sub-langs "en.*,vi.*,es.*" \
+            --convert-subs srt \
+            --output "captions/%(uploader)s/%(playlist_title)s/%(title)s [%(id)s].%(ext)s" \
             "https://www.youtube.com/@VietnameseComprehensibleInput/playlists"
 
-      - name: Commit changes
+      # ✅ Commit results back to the repo
+      - name: Commit and push captions
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add captions || true
-          git commit -m "Update captions" || echo "No changes to commit"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update captions"
           git push
