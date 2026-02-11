@@ -1,0 +1,1671 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vietnamese CI | Series + Book</title>
+
+  <style>
+    :root{
+      --bg1:#fff6fb;
+      --bg2:#f2fbff;
+      --panel:#ffffff;
+      --panel2:#f7fbff;
+      --line: rgba(25, 60, 110, .14);
+
+      --text:#1a2a44;
+      --muted:#587194;
+
+      --accent:#4f8cff;
+      --accent2:#22c55e;
+      --accent3:#f97316;
+      --accent4:#a855f7;
+      --accent5:#06b6d4;
+
+      --shadow: 0 16px 40px rgba(19, 35, 70, .10);
+      --shadow2: 0 12px 26px rgba(19, 35, 70, .14);
+      --radius: 18px;
+      --radius2: 26px;
+
+      --max: 1240px;
+      --ring: 0 0 0 4px rgba(79,140,255,.16);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(900px 520px at 10% -10%, rgba(168,85,247,.18), transparent 60%),
+        radial-gradient(900px 520px at 110% 0%, rgba(79,140,255,.18), transparent 55%),
+        radial-gradient(900px 520px at 30% 100%, rgba(34,197,94,.14), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+    a{color:inherit; text-decoration:none}
+    a:hover{color: var(--accent)}
+
+    .app-wrap{max-width: var(--max); margin:0 auto; padding: 18px;}
+
+    /* Header + Tabs */
+    .app-header{
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      border-radius: var(--radius2);
+      overflow:hidden;
+      box-shadow: var(--shadow2);
+      border: 1px solid rgba(79,140,255,.22);
+      background:
+        radial-gradient(900px 300px at 20% 20%, rgba(79,140,255,.40), transparent 60%),
+        radial-gradient(700px 260px at 70% 30%, rgba(168,85,247,.32), transparent 60%),
+        radial-gradient(700px 260px at 40% 80%, rgba(34,197,94,.22), transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      backdrop-filter: blur(10px);
+    }
+    .app-header-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 14px 16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 240px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius: 14px;
+      background: conic-gradient(from 210deg, #4f8cff, #a855f7, #22c55e, #f97316, #06b6d4, #4f8cff);
+      box-shadow: 0 14px 28px rgba(79,140,255,.18);
+      border: 1px solid rgba(255,255,255,.8);
+      flex: 0 0 auto;
+    }
+    .brand h1{margin:0; font-size:15px; letter-spacing:.2px}
+    .brand p{margin:2px 0 0; color: var(--muted); font-size:12px}
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      flex: 1;
+    }
+    .tab-btn{
+      border:1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.85);
+      padding:10px 12px;
+      border-radius: 999px;
+      font-weight: 850;
+      font-size: 13px;
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: 0 10px 18px rgba(19,35,70,.06);
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tab-btn:hover{transform: translateY(-1px)}
+    .tab-btn.active{
+      border-color: rgba(79,140,255,.40);
+      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
+      box-shadow: 0 14px 26px rgba(79,140,255,.12);
+    }
+
+    .header-actions{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+      min-width: 240px;
+    }
+    .btn{
+      padding:10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+      font-size: 13px;
+      cursor:pointer;
+      box-shadow: 0 10px 20px rgba(19,35,70,.06);
+      transition: transform .12s ease;
+      font-weight: 800;
+    }
+    .btn.primary{
+      border-color: rgba(79,140,255,.40);
+      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
+    }
+    .btn:hover{transform: translateY(-1px)}
+
+    .tab-page{display:none; margin-top: 16px;}
+    .tab-page.active{display:block;}
+
+    /* =========================
+       SERIES PAGE
+    ========================= */
+    .series-grid{
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .series-aside{
+      background: rgba(255,255,255,.85);
+      border: 1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      position: sticky;
+      top: 96px;
+      backdrop-filter: blur(10px);
+    }
+    .series-sideTitle{
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: .2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .series-searchBox{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(79,140,255,.22);
+      background: linear-gradient(180deg, rgba(79,140,255,.08), rgba(255,255,255,.82));
+      box-shadow: 0 10px 20px rgba(79,140,255,.10);
+      margin-bottom: 12px;
+    }
+    .series-searchBox input{
+      width:100%;
+      border:0;
+      outline:none;
+      background: transparent;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .series-hint{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin: 6px 2px 12px;
+    }
+
+    .series-aside details{
+      border:1px solid rgba(25,60,110,.14);
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(247,251,255,.85);
+      margin-bottom: 10px;
+    }
+    .series-aside summary{
+      cursor:pointer;
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .series-aside summary::-webkit-details-marker{display:none}
+    .series-chev{color: var(--muted); font-size: 12px}
+    .series-opt{
+      display:flex; flex-wrap:wrap; gap:8px;
+      padding-top: 10px;
+    }
+    .series-chip{
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.88);
+      color: var(--muted);
+      box-shadow: 0 8px 18px rgba(19,35,70,.06);
+      cursor:pointer;
+      user-select:none;
+    }
+    .series-chip:hover{box-shadow: var(--ring)}
+
+    .series-playlistBox{
+      border-radius: 18px;
+      border: 1px solid rgba(168,85,247,.22);
+      background:
+        radial-gradient(220px 140px at 10% 20%, rgba(168,85,247,.14), transparent 60%),
+        radial-gradient(220px 140px at 80% 20%, rgba(79,140,255,.14), transparent 60%),
+        radial-gradient(220px 140px at 30% 100%, rgba(34,197,94,.12), transparent 60%),
+        rgba(255,255,255,.9);
+      padding: 12px 12px 14px;
+      box-shadow: 0 14px 30px rgba(168,85,247,.10);
+      margin-top: 10px;
+    }
+    .series-playlistBox b{display:block; margin-bottom:6px}
+    .series-playlistBox a{
+      display:inline-block;
+      margin-top:8px;
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .series-main{
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(25,60,110,.12);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      backdrop-filter: blur(10px);
+    }
+    .series-topline{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin: 2px 2px 10px;
+    }
+    .series-topline h2{margin:0; font-size: 18px}
+    .series-topline p{margin:0; color: var(--muted); font-size: 13px}
+
+    .series-cards{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .series-card{
+      border: 1px solid rgba(25,60,110,.14);
+      border-radius: 20px;
+      overflow:hidden;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 14px 30px rgba(19,35,70,.10);
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .series-card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(79,140,255,.35);
+      box-shadow: 0 18px 40px rgba(19,35,70,.14);
+    }
+    .series-thumb{
+      aspect-ratio: 16/9;
+      position:relative;
+      background: #eaf4ff;
+      border-bottom: 1px solid rgba(25,60,110,.10);
+      overflow:hidden;
+    }
+    .series-thumb img{
+      width:100%; height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .series-play{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.20));
+    }
+    .series-playBadge{
+      width:60px; height:60px;
+      border-radius: 22px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(79,140,255,.30);
+      box-shadow: 0 18px 40px rgba(19,35,70,.18);
+      font-size: 22px;
+      color: #1a2a44;
+    }
+    .series-meta{padding: 12px 12px 14px; text-align:left}
+    .series-title{margin:0 0 8px; font-size: 14px; line-height: 1.25}
+    .series-row{display:flex; justify-content:space-between; gap: 10px; color: var(--muted); font-size: 12px}
+    .series-row a{color: var(--accent)}
+    .series-row a:hover{text-decoration: underline}
+    .series-tags{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-top: 10px;
+    }
+    .series-tag{
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.95);
+      color: var(--muted);
+      box-shadow: 0 10px 18px rgba(19,35,70,.06);
+    }
+    .series-tag.level{border-color: rgba(79,140,255,.28); background: rgba(79,140,255,.10); color:#2f5fb8}
+    .series-tag.topic{border-color: rgba(34,197,94,.26); background: rgba(34,197,94,.10); color:#1f7a45}
+    .series-tag.extra{border-color: rgba(168,85,247,.24); background: rgba(168,85,247,.10); color:#6b2db5}
+
+    /* Series modal */
+    .series-modal{
+      position: fixed; inset: 0;
+      background: rgba(14, 25, 45, .55);
+      display:none;
+      align-items:center; justify-content:center;
+      padding: 18px;
+      z-index: 999;
+      backdrop-filter: blur(6px);
+    }
+    .series-dialog{
+      width: min(980px, 100%);
+      border-radius: 26px;
+      overflow:hidden;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(25,60,110,.14);
+      box-shadow: 0 24px 70px rgba(19,35,70,.22);
+    }
+    .series-dialogTop{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(25,60,110,.12);
+      background: linear-gradient(135deg, rgba(79,140,255,.10), rgba(168,85,247,.10));
+    }
+    .series-dialogTitle{
+      margin:0; font-size: 14px;
+      overflow:hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .series-closeBtn{
+      border: 1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.9);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-size: 13px;
+      box-shadow: 0 10px 20px rgba(19,35,70,.10);
+      font-weight: 850;
+    }
+    .series-player{
+      aspect-ratio: 16/9;
+      background:#000;
+    }
+    .series-player iframe{width:100%; height:100%; border:0; display:block}
+
+    .series-state{
+      border: 1px solid rgba(25,60,110,.12);
+      background: rgba(255,255,255,.88);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 12px 28px rgba(19,35,70,.08);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    /* =========================
+       BOOK PAGE (restyled)
+    ========================= */
+    .book-shell{
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(25,60,110,.12);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .book-nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 16px 18px;
+      gap: 12px;
+      border-bottom: 1px solid rgba(25,60,110,.10);
+      background:
+        radial-gradient(900px 260px at 20% 30%, rgba(79,140,255,.18), transparent 60%),
+        radial-gradient(700px 240px at 80% 20%, rgba(168,85,247,.14), transparent 60%),
+        rgba(255,255,255,.85);
+    }
+    .book-brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 950;
+      letter-spacing:.3px;
+      white-space:nowrap;
+    }
+    .book-brand .dot{
+      width:14px;height:14px;border-radius:999px;
+      background: conic-gradient(from 210deg, #4f8cff, #a855f7, #22c55e, #f97316, #06b6d4, #4f8cff);
+      box-shadow: 0 8px 18px rgba(19,35,70,.14);
+      border: 1px solid rgba(255,255,255,.7);
+    }
+    .book-links{
+      display:flex;
+      gap:18px;
+      flex-wrap:wrap;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 13px;
+      opacity:.92;
+    }
+    .book-links a:hover{opacity:1}
+    .book-cta{
+      display:flex; align-items:center; gap:10px;
+    }
+    .book-pill{
+      display:flex; align-items:center; gap:10px;
+      background: rgba(79,140,255,.10);
+      border:1px solid rgba(79,140,255,.22);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight: 850;
+      color: #2f5fb8;
+      font-size: 12.5px;
+      white-space:nowrap;
+      box-shadow: 0 10px 20px rgba(79,140,255,.10);
+    }
+    .book-pill .ping{
+      width:10px;height:10px;border-radius:999px;
+      background:#22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,.18);
+    }
+
+    .book-btn{
+      border: 1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.9);
+      color: var(--text);
+      font-weight: 900;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      box-shadow: 0 12px 22px rgba(19,35,70,.10);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition: transform .12s ease;
+    }
+    .book-btn.primary{
+      border-color: rgba(79,140,255,.40);
+      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
+    }
+    .book-btn:hover{transform: translateY(-1px)}
+    .book-btn:active{transform: translateY(0px)}
+    .book-btn.outline{
+      background: rgba(255,255,255,.9);
+      border-color: rgba(25,60,110,.14);
+    }
+
+    .book-hero{
+      padding: 18px 18px 10px;
+      background:
+        radial-gradient(1200px 500px at 25% 35%, rgba(168,85,247,.14), transparent 60%),
+        radial-gradient(900px 480px at 75% 45%, rgba(79,140,255,.14), transparent 55%),
+        rgba(255,255,255,.7);
+    }
+    .book-heroGrid{
+      display:grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 18px;
+      align-items:center;
+    }
+    .book-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.9);
+      border:1px solid rgba(25,60,110,.14);
+      box-shadow: 0 10px 25px rgba(19,35,70,.06);
+      font-weight: 900;
+      color: var(--text);
+      width:fit-content;
+    }
+    .book-kicker .miniDot{
+      width:10px;height:10px;border-radius:999px;
+      background: linear-gradient(180deg,#22c55e,#06b6d4);
+    }
+    .book-h1{
+      margin:14px 0 10px;
+      font-size: clamp(34px, 4.2vw, 52px);
+      line-height:1.03;
+      letter-spacing:-.8px;
+    }
+    .book-hl{
+      background: linear-gradient(180deg, rgba(79,140,255,.0) 0 42%, rgba(79,140,255,.20) 43% 100%);
+      border-radius:14px;
+      padding:0 10px;
+      display:inline-block;
+    }
+    .book-sub{
+      color: var(--muted);
+      font-size:16px;
+      line-height:1.55;
+      max-width: 56ch;
+    }
+    .book-ctaRow{
+      margin-top:16px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .book-watch{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.9);
+      font-weight: 900;
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: 0 10px 20px rgba(19,35,70,.08);
+    }
+    .book-watch:hover{box-shadow: var(--ring)}
+    .book-playIcon{
+      width:34px;height:34px;border-radius:999px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
+      border:1px solid rgba(79,140,255,.22);
+    }
+
+    .book-quote{
+      margin-top:18px;
+      border-left:4px solid rgba(79,140,255,.25);
+      padding-left:14px;
+      color: var(--text);
+      opacity:.92;
+    }
+    .book-quote b{display:block; margin-top:8px; color: var(--text)}
+
+    .book-portraitWrap{
+      position:relative;
+      display:grid;
+      place-items:center;
+      padding: 14px 0;
+    }
+    .book-portraitCircle{
+      width:min(380px, 84%);
+      aspect-ratio:1/1;
+      border-radius:999px;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(79,140,255,.18), rgba(79,140,255,.02) 65%),
+        rgba(255,255,255,.7);
+      border:1px solid rgba(25,60,110,.12);
+      position:absolute;
+      z-index:0;
+      filter: drop-shadow(0 20px 34px rgba(19,35,70,.10));
+    }
+    .book-portrait{
+      width:min(360px, 82%);
+      aspect-ratio: 3 / 4;
+      border-radius: 22px;
+      z-index:1;
+      box-shadow: 0 22px 50px rgba(19,35,70,.18);
+      border: 6px solid rgba(255,255,255,.88);
+      object-fit: cover;
+      background:#fff;
+    }
+    .book-floatBadge{
+      position:absolute;
+      right: 6%;
+      top: 10%;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(25,60,110,.14);
+      border-radius: 14px;
+      padding:10px 12px;
+      box-shadow: 0 18px 45px rgba(19,35,70,.12);
+      z-index:2;
+      width: 180px;
+      font-weight: 950;
+      color: var(--text);
+    }
+    .book-floatBadge small{
+      display:block;
+      color: var(--muted);
+      font-weight: 850;
+      margin-top:4px;
+    }
+
+    .book-stats{
+      margin-top: 18px;
+      color:#fff;
+      padding: 16px 18px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      background:
+        radial-gradient(800px 260px at 15% 20%, rgba(79,140,255,.35), transparent 60%),
+        radial-gradient(800px 260px at 75% 30%, rgba(168,85,247,.28), transparent 60%),
+        linear-gradient(135deg, rgba(26,42,68,.92), rgba(26,42,68,.88));
+    }
+    .book-stat{text-align:center; padding: 10px 8px}
+    .book-stat .num{
+      font-size: 40px;
+      font-weight: 950;
+      letter-spacing:-.8px;
+      line-height:1;
+    }
+    .book-stat .lab{margin-top:6px; opacity:.92; font-weight:850}
+
+    .book-section{padding: 22px 18px}
+    .book-sectionTitle{font-size: 22px; margin:0 0 10px; letter-spacing:-.2px}
+    .book-sectionSub{color: var(--muted); margin:0 0 16px}
+
+    .book-features{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .book-card{
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(25,60,110,.14);
+      border-radius: var(--radius);
+      padding:16px;
+      box-shadow: 0 10px 26px rgba(19,35,70,.08);
+      min-height: 120px;
+    }
+    .book-icon{
+      width:40px;height:40px;border-radius:12px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(79,140,255,.12), rgba(168,85,247,.10));
+      border:1px solid rgba(79,140,255,.18);
+      margin-bottom:10px;
+    }
+    .book-card h3{margin:0 0 6px; font-size:16px}
+    .book-card p{margin:0; color: var(--muted); line-height:1.5; font-size:14px}
+
+    .book-singlePrice{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      align-items:stretch;
+    }
+
+    .book-priceBox{
+      background:
+        radial-gradient(260px 200px at 85% 10%, rgba(168,85,247,.14), transparent 60%),
+        linear-gradient(180deg, rgba(79,140,255,.10), rgba(255,255,255,.75));
+      border:1px solid rgba(79,140,255,.22);
+      border-radius: var(--radius);
+      padding:16px;
+      box-shadow: 0 14px 30px rgba(19,35,70,.10);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .book-priceTag{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      background: rgba(34,197,94,.16);
+      border:1px solid rgba(34,197,94,.24);
+      color:#1f7a45;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:950;
+      font-size:12px;
+    }
+    .book-amount{
+      font-size: 46px;
+      font-weight: 950;
+      letter-spacing: -.8px;
+      margin: 10px 0 6px;
+      color: var(--text);
+    }
+    .book-per{
+      color: var(--muted);
+      font-weight:900;
+      margin-bottom:12px;
+    }
+    .book-list{
+      margin:12px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+    .book-list li{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color: var(--text);
+      font-weight:850;
+      font-size:13.5px;
+      opacity:.9;
+    }
+    .book-check{
+      width:18px;height:18px;border-radius:6px;
+      background: rgba(79,140,255,.12);
+      border:1px solid rgba(79,140,255,.18);
+      display:grid;place-items:center;
+      flex:0 0 auto;
+      margin-top:1px;
+      color:#2f5fb8;
+      font-weight: 950;
+    }
+
+    .book-embedCard{padding:0; overflow:hidden}
+    .book-embedCard iframe{
+      width:100%;
+      height:760px;
+      border:0;
+      display:block;
+      background:#fff;
+    }
+
+    /* Reviews carousel */
+    .book-carousel{
+      position:relative;
+      border:1px solid rgba(25,60,110,.14);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 14px 34px rgba(19,35,70,.10);
+      overflow:hidden;
+    }
+    .book-carouselTrack{display:flex; transition: transform .45s cubic-bezier(.2,.8,.2,1); will-change: transform}
+    .book-reviewSlide{min-width:100%; padding:18px; display:grid; gap:10px}
+    .book-reviewHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .book-who{display:flex; flex-direction:column; gap:2px}
+    .book-who b{font-size:15px}
+    .book-who span{color:var(--muted); font-weight:850; font-size:13px}
+    .book-stars{
+      font-weight:950;
+      color:#2f5fb8;
+      background: rgba(79,140,255,.12);
+      border:1px solid rgba(79,140,255,.18);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .book-reviewText{margin:0; color: var(--text); line-height:1.6; font-size:14.5px; opacity:.9}
+    .book-carouselNav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 14px 14px;
+      border-top:1px solid rgba(25,60,110,.12);
+      background: rgba(255,255,255,.92);
+    }
+    .book-arrow{
+      width:44px;height:40px;
+      border-radius: 12px;
+      border:1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.92);
+      cursor:pointer;
+      display:grid; place-items:center;
+      font-weight:950;
+      color: var(--text);
+      box-shadow: 0 10px 18px rgba(19,35,70,.08);
+    }
+    .book-arrow:hover{box-shadow: var(--ring)}
+    .book-dots{display:flex; gap:8px; justify-content:center; align-items:center; flex:1}
+    .book-dotBtn{
+      width:10px;height:10px;border-radius:999px;
+      border:0;
+      background: rgba(79,140,255,.25);
+      cursor:pointer;
+    }
+    .book-dotBtn.active{background: var(--accent)}
+    .book-reviewFoot{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+    .book-tinyLink{
+      font-weight:900;
+      color: var(--text);
+      border:1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.92);
+      padding:9px 12px;
+      border-radius:999px;
+      box-shadow: 0 10px 18px rgba(19,35,70,.08);
+    }
+    .book-tinyLink:hover{box-shadow: var(--ring)}
+
+    .book-footer{
+      padding: 16px 18px 18px;
+      color: var(--muted);
+      border-top:1px solid rgba(25,60,110,.10);
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      justify-content:space-between;
+      align-items:center;
+      background: rgba(255,255,255,.88);
+    }
+
+    /* Book video modal */
+    .book-modalBack{
+      position:fixed; inset:0;
+      background: rgba(14, 25, 45, .55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:999;
+      backdrop-filter: blur(6px);
+    }
+    .book-modal{
+      width:min(760px, 100%);
+      background: rgba(255,255,255,.94);
+      border-radius: 26px;
+      border:1px solid rgba(25,60,110,.14);
+      box-shadow: 0 30px 90px rgba(19,35,70,.28);
+      overflow:hidden;
+    }
+    .book-modalTop{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(25,60,110,.12);
+      background: linear-gradient(135deg, rgba(79,140,255,.10), rgba(168,85,247,.10));
+      font-weight:950;
+      color: var(--text);
+    }
+    .book-modalClose{
+      border:1px solid rgba(25,60,110,.14);
+      background: rgba(255,255,255,.92);
+      width:40px;height:36px;border-radius:12px;
+      cursor:pointer;
+      font-weight:950;
+      color: var(--text);
+      box-shadow: 0 10px 18px rgba(19,35,70,.10);
+    }
+    .book-modalBody{padding:16px}
+    .book-thumb{
+      width:100%;
+      border-radius:16px;
+      border:1px solid rgba(25,60,110,.14);
+      overflow:hidden;
+      background:#fff;
+      box-shadow: 0 12px 28px rgba(19,35,70,.10);
+    }
+    .book-thumb img{width:100%; display:block}
+    .book-modalNote{
+      margin:12px 0 0;
+      color: var(--muted);
+      line-height:1.5;
+      font-weight: 800;
+      font-size:14px;
+    }
+    .book-modalActions{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    @media (max-width: 980px){
+      .series-grid{grid-template-columns: 1fr}
+      .series-aside{position:relative; top:auto}
+      .series-cards{grid-template-columns: repeat(2, minmax(0,1fr));}
+      .book-heroGrid{grid-template-columns: 1fr}
+      .book-features{grid-template-columns: 1fr}
+      .book-stats{grid-template-columns: 1fr}
+      .book-links{display:none}
+      .book-singlePrice{grid-template-columns: 1fr}
+      .book-embedCard iframe{height:820px}
+      .header-actions{display:none}
+      .brand{min-width: unset}
+    }
+    @media (max-width: 560px){
+      .series-cards{grid-template-columns: 1fr;}
+      .tabs{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrap">
+
+    <div class="app-header">
+      <div class="app-header-inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>Vietnamese Comprehensible Input</h1>
+            <p>Series + booking in one place</p>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Pages">
+          <button class="tab-btn active" id="tabSeries" role="tab" aria-selected="true" aria-controls="pageSeries">🎬 Series</button>
+          <button class="tab-btn" id="tabBook" role="tab" aria-selected="false" aria-controls="pageBook">📅 Book a class with me</button>
+        </div>
+
+        <div class="header-actions">
+          <a class="btn primary" href="https://www.youtube.com/@VietnameseComprehensibleInput" target="_blank" rel="noreferrer">YouTube</a>
+          <a class="btn" href="https://preply.com/en/tutor/2553268" target="_blank" rel="noreferrer">Preply</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================
+         TAB 1: SERIES (AUTO-LOADED)
+    ========================== -->
+    <div class="tab-page active" id="pageSeries" role="tabpanel" aria-labelledby="tabSeries">
+      <div class="series-grid">
+        <aside class="series-aside">
+          <p class="series-sideTitle">Search</p>
+          <div class="series-searchBox">
+            <span aria-hidden="true">🔎</span>
+            <input id="series-q" placeholder="Search titles…" />
+          </div>
+
+          <div class="series-state" id="series-stateBox">
+            Loading playlists & videos from YouTube…
+          </div>
+
+          <div style="height:10px"></div>
+
+          <details open>
+            <summary>Level <span class="series-chev">click</span></summary>
+            <div class="series-opt" id="series-levelChips"></div>
+          </details>
+
+          <details>
+            <summary>Topic <span class="series-chev">click</span></summary>
+            <div class="series-opt" id="series-topicChips"></div>
+          </details>
+
+          <div class="series-playlistBox">
+            <b>Channel</b>
+            <div class="series-hint" style="margin:0">
+              This page stays updated as you upload new videos (via API).
+            </div>
+            <a href="https://www.youtube.com/@VietnameseComprehensibleInput/playlists" target="_blank" rel="noreferrer">
+              Open playlists on YouTube ↗
+            </a>
+          </div>
+
+          <div class="series-hint" style="margin-top:10px">
+            ⚠️ If you see an API error, your key likely needs referrer restrictions or API enabled.
+          </div>
+        </aside>
+
+        <main class="series-main">
+          <div class="series-topline">
+            <div>
+              <h2>Series</h2>
+              <p id="series-countText">0 videos</p>
+            </div>
+            <p>
+              <a href="https://www.youtube.com/@VietnameseComprehensibleInput/playlists" target="_blank" rel="noreferrer">
+                All playlists ↗
+              </a>
+            </p>
+          </div>
+
+          <div class="series-cards" id="series-cards"></div>
+        </main>
+      </div>
+
+      <div class="series-modal" id="series-modal" aria-hidden="true">
+        <div class="series-dialog" role="dialog" aria-modal="true" aria-label="Video player">
+          <div class="series-dialogTop">
+            <p class="series-dialogTitle" id="series-modalTitle">Video</p>
+            <button class="series-closeBtn" id="series-closeBtn">Close ✕</button>
+          </div>
+          <div class="series-player" id="series-playerBox"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================
+         TAB 2: BOOK A CLASS WITH ME
+    ========================== -->
+    <div class="tab-page" id="pageBook" role="tabpanel" aria-labelledby="tabBook">
+      <div class="book-shell">
+        <div class="book-nav">
+          <div class="book-brand">
+            <span class="dot"></span>
+            <span>DIỆP NGUYỄN • VIETNAMESE</span>
+          </div>
+
+          <nav class="book-links">
+            <a href="#book-about">About</a>
+            <a href="#book-services">Services</a>
+            <a href="#book-pricing">Price</a>
+            <a href="#book-book">Book</a>
+            <a href="#book-reviews">Reviews</a>
+            <a href="#book-contact">Contact</a>
+          </nav>
+
+          <div class="book-cta">
+            <div class="book-pill">
+              <span class="ping"></span>
+              <span>Available • Online lessons</span>
+            </div>
+            <button class="book-btn primary" onclick="document.querySelector('#book-book').scrollIntoView({behavior:'smooth'})">Book</button>
+          </div>
+        </div>
+
+        <header class="book-hero" id="book-about">
+          <div class="book-heroGrid">
+            <div>
+              <div class="book-kicker">
+                <span class="miniDot"></span>
+                <span>Structured lessons + authentic Vietnamese</span>
+              </div>
+
+              <h1 class="book-h1">Learn <span class="book-hl">Vietnamese</span> with confidence.</h1>
+
+              <p class="book-sub">
+                Xin chào! I’m Diệp, a Vietnamese tutor from Vietnam, currently living in Argentina.
+                My lessons blend <b>Comprehensible Input</b>, <b>real-life conversation</b>, and <b>clear grammar support</b>
+                so you progress naturally and confidently.
+              </p>
+
+              <div class="book-ctaRow">
+                <button class="book-btn primary" onclick="document.querySelector('#book-book').scrollIntoView({behavior:'smooth'})">Check availability</button>
+
+                <button class="book-watch" id="book-watchBtn" type="button">
+                  <span class="book-playIcon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 7.5v9l8-4.5-8-4.5Z" fill="#2f5fb8"/>
+                    </svg>
+                  </span>
+                  Watch video
+                </button>
+
+                <button class="book-btn outline" onclick="document.querySelector('#book-contact').scrollIntoView({behavior:'smooth'})">Contact</button>
+              </div>
+
+              <div class="book-quote">
+                “Learning a language should feel joyful, human, and healing.”
+                <b>— Diệp</b>
+              </div>
+            </div>
+
+            <div class="book-portraitWrap">
+              <div class="book-portraitCircle"></div>
+
+              <div class="book-floatBadge">
+                5.0 ★ rating
+                <small>Encouraging • Structured</small>
+              </div>
+
+              <img class="book-portrait"
+                src="https://avatars.preply.com/i/logos/i/logos/avatar_al2t8nm2t38.jpg"
+                alt="Diệp Nguyễn profile photo" />
+            </div>
+          </div>
+
+          <div class="book-stats">
+            <div class="book-stat"><div class="num">2141</div><div class="lab">lessons taught</div></div>
+            <div class="book-stat"><div class="num">5.0</div><div class="lab">lesson rating</div></div>
+            <div class="book-stat"><div class="num">28</div><div class="lab">public reviews</div></div>
+          </div>
+        </header>
+
+        <section class="book-section" id="book-services">
+          <h2 class="book-sectionTitle">How we’ll learn</h2>
+          <p class="book-sectionSub">A calm, structured, and very practical approach, tailored to your goals.</p>
+
+          <div class="book-features">
+            <div class="book-card"><div class="book-icon">🧠</div><h3>Comprehensible Input</h3><p>Absorb Vietnamese naturally through understandable listening and reading, even as a beginner.</p></div>
+            <div class="book-card"><div class="book-icon">💬</div><h3>Real-life conversation</h3><p>Practice speaking in a patient, relaxed space where mistakes are welcome and useful.</p></div>
+            <div class="book-card"><div class="book-icon">🧱</div><h3>Structured grammar support</h3><p>Clear explanations that help you build a solid foundation and speak with confidence.</p></div>
+          </div>
+        </section>
+
+        <section class="book-section" id="book-pricing">
+          <h2 class="book-sectionTitle">Price</h2>
+          <p class="book-sectionSub">One simple price for all lesson focuses (beginner, conversation, heritage).</p>
+
+          <div class="book-singlePrice">
+            <div class="book-card">
+              <div class="book-icon">🎯</div>
+              <h3>What you can work on</h3>
+              <p>We pick the focus based on your goals and adjust it anytime.</p>
+              <ul class="book-list" style="margin-top:12px">
+                <li><span class="book-check">✓</span>Beginner foundations (sounds, tones, questions)</li>
+                <li><span class="book-check">✓</span>Conversation & fluency projects</li>
+                <li><span class="book-check">✓</span>Heritage support + reading/writing</li>
+                <li><span class="book-check">✓</span>Homework + feedback</li>
+              </ul>
+            </div>
+
+            <div class="book-priceBox">
+              <div class="book-priceTag">USD</div>
+              <div class="book-amount">$35</div>
+              <div class="book-per">per 50-minute lesson</div>
+              <ul class="book-list">
+                <li><span class="book-check">✓</span>Personalized plan</li>
+                <li><span class="book-check">✓</span>Structured materials</li>
+                <li><span class="book-check">✓</span>Supportive correction</li>
+              </ul>
+              <div class="book-ctaRow" style="margin-top:14px">
+                <button class="book-btn primary" onclick="document.querySelector('#book-book').scrollIntoView({behavior:'smooth'})">Book a time</button>
+                <button class="book-btn outline" onclick="document.querySelector('#book-reviews').scrollIntoView({behavior:'smooth'})">See reviews</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px; color:var(--muted); font-weight:800; font-size:13px; line-height:1.5">
+            Payment is handled via PayPal after booking (via your Calendly confirmation page).
+          </div>
+        </section>
+
+        <section class="book-section" id="book-book">
+          <h2 class="book-sectionTitle">Book a lesson</h2>
+          <p class="book-sectionSub">Pick a time that works for you. After booking, you’ll see the PayPal payment button to confirm.</p>
+
+          <div class="book-card book-embedCard">
+            <iframe
+              src="https://calendly.com/ngocdieplindt/dangki?hide_event_type_details=1&hide_gdpr_banner=1"
+              title="Book Vietnamese with Diệp (Calendly)"
+              loading="lazy"></iframe>
+          </div>
+        </section>
+
+        <section class="book-section" id="book-reviews">
+          <h2 class="book-sectionTitle">Student reviews</h2>
+          <p class="book-sectionSub">Swipe or use arrows to browse.</p>
+
+          <div class="book-carousel" aria-roledescription="carousel">
+            <div class="book-carouselTrack" id="book-reviewsTrack"></div>
+
+            <div class="book-carouselNav">
+              <button class="book-arrow" id="book-prevBtn" aria-label="Previous review">‹</button>
+              <div class="book-dots" id="book-dots"></div>
+              <div class="book-reviewFoot">
+                <button class="book-arrow" id="book-nextBtn" aria-label="Next review">›</button>
+                <a class="book-tinyLink" href="https://preply.com/en/tutor/2553268" target="_blank" rel="noopener">View reviews on Preply</a>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px; color:var(--muted); font-weight:800; font-size:13px; line-height:1.5">
+            Want all reviews here? Add them to the <b>bookReviews</b> array in the script.
+          </div>
+        </section>
+
+        <section class="book-section" id="book-contact">
+          <h2 class="book-sectionTitle">Contact</h2>
+          <p class="book-sectionSub">Questions before booking? Send a message.</p>
+
+          <div class="book-features">
+            <div class="book-card">
+              <div class="book-icon">📩</div>
+              <h3>Message</h3>
+              <p>Add your preferred contact method here (email, Instagram, WhatsApp).</p>
+              <div class="book-ctaRow" style="margin-top:12px">
+                <a class="book-btn primary" href="#book-book">Book first</a>
+                <a class="book-btn outline" href="https://preply.com/en/tutor/2553268" target="_blank" rel="noopener">Preply profile</a>
+              </div>
+            </div>
+
+            <div class="book-card"><div class="book-icon">🧾</div><h3>Payment</h3><p>Payment is completed via PayPal after booking. Your lesson is confirmed once payment is received.</p></div>
+            <div class="book-card"><div class="book-icon">🌎</div><h3>Languages</h3><p>Vietnamese (Native), English (C2), Spanish (B1), Chinese (A2), Korean (A1).</p></div>
+          </div>
+        </section>
+
+        <div class="book-footer">
+          <div>© <span id="book-year"></span> Diệp Nguyễn • Vietnamese tutoring</div>
+          <div style="display:flex; gap:14px; flex-wrap:wrap">
+            <a href="#book-about">About</a>
+            <a href="#book-pricing">Price</a>
+            <a href="#book-book">Book</a>
+            <a href="#book-reviews">Reviews</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-modalBack" id="book-videoModalBack" role="dialog" aria-modal="true" aria-label="Video modal">
+        <div class="book-modal">
+          <div class="book-modalTop">
+            <div>Watch my Preply intro video</div>
+            <button class="book-modalClose" id="book-closeModal" aria-label="Close">✕</button>
+          </div>
+          <div class="book-modalBody">
+            <div class="book-thumb">
+              <img src="https://avatars.preply.com/i/video_thumbnails/36c29f28-8047-488b-8478-7c53fcfeb9f6.png" alt="Video thumbnail"/>
+            </div>
+            <p class="book-modalNote">
+              Preply serves the intro video dynamically, so direct embed isn’t reliable.
+              Click “Play on Preply” to open your profile and play the video there.
+            </p>
+            <div class="book-modalActions">
+              <button class="book-btn outline" id="book-modalCopyLink">Copy Preply link</button>
+              <button class="book-btn primary" id="book-modalOpenPreply">Play on Preply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       0) CONFIG (YOUR API KEY + CHANNEL HANDLE)
+       - Key is visible in HTML. Restrict it in Google Cloud:
+         HTTP referrers: http://localhost/* and yourdomain.com/*
+         API restrictions: YouTube Data API v3 only
+    ========================================================= */
+    const YT_API_KEY = "AIzaSyDYoXV8JQraJtxaNn9eUfWoE93StWWuwvs";
+    const YT_CHANNEL_HANDLE = "VietnameseComprehensibleInput";
+
+    // If forHandle ever fails, you can hardcode the channelId here:
+    // const YT_CHANNEL_ID_OVERRIDE = "UCxxxxxxxxxxxxxxxxxxxxxx";
+    const YT_CHANNEL_ID_OVERRIDE = "";
+
+    /* =========================================================
+       1) TABS
+    ========================================================= */
+    const tabSeries = document.getElementById("tabSeries");
+    const tabBook = document.getElementById("tabBook");
+    const pageSeries = document.getElementById("pageSeries");
+    const pageBook = document.getElementById("pageBook");
+
+    function setTab(which){
+      const isSeries = which === "series";
+      tabSeries.classList.toggle("active", isSeries);
+      tabBook.classList.toggle("active", !isSeries);
+      tabSeries.setAttribute("aria-selected", isSeries ? "true" : "false");
+      tabBook.setAttribute("aria-selected", !isSeries ? "true" : "false");
+      pageSeries.classList.toggle("active", isSeries);
+      pageBook.classList.toggle("active", !isSeries);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    tabSeries.addEventListener("click", () => setTab("series"));
+    tabBook.addEventListener("click", () => setTab("book"));
+
+    /* =========================================================
+       2) SERIES UI HOOKS
+    ========================================================= */
+    const seriesState = { q: "", level: "All", topic: "All" };
+    const seriesCards = document.getElementById("series-cards");
+    const seriesQ = document.getElementById("series-q");
+    const seriesCountText = document.getElementById("series-countText");
+    const seriesStateBox = document.getElementById("series-stateBox");
+
+    const seriesModal = document.getElementById("series-modal");
+    const seriesPlayerBox = document.getElementById("series-playerBox");
+    const seriesModalTitle = document.getElementById("series-modalTitle");
+    const seriesCloseBtn = document.getElementById("series-closeBtn");
+
+    function seriesThumb(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+    function uniq(arr){ return [...new Set(arr)].sort((a,b)=>a.localeCompare(b)); }
+
+    function seriesOpenVideo(v){
+      seriesModalTitle.textContent = v.title || "Video";
+      const origin = encodeURIComponent(location.origin);
+      const src = `https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&origin=${origin}`;
+      seriesPlayerBox.innerHTML = `
+        <iframe
+          src="${src}"
+          title="${v.title || "Video"}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      `;
+      seriesModal.style.display = "flex";
+      seriesModal.setAttribute("aria-hidden", "false");
+    }
+    function seriesCloseVideo(){
+      seriesModal.style.display = "none";
+      seriesModal.setAttribute("aria-hidden", "true");
+      seriesPlayerBox.innerHTML = "";
+    }
+    seriesCloseBtn.addEventListener("click", seriesCloseVideo);
+    seriesModal.addEventListener("click", (e) => { if(e.target === seriesModal) seriesCloseVideo(); });
+
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        seriesCloseVideo();
+        bookCloseModal();
+      }
+    });
+
+    function seriesRenderChips(el, items, key){
+      el.innerHTML = "";
+
+      const mk = (label, isAll=false) => {
+        const chip = document.createElement("span");
+        chip.className = "series-chip";
+        chip.textContent = label;
+        chip.addEventListener("click", () => {
+          seriesState[key] = label;
+          seriesRender();
+        });
+        if(isAll){
+          chip.style.borderColor = "rgba(79,140,255,.25)";
+          chip.style.background = "rgba(79,140,255,.08)";
+        }
+        return chip;
+      };
+
+      el.appendChild(mk("All", true));
+      items.forEach(v => el.appendChild(mk(v)));
+    }
+
+    function seriesInferLevel(text){
+      const t = (text || "").toLowerCase();
+
+      // CEFR-ish
+      const cefr = t.match(/\b(a0|a1|a2|b1|b2|c1|c2)\b/i);
+      if(cefr) return cefr[1].toUpperCase();
+
+      if(t.includes("beginner") || t.includes("complete beginner")) return "Beginner";
+      if(t.includes("intermediate")) return "Intermediate";
+      if(t.includes("advanced")) return "Advanced";
+
+      // fallback
+      return "All levels";
+    }
+
+    function seriesMatches(v){
+      const q = seriesState.q.trim().toLowerCase();
+      const okQ = !q || (v.title || "").toLowerCase().includes(q);
+      const okL = seriesState.level === "All" || v.level === seriesState.level;
+      const okT = seriesState.topic === "All" || v.topic === seriesState.topic;
+      return okQ && okL && okT;
+    }
+
+    let seriesVideos = []; // filled by API
+
+    function seriesRender(){
+      const filtered = seriesVideos.filter(seriesMatches);
+
+      seriesCards.innerHTML = "";
+      filtered.forEach(v => {
+        const card = document.createElement("article");
+        card.className = "series-card";
+        card.innerHTML = `
+          <div class="series-thumb">
+            <img src="${seriesThumb(v.id)}" alt="${escapeHtml(v.title || "Video")}">
+            <div class="series-play"><div class="series-playBadge">▶</div></div>
+          </div>
+          <div class="series-meta">
+            <h3 class="series-title">${escapeHtml(v.title || "Untitled")}</h3>
+            <div class="series-row">
+              <span>Click to play</span>
+              <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noreferrer">YouTube ↗</a>
+            </div>
+            <div class="series-tags">
+              <span class="series-tag level">${escapeHtml(v.level)}</span>
+              <span class="series-tag topic">${escapeHtml(v.topic)}</span>
+              <span class="series-tag extra">CI</span>
+            </div>
+          </div>
+        `;
+        card.addEventListener("click", () => seriesOpenVideo(v));
+        seriesCards.appendChild(card);
+      });
+
+      seriesCountText.textContent = `${filtered.length} video${filtered.length === 1 ? "" : "s"} shown`;
+
+      // highlight active chips
+      document.querySelectorAll("#series-levelChips .series-chip").forEach(ch => {
+        ch.style.outline = (ch.textContent === seriesState.level) ? "2px solid rgba(79,140,255,.35)" : "none";
+      });
+      document.querySelectorAll("#series-topicChips .series-chip").forEach(ch => {
+        ch.style.outline = (ch.textContent === seriesState.topic) ? "2px solid rgba(79,140,255,.35)" : "none";
+      });
+    }
+
+    seriesQ.addEventListener("input", () => {
+      seriesState.q = seriesQ.value;
+      seriesRender();
+    });
+
+    function escapeHtml(str){
+      return (str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    /* =========================================================
+       3) YOUTUBE DATA API (AUTO-LOAD ALL PLAYLISTS + VIDEOS)
+    ========================================================= */
+    async function ytFetch(url){
+      const res = await fetch(url);
+      if(!res.ok){
+        let msg = `${res.status} ${res.statusText}`;
+        try{
+          const j = await res.json();
+          msg = j?.error?.message || msg;
+        }catch{}
+        throw new Error(msg);
+      }
+      return res.json();
+    }
+
+    async function getChannelId(){
+      if(YT_CHANNEL_ID_OVERRIDE) return YT_CHANNEL_ID_OVERRIDE;
+
+      // forHandle is supported on YouTube Data API v3 for many channels.
+      const url = `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(YT_CHANNEL_HANDLE)}&key=${encodeURIComponent(YT_API_KEY)}`;
+      const data = await ytFetch(url);
+      const id = data?.items?.[0]?.id;
+      if(!id){
+        throw new Error(`Could not resolve channel ID from handle @${YT_CHANNEL_HANDLE}. You can hardcode YT_CHANNEL_ID_OVERRIDE.`);
+      }
+      return id;
+    }
+
+    async function getAllPlaylists(channelId){
+      const all = [];
+      let pageToken = "";
+      do{
+        const url =
+          `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&channelId=${encodeURIComponent(channelId)}&maxResults=50&pageToken=${encodeURIComponent(pageToken)}&key=${encodeURIComponent(YT_API_KEY)}`;
+        const data = await ytFetch(url);
+        all.push(...(data.items || []));
+        pageToken = data.nextPageToken || "";
+      }while(pageToken);
+      return all;
+    }
+
+    async function getAllPlaylistItems(playlistId){
+      const all = [];
+      let pageToken = "";
+      do{
+        const url =
+          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${encodeURIComponent(playlistId)}&maxResults=50&pageToken=${encodeURIComponent(pageToken)}&key=${encodeURIComponent(YT_API_KEY)}`;
+        const data = await ytFetch(url);
+        all.push(...(data.items || []));
+        pageToken = data.nextPageToken || "";
+      }while(pageToken);
+      return all;
+    }
+
+    async function loadSeriesFromYouTube(){
+      seriesStateBox.textContent = "Loading channel…";
+
+      const channelId = await getChannelId();
+      seriesStateBox.textContent = "Loading playlists…";
+
+      const playlists = await getAllPlaylists(channelId);
+
+      // Keep out “Liked videos” etc (usually not returned anyway). Filter to public-ish playlists that have items.
+      const usable = playlists
+        .filter(p => (p?.contentDetails?.itemCount ?? 0) > 0)
+        .map(p => ({
+          id: p.id,
+          title: p?.snippet?.title || "Playlist",
+          count: p?.contentDetails?.itemCount || 0
+        }));
+
+      seriesStateBox.innerHTML =
+        `Found <b>${usable.length}</b> playlists. Loading videos…`;
+
+      // Fetch playlist items sequentially (more reliable with quota/limits)
+      const videoMap = new Map(); // videoId -> video object
+      let loadedPlaylists = 0;
+
+      for(const pl of usable){
+        loadedPlaylists++;
+        seriesStateBox.innerHTML =
+          `Loading videos… <b>${loadedPlaylists}/${usable.length}</b> playlists<br><span style="font-weight:800; color:var(--muted)">${escapeHtml(pl.title)}</span>`;
+
+        const items = await getAllPlaylistItems(pl.id);
+
+        for(const it of items){
+          const vid = it?.contentDetails?.videoId;
+          if(!vid) continue;
+
+          const title = it?.snippet?.title || "";
+          const topic = pl.title;               // Topic = playlist title
+          const level = seriesInferLevel(pl.title); // Level inferred from playlist title
+
+          // Deduplicate video IDs (video can appear in multiple playlists)
+          if(!videoMap.has(vid)){
+            videoMap.set(vid, {
+              id: vid,
+              title,
+              topic,
+              level,
+            });
+          } else {
+            // If already exists, you could choose to keep the "best" topic/level.
+            // We'll keep the first, but you can change this behavior.
+          }
+        }
+      }
+
+      seriesVideos = [...videoMap.values()];
+
+      // Build filter chips
+      const levels = uniq(seriesVideos.map(v => v.level));
+      const topics = uniq(seriesVideos.map(v => v.topic));
+
+      seriesRenderChips(document.getElementById("series-levelChips"), levels, "level");
+      seriesRenderChips(document.getElementById("series-topicChips"), topics, "topic");
+
+      seriesStateBox.innerHTML =
+        `✅ Loaded <b>${seriesVideos.length}</b> videos from <b>${usable.length}</b> playlists.<br>
+         <span style="font-weight:800; color:var(--muted)">Use search + filters on the left.</span>`;
+
+      seriesRender();
+    }
+
+    // Kick off loading
+    loadSeriesFromYouTube().catch(err => {
+      console.error(err);
+      seriesStateBox.innerHTML =
+        `❌ Could not load from YouTube API.<br><br>
+         <b>Error:</b> ${escapeHtml(err.message)}<br><br>
+         <span style="font-weight:800; color:var(--muted)">
+           Fix checklist:
+           <br>1) Enable “YouTube Data API v3” for this project
+           <br>2) Restrict key: API restrictions = YouTube Data API v3
+           <br>3) Restrict key: HTTP referrers include <code>http://localhost/*</code> (and your domain)
+           <br>4) If handle lookup fails, set <b>YT_CHANNEL_ID_OVERRIDE</b>
+         </span>`;
+    });
+
+    /* =========================================================
+       4) BOOK PAGE SCRIPT (year + reviews carousel + modal)
+    ========================================================= */
+    document.getElementById("book-year").textContent = new Date().getFullYear();
+
+    const bookReviews = [
+      { name: "Marie", date: "December 4, 2025", rating: 5, text: "If you want to learn Vietnamese, don't hesitate for a second to take lessons with Diệp! She adapts to our needs, is very dynamic, makes us practice a lot, and does so with a good mood." },
+      { name: "Duy", date: "June 20, 2025 (edited)", rating: 5, text: "Diep is an excellent teacher who makes the lessons varied and motivating. She challenges me specifically so that I can speak the language even better. The lessons are a lot of fun with her - Thank you very much." },
+      { name: "van", date: "April 25, 2025 (edited)", rating: 5, text: "Diệp is an excellent tutor who is so patient, effusive, fun, relatable, personable, and prepared to guide you through learning Vietnamese... Highly recommend, it's been a true delight so far!" },
+      { name: "Juan", date: "March 7, 2025", rating: 5, text: "Amazing teacher, she puts a lot on the class preparation, makes great exercises to practice, is very patient and generous." },
+      { name: "Kelly", date: "February 7, 2025", rating: 5, text: "Diệp is an incredible tutor! She's a fantastic conversation partner and I learn so much with her... Highly recommend her to anyone looking to learn!" },
+      { name: "Caity", date: "December 17, 2024", rating: 5, text: "I love learning with Diệp! My Vietnamese has progressed enormously... I highly recommend working with her!" }
+    ];
+
+    const bookTrack = document.getElementById("book-reviewsTrack");
+    const bookDotsWrap = document.getElementById("book-dots");
+
+    function bookStarString(n){
+      return "★".repeat(n) + "☆".repeat(Math.max(0, 5-n));
+    }
+
+    bookReviews.forEach((r, i) => {
+      const slide = document.createElement("div");
+      slide.className = "book-reviewSlide";
+      slide.innerHTML = `
+        <div class="book-reviewHead">
+          <div class="book-who">
+            <b>${escapeHtml(r.name)}</b>
+            <span>${escapeHtml(r.date)}</span>
+          </div>
+          <div class="book-stars" aria-label="${r.rating} out of 5">
+            ${bookStarString(r.rating)}
+          </div>
+        </div>
+        <p class="book-reviewText">${escapeHtml(r.text)}</p>
+      `;
+      bookTrack.appendChild(slide);
+
+      const dot = document.createElement("button");
+      dot.className = "book-dotBtn" + (i===0 ? " active" : "");
+      dot.type = "button";
+      dot.setAttribute("aria-label", `Go to review ${i+1}`);
+      dot.addEventListener("click", () => bookGoTo(i, true));
+      bookDotsWrap.appendChild(dot);
+    });
+
+    const bookDots = [...document.querySelectorAll(".book-dotBtn")];
+    let bookIndex = 0;
+    let bookAutoTimer = null;
+
+    function bookPaint(){
+      bookTrack.style.transform = `translateX(${-bookIndex * 100}%)`;
+      bookDots.forEach((d, i) => d.classList.toggle("active", i===bookIndex));
+    }
+
+    function bookGoTo(i, userAction=false){
+      bookIndex = (i + bookReviews.length) % bookReviews.length;
+      bookPaint();
+      if(userAction) bookRestartAuto();
+    }
+
+    document.getElementById("book-prevBtn").addEventListener("click", () => bookGoTo(bookIndex-1, true));
+    document.getElementById("book-nextBtn").addEventListener("click", () => bookGoTo(bookIndex+1, true));
+
+    function bookRestartAuto(){
+      clearInterval(bookAutoTimer);
+      bookAutoTimer = setInterval(() => bookGoTo(bookIndex+1, false), 6500);
+    }
+    bookRestartAuto();
+
+    let bookStartX = null;
+    bookTrack.addEventListener("pointerdown", (e) => { bookStartX = e.clientX; });
+    bookTrack.addEventListener("pointerup", (e) => {
+      if(bookStartX === null) return;
+      const dx = e.clientX - bookStartX;
+      if(Math.abs(dx) > 40){
+        bookGoTo(bookIndex + (dx < 0 ? 1 : -1), true);
+      }
+      bookStartX = null;
+    });
+
+    // Book modal (Preply)
+    const bookModalBack = document.getElementById("book-videoModalBack");
+    const bookOpenBtn = document.getElementById("book-watchBtn");
+    const bookCloseBtn = document.getElementById("book-closeModal");
+    const bookOpenPreplyBtn = document.getElementById("book-modalOpenPreply");
+    const bookCopyBtn = document.getElementById("book-modalCopyLink");
+    const preplyUrl = "https://preply.com/en/tutor/2553268";
+
+    function bookOpenModal(){
+      bookModalBack.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    function bookCloseModal(){
+      bookModalBack.style.display = "none";
+      document.body.style.overflow = "";
+    }
+
+    bookOpenBtn.addEventListener("click", bookOpenModal);
+    bookCloseBtn.addEventListener("click", bookCloseModal);
+    bookModalBack.addEventListener("click", (e) => { if(e.target === bookModalBack) bookCloseModal(); });
+
+    bookOpenPreplyBtn.addEventListener("click", () => {
+      window.open(preplyUrl, "_blank", "noopener");
+      bookCloseModal();
+    });
+
+    bookCopyBtn.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(preplyUrl);
+        bookCopyBtn.textContent = "Copied!";
+        setTimeout(()=> bookCopyBtn.textContent = "Copy Preply link", 1400);
+      }catch(err){
+        prompt("Copy this link:", preplyUrl);
+      }
+    });
+  </script>
+</body>
+</html>
