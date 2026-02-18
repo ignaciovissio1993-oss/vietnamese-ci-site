@@ -1,449 +1,579 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Vietnamese CI Website</title>
-
   <style>
-    /* ====== Your existing styles (unchanged) ====== */
+    :root{
+      --bg:#0b0b0f;
+      --panel:#111827;
+      --panel2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#ff6b6b;
+      --accent2:#60a5fa;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    }
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:#0b0f14;
-      color:#fff;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 15% 10%, rgba(96,165,250,.18), transparent 60%),
+                  radial-gradient(900px 500px at 80% 20%, rgba(255,107,107,.16), transparent 55%),
+                  var(--bg);
+      color:var(--text);
     }
-
-    /* ... (everything you had) ... */
-
-    /* SERIES MODAL */
-    .series-modal{
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(0,0,0,.75);
-      backdrop-filter: blur(6px);
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px;
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:16px;
     }
-    .series-modalCard{
-      width: min(1200px, 96vw);
-      max-height: min(92vh, 920px);
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-      background: rgba(18,24,34,.92);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 12px 40px rgba(0,0,0,.45);
+    @media (max-width: 980px){
+      .wrap{grid-template-columns:1fr}
     }
-    .series-modalLeft{
-      padding: 14px;
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--border);
       display:flex;
-      flex-direction:column;
-      gap: 12px;
-      overflow:auto;
-    }
-    .series-modalRight{
-      padding: 14px;
-      border-left: 1px solid rgba(255,255,255,.10);
-      overflow:auto;
-    }
-    .series-player{
-      width: 100%;
-      aspect-ratio: 16/9;
-      border-radius: 14px;
-      overflow: hidden;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-    }
-    .series-player iframe{
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display:block;
-    }
-
-    /* Captions under the video (from /captions/<VIDEO_ID>.srt) */
-    .series-captionsBox{
-      width: min(1100px, 92vw);
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 12px 14px;
-      max-height: 42vh;
-      overflow: auto;
-    }
-    .series-captionsHeader{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px; margin-bottom:10px;
-    }
-    .series-captionsHeader .capTitle{
-      font-weight:700;
-      opacity:.95;
-    }
-    .series-captionsHeader .capMeta{
-      font-size: 12px;
-      opacity: .75;
-      white-space: nowrap;
-    }
-    .series-captions{
-      display:flex;
-      flex-direction:column;
+      justify-content:space-between;
+      align-items:center;
       gap:10px;
-      font-size: 18px;
-      line-height: 1.6;
+    }
+    .title{
+      font-weight:700;
+      letter-spacing:.2px;
+      font-size:16px;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--border);
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(0,0,0,.25);
+    }
+    .list{
+      max-height: calc(100vh - 140px);
+      overflow:auto;
+    }
+    .item{
+      padding:12px 14px;
+      border-bottom:1px solid var(--border);
+      cursor:pointer;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .item:hover{background: rgba(255,255,255,.03)}
+    .item.active{background: rgba(96,165,250,.12)}
+    .thumb{
+      width:92px; height:52px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      flex: 0 0 auto;
+      background:#000;
+      object-fit:cover;
+    }
+    .meta{min-width:0}
+    .meta .name{
+      font-size:13px;
+      font-weight:650;
+      line-height:1.25;
+      margin-top:1px;
+      margin-bottom:4px;
+      word-break:break-word;
+    }
+    .meta .sub{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .main{
+      display:grid;
+      grid-template-rows: auto 1fr;
+      gap:16px;
+    }
+    .playerBox{padding:14px}
+    .playerFrame{
+      width:100%;
+      aspect-ratio: 16 / 9;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#000;
+      overflow:hidden;
+      position:relative;
+    }
+    #player{
+      width:100%;
+      height:100%;
+    }
+    .controls{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .btnrow{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.28);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:650;
+    }
+    button:hover{background: rgba(255,255,255,.05)}
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      padding:2px 2px 0;
+    }
+
+    .capBox{padding:14px}
+    .capHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .capHeader .left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .toggle{
+      display:flex; gap:8px; align-items:center;
+      color:var(--muted); font-size:12px;
+      user-select:none;
+    }
+    .toggle input{transform: translateY(1px)}
+    .captionList{
+      max-height: 420px;
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(0,0,0,.22);
     }
     .capLine{
-      padding: 8px 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background .15s ease, transform .05s ease;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.06);
+      padding:10px 12px;
+      border-bottom:1px solid var(--border);
+      line-height:1.6;
+      font-size:16px;
     }
-    .capLine:hover{ background: rgba(255,255,255,.07); }
-    .capLine:active{ transform: scale(.99); }
+    .capLine:last-child{border-bottom:none}
+    .capLine small{
+      display:block;
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:11px;
+      margin-bottom:6px;
+    }
     .capLine.active{
-      background: rgba(255,255,255,.14);
-      border-color: rgba(255,255,255,.22);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset;
+      background: rgba(255,107,107,.12);
+      outline: 1px solid rgba(255,107,107,.25);
     }
-    .capLine .capTime{
-      font-size: 12px;
-      opacity: .7;
-      margin-bottom: 4px;
+    .word{
+      padding:2px 0;
+      border-radius:6px;
     }
-
-    /* ... keep the rest of your original CSS ... */
+    .word.active{
+      background: rgba(96,165,250,.22);
+      outline: 1px solid rgba(96,165,250,.25);
+    }
+    .empty{
+      padding:14px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .err{
+      padding:12px;
+      border:1px solid rgba(255,107,107,.35);
+      background: rgba(255,107,107,.10);
+      border-radius:14px;
+      color:#ffd0d0;
+      font-size:13px;
+    }
   </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        <div class="title">Videos</div>
+        <div class="pill" id="statusPill">ready</div>
+      </div>
+      <div class="list" id="videoList"></div>
+    </div>
 
-  <!-- ====== Your existing HTML (unchanged) ====== -->
-  <!-- ... your page content ... -->
-
-  <!-- SERIES MODAL -->
-  <div class="series-modal" id="series-modal" aria-hidden="true">
-    <div class="series-modalCard" role="dialog" aria-modal="true" aria-label="Series Video Modal">
-      <div class="series-modalLeft" id="series-modalBack">
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
-          <div>
-            <div id="series-modalTitle" style="font-size:20px; font-weight:800; margin-bottom:4px;">Title</div>
-            <div id="series-modalMeta" style="opacity:.78; font-size:13px;">Meta</div>
-          </div>
-          <button id="series-closeBtn" style="cursor:pointer; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; border-radius:10px; padding:8px 10px;">
-            Close
-          </button>
+    <div class="main">
+      <div class="card playerBox">
+        <div class="head" style="border-bottom:none; padding-bottom:0;">
+          <div class="title" id="videoTitle">Select a video</div>
+          <div class="pill" id="capPill">captions: -</div>
         </div>
 
-        <div class="series-player" id="series-playerBox"></div>
+        <div class="playerFrame" style="margin-top:12px;">
+          <div id="player"></div>
+        </div>
 
-        <!-- NEW: captions panel under the video -->
-        <div class="series-captionsBox" id="series-captionsBox" style="display:none;">
-          <div class="series-captionsHeader">
-            <div class="capTitle">Subtitles</div>
-            <div class="capMeta" id="capMeta"></div>
+        <div class="controls">
+          <div class="btnrow">
+            <button id="btnPlay">Play/Pause</button>
+            <button id="btnBack">-5s</button>
+            <button id="btnFwd">+5s</button>
           </div>
-          <div class="series-captions" id="series-captions"></div>
+          <div class="hint" id="hintText">
+            Captions load from <span style="font-family:var(--mono)">captions/&lt;VIDEO_ID&gt;.srt</span>
+          </div>
         </div>
       </div>
 
-      <div class="series-modalRight">
-        <div id="series-filterChips" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"></div>
-        <div id="series-modalList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <div class="card capBox">
+        <div class="capHeader">
+          <div class="left">
+            <div class="title">Script (auto)</div>
+            <div class="toggle">
+              <input type="checkbox" id="toggleWord" checked />
+              <label for="toggleWord">Highlight “word-ish” (approx)</label>
+            </div>
+          </div>
+          <div class="pill" id="timePill">00:00</div>
+        </div>
+
+        <div id="capError"></div>
+        <div class="captionList" id="captionList">
+          <div class="empty">Pick a video. If the SRT exists, it will appear here automatically.</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== Your existing scripts (with modifications) ====== -->
+  <!-- YouTube Iframe API -->
   <script>
-    // ===== Your existing JS variables/data should stay here =====
-    // (Leaving the rest of your file as-is. Only the video-open part is upgraded.)
+    // ======= 0) YOUR VIDEO IDS HERE =======
+    // Add as many as you want. Captions must be in: captions/<id>.srt
+    const VIDEO_IDS = [
+      "hsG5_ykkkGk",
+      // "ANOTHER_ID_HERE",
+    ];
 
-    // Example element refs (keep yours if they already exist):
-    const seriesModal = document.getElementById("series-modal");
-    const seriesPlayerBox = document.getElementById("series-playerBox");
-    const seriesModalTitle = document.getElementById("series-modalTitle");
-    const seriesModalMeta = document.getElementById("series-modalMeta");
-    const seriesModalList = document.getElementById("series-modalList");
-    const seriesModalBack = document.getElementById("series-modalBack");
-    const seriesCloseBtn = document.getElementById("series-closeBtn");
+    // ======= 1) Build list UI =======
+    const elList = document.getElementById("videoList");
+    const elTitle = document.getElementById("videoTitle");
+    const elCapPill = document.getElementById("capPill");
+    const elTimePill = document.getElementById("timePill");
+    const elCapList = document.getElementById("captionList");
+    const elCapError = document.getElementById("capError");
+    const elToggleWord = document.getElementById("toggleWord");
 
-    // ===== YouTube player + captions (SRT) =====
-    let ytPlayer = null;
-    let ytApiReady = false;
-    let ytApiPromise = null;
+    let player = null;
+    let currentVideoId = null;
 
-    let capCues = [];
-    let capTimer = null;
-    let lastActiveIndex = -1;
+    // captions state
+    let cues = [];              // [{start,end,text,rawStart,rawEnd,words:[...]}]
+    let activeCueIndex = -1;
+    let tickTimer = null;
 
-    function ensureYouTubeApi(){
-      if (ytApiPromise) return ytApiPromise;
+    function ytThumb(id){
+      return `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+    }
 
-      ytApiPromise = new Promise((resolve) => {
-        if (window.YT && window.YT.Player) {
-          ytApiReady = true;
-          resolve();
-          return;
+    function renderVideoList(){
+      elList.innerHTML = "";
+      VIDEO_IDS.forEach((id, idx) => {
+        const row = document.createElement("div");
+        row.className = "item";
+        row.dataset.videoId = id;
+
+        const img = document.createElement("img");
+        img.className = "thumb";
+        img.src = ytThumb(id);
+        img.alt = id;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML = `
+          <div class="name">${id}</div>
+          <div class="sub">captions/${id}.srt</div>
+        `;
+
+        row.appendChild(img);
+        row.appendChild(meta);
+
+        row.addEventListener("click", () => selectVideo(id));
+        elList.appendChild(row);
+
+        if (idx === 0) {
+          // optional auto select first
+          // selectVideo(id);
         }
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-
-        window.onYouTubeIframeAPIReady = () => {
-          ytApiReady = true;
-          resolve();
-        };
       });
-
-      return ytApiPromise;
     }
 
-    function destroyPlayer(){
-      try { if (capTimer) clearInterval(capTimer); } catch(_){}
-      capTimer = null;
-      lastActiveIndex = -1;
-      capCues = [];
-
-      const capBox = document.getElementById('series-captionsBox');
-      const capEl  = document.getElementById('series-captions');
-      const capMeta = document.getElementById('capMeta');
-      if (capEl) capEl.innerHTML = '';
-      if (capMeta) capMeta.textContent = '';
-      if (capBox) capBox.style.display = 'none';
-
-      try { if (ytPlayer && ytPlayer.destroy) ytPlayer.destroy(); } catch(_){}
-      ytPlayer = null;
+    function markActive(id){
+      [...document.querySelectorAll(".item")].forEach(n => {
+        n.classList.toggle("active", n.dataset.videoId === id);
+      });
     }
 
-    function parseSrtTimeToSeconds(t){
-      const m = t.trim().match(/^(\d+):(\d+):(\d+)[,\.](\d+)$/);
-      if (!m) return 0;
-      const hh = parseInt(m[1],10);
-      const mm = parseInt(m[2],10);
-      const ss = parseInt(m[3],10);
-      const ms = parseInt(m[4].padEnd(3,'0').slice(0,3),10);
-      return hh*3600 + mm*60 + ss + (ms/1000);
+    // ======= 2) Load YouTube API =======
+    function loadYTApi(){
+      return new Promise((resolve) => {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        window.onYouTubeIframeAPIReady = () => resolve();
+        document.head.appendChild(tag);
+      });
     }
 
-    function fmtTime(sec){
-      sec = Math.max(0, sec);
-      const mm = Math.floor(sec/60);
-      const ss = Math.floor(sec%60);
-      return `${mm}:${String(ss).padStart(2,'0')}`;
+    function createPlayer(videoId){
+      return new Promise((resolve) => {
+        player = new YT.Player("player", {
+          videoId,
+          playerVars: {
+            rel: 0,
+            modestbranding: 1
+          },
+          events: {
+            onReady: () => resolve(),
+            onStateChange: () => {}
+          }
+        });
+      });
     }
 
-    function parseSrt(srtText){
-      const text = (srtText || '').replace(/\r/g,'').trim();
-      const blocks = text.split(/\n\n+/);
-      const cues = [];
-      for (const block of blocks){
-        const lines = block.split('\n').filter(Boolean);
+    // ======= 3) Captions: fetch + parse SRT =======
+    function baseRelative(path){
+      // IMPORTANT: relative path for GitHub Pages subfolder deployment.
+      // Never start with "/" here.
+      return path.replace(/^\/+/, "");
+    }
+
+    async function loadCaptionsFor(videoId){
+      elCapError.innerHTML = "";
+      elCapPill.textContent = "captions: loading...";
+      elCapList.innerHTML = `<div class="empty">Loading captions…</div>`;
+      cues = [];
+      activeCueIndex = -1;
+
+      const url = baseRelative(`captions/${videoId}.srt`);
+      try{
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`SRT not found (${res.status}) → ${url}`);
+        const srtText = await res.text();
+        cues = parseSRT(srtText);
+        if (!cues.length) throw new Error("SRT parsed but no cues found.");
+        elCapPill.textContent = `captions: OK (${cues.length})`;
+        renderCaptions(cues);
+      }catch(err){
+        elCapPill.textContent = "captions: missing";
+        elCapList.innerHTML = `<div class="empty">No captions for this video.</div>`;
+        elCapError.innerHTML = `<div class="err">Could not load captions: ${escapeHtml(err.message)}<br><br>
+          Fix: upload <b>captions/${videoId}.srt</b> to your repo (same branch GitHub Pages uses).</div>`;
+      }
+    }
+
+    function parseTime(t){
+      // "00:01:02,500" → seconds float
+      const m = t.match(/(\d+):(\d+):(\d+)[,\.](\d+)/);
+      if(!m) return 0;
+      const hh = Number(m[1]), mm = Number(m[2]), ss = Number(m[3]), ms = Number(m[4]);
+      return hh*3600 + mm*60 + ss + ms/1000;
+    }
+
+    function parseSRT(srt){
+      const blocks = srt
+        .replace(/\r/g, "")
+        .trim()
+        .split("\n\n")
+        .map(b => b.trim())
+        .filter(Boolean);
+
+      const out = [];
+      for (const b of blocks){
+        const lines = b.split("\n").filter(Boolean);
         if (lines.length < 2) continue;
 
-        let timeLineIdx = 0;
-        if (/^\d+$/.test(lines[0].trim())) timeLineIdx = 1;
+        // sometimes first line is index
+        let timeLineIndex = 0;
+        if (/^\d+$/.test(lines[0].trim())) timeLineIndex = 1;
 
-        const timeLine = lines[timeLineIdx] || '';
-        const tm = timeLine.match(/(\d+:\d+:\d+[,\.]\d+)\s*-->\s*(\d+:\d+:\d+[,\.]\d+)/);
-        if (!tm) continue;
+        const timeLine = lines[timeLineIndex] || "";
+        const tm = timeLine.match(/(.+?)\s*-->\s*(.+)/);
+        if(!tm) continue;
 
-        const start = parseSrtTimeToSeconds(tm[1]);
-        const end   = parseSrtTimeToSeconds(tm[2]);
+        const rawStart = tm[1].trim();
+        const rawEnd = tm[2].trim();
+        const start = parseTime(rawStart);
+        const end = parseTime(rawEnd);
 
-        const textLines = lines.slice(timeLineIdx+1)
-          .join('\n')
-          .replace(/<\/?[^>]+>/g,'')
-          .trim();
+        const textLines = lines.slice(timeLineIndex+1);
+        const text = textLines.join(" ").replace(/\s+/g," ").trim();
+        if(!text) continue;
 
-        if (!textLines) continue;
-        cues.push({ start, end, text: textLines });
+        out.push({
+          start, end,
+          rawStart, rawEnd,
+          text,
+          // pre-split for “word-ish” highlight (approx)
+          words: text.split(" ").filter(Boolean)
+        });
       }
-      return cues;
+      return out.sort((a,b)=>a.start-b.start);
     }
 
     function renderCaptions(cues){
-      const capBox = document.getElementById('series-captionsBox');
-      const capEl  = document.getElementById('series-captions');
-      const capMeta = document.getElementById('capMeta');
-      if (!capBox || !capEl) return;
-
-      capEl.innerHTML = '';
-      capCues = cues || [];
-      lastActiveIndex = -1;
-
-      if (!capCues.length){
-        capBox.style.display = 'none';
-        if (capMeta) capMeta.textContent = '';
-        return;
-      }
-
-      capBox.style.display = 'block';
-      if (capMeta) capMeta.textContent = `${capCues.length} lines`;
-
-      capCues.forEach((c, i) => {
-        const div = document.createElement('div');
-        div.className = 'capLine';
-        div.dataset.i = String(i);
-        div.dataset.start = String(c.start);
-        div.innerHTML = `
-          <div class="capTime">${fmtTime(c.start)} - ${fmtTime(c.end)}</div>
-          <div class="capText"></div>
+      elCapList.innerHTML = "";
+      cues.forEach((c, i) => {
+        const row = document.createElement("div");
+        row.className = "capLine";
+        row.dataset.index = String(i);
+        row.innerHTML = `
+          <small>${c.rawStart} → ${c.rawEnd}</small>
+          <div class="capText">${escapeHtml(c.text)}</div>
         `;
-        div.querySelector('.capText').textContent = c.text;
-
-        div.addEventListener('click', () => {
-          if (ytPlayer && ytPlayer.seekTo) {
-            ytPlayer.seekTo(c.start + 0.01, true);
-            if (ytPlayer.playVideo) ytPlayer.playVideo();
-          }
+        row.addEventListener("click", () => {
+          if(player) player.seekTo(c.start, true);
         });
-
-        capEl.appendChild(div);
+        elCapList.appendChild(row);
       });
     }
 
-    async function loadCaptionsForVideoId(videoId){
-      const capBox = document.getElementById('series-captionsBox');
-      const capEl  = document.getElementById('series-captions');
-      const capMeta = document.getElementById('capMeta');
+    function setActiveCue(i){
+      if (i === activeCueIndex) return;
+      activeCueIndex = i;
 
-      if (capEl) capEl.innerHTML = '';
-      if (capMeta) capMeta.textContent = 'Loading subtitles...';
-      if (capBox) capBox.style.display = 'block';
+      [...elCapList.querySelectorAll(".capLine")].forEach(el => {
+        el.classList.toggle("active", Number(el.dataset.index) === i);
+        // reset word highlighting
+        const capText = el.querySelector(".capText");
+        if (capText) capText.innerHTML = escapeHtml(cues[Number(el.dataset.index)]?.text || "");
+      });
 
-      const url = `captions/${videoId}.srt`; // <-- naming convention
-      try{
-        const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const srt = await res.text();
-        const cues = parseSrt(srt);
-        renderCaptions(cues);
-        if (!cues.length && capMeta) capMeta.textContent = 'No subtitles found in SRT.';
-      }catch(err){
-        if (capMeta) capMeta.textContent = `No subtitles file: ${url}`;
-        if (capEl) capEl.innerHTML = '';
+      // auto scroll active into view
+      const activeEl = elCapList.querySelector(`.capLine[data-index="${i}"]`);
+      if (activeEl){
+        activeEl.scrollIntoView({ block:"nearest", behavior:"smooth" });
       }
     }
 
-    function startCaptionSync(){
-      if (!ytPlayer || !capCues.length) return;
-      if (capTimer) clearInterval(capTimer);
+    function highlightApproxWord(i, currentTime){
+      if(!elToggleWord.checked) return;
+      const cue = cues[i];
+      const el = elCapList.querySelector(`.capLine[data-index="${i}"] .capText`);
+      if(!cue || !el) return;
 
-      capTimer = setInterval(() => {
-        if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+      const dur = Math.max(0.001, cue.end - cue.start);
+      const p = Math.min(0.999, Math.max(0, (currentTime - cue.start) / dur));
+      const wordIndex = Math.min(cue.words.length-1, Math.floor(p * cue.words.length));
 
-        const t = ytPlayer.getCurrentTime();
-
-        if (lastActiveIndex >= 0 && lastActiveIndex < capCues.length){
-          const c = capCues[lastActiveIndex];
-          if (t >= c.start && t <= c.end) return;
-        }
-
-        let found = -1;
-        const start = Math.max(0, (lastActiveIndex === -1 ? 0 : lastActiveIndex - 4));
-        const end = Math.min(capCues.length-1, (lastActiveIndex === -1 ? 30 : lastActiveIndex + 30));
-
-        for (let i = start; i <= end; i++){
-          const c = capCues[i];
-          if (t >= c.start && t <= c.end){ found = i; break; }
-        }
-        if (found === -1){
-          for (let i = 0; i < capCues.length; i++){
-            const c = capCues[i];
-            if (t >= c.start && t <= c.end){ found = i; break; }
-          }
-        }
-
-        if (found !== lastActiveIndex){
-          const capEl = document.getElementById('series-captions');
-          if (!capEl) return;
-
-          const prev = capEl.querySelector('.capLine.active');
-          if (prev) prev.classList.remove('active');
-
-          if (found >= 0){
-            const cur = capEl.querySelector(`.capLine[data-i="${found}"]`);
-            if (cur){
-              cur.classList.add('active');
-              cur.scrollIntoView({ block: 'center', behavior: 'smooth' });
-            }
-          }
-          lastActiveIndex = found;
-        }
-      }, 250);
+      // rebuild with a highlighted span on the current word (approximation!)
+      const htmlWords = cue.words.map((w, idx) => {
+        const safe = escapeHtml(w);
+        if(idx === wordIndex) return `<span class="word active">${safe}</span>`;
+        return `<span class="word">${safe}</span>`;
+      }).join(" ");
+      el.innerHTML = htmlWords;
     }
 
-    // === THIS is the key: open video by ID => creates a controllable YT player + loads captions/ID.srt ===
-    function seriesOpenVideo(v){
-      seriesModalTitle.textContent = v.title;
-      seriesModalMeta.textContent = `${v.duration} • ${v.level}`;
+    // ======= 4) Sync loop =======
+    function startTick(){
+      if (tickTimer) clearInterval(tickTimer);
+      tickTimer = setInterval(() => {
+        if(!player || !cues.length) return;
 
-      destroyPlayer();
-      seriesPlayerBox.innerHTML = `<div id="ytPlayerMount" style="width:100%; aspect-ratio:16/9; border-radius:14px; overflow:hidden;"></div>`;
+        const t = player.getCurrentTime ? player.getCurrentTime() : 0;
+        elTimePill.textContent = fmtTime(t);
 
-      // load captions in parallel
-      loadCaptionsForVideoId(v.id);
+        // find cue
+        let i = activeCueIndex;
 
-      ensureYouTubeApi().then(() => {
-        ytPlayer = new YT.Player('ytPlayerMount', {
-          videoId: v.id,
-          playerVars: {
-            autoplay: 1,
-            rel: 0,
-            modestbranding: 1,
-            playsinline: 1
-          },
-          events: {
-            onReady: () => startCaptionSync(),
-            onStateChange: (e) => {
-              if (window.YT && e.data === YT.PlayerState.PLAYING) startCaptionSync();
-            }
-          }
-        });
-      }).catch(() => {
-        // fallback iframe (captions show but no auto-sync)
-        seriesPlayerBox.innerHTML = `
-          <iframe
-            src="https://www.youtube.com/embed/${v.id}?rel=0&modestbranding=1"
-            title="${v.title}"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen>
-          </iframe>`;
-      });
+        if (i < 0 || t < cues[i].start || t > cues[i].end){
+          i = cues.findIndex(c => t >= c.start && t <= c.end);
+          if (i !== -1) setActiveCue(i);
+        }
 
-      // mark active in list (if you use it)
-      Array.from(seriesModalList.querySelectorAll('.series-videoItem')).forEach(el=>{
-        el.classList.toggle('active', el.dataset.id===v.id);
-      });
-
-      seriesModalBack.scrollTop = 0;
+        if (i !== -1) highlightApproxWord(i, t);
+      }, 120);
     }
 
-    // OPTIONAL: wire close button properly (and destroy player)
-    seriesCloseBtn.addEventListener("click", () => {
-      destroyPlayer();
-      seriesModal.style.display = "none";
-      seriesModal.setAttribute("aria-hidden","true");
+    function fmtTime(sec){
+      sec = Math.max(0, sec || 0);
+      const m = Math.floor(sec/60);
+      const s = Math.floor(sec%60);
+      return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ======= 5) Select video =======
+    async function selectVideo(videoId){
+      currentVideoId = videoId;
+      markActive(videoId);
+      elTitle.textContent = `Video: ${videoId}`;
+
+      // load player if needed
+      if(!player){
+        await loadYTApi();
+        await createPlayer(videoId);
+        startTick();
+      }else{
+        player.loadVideoById(videoId);
+      }
+
+      await loadCaptionsFor(videoId);
+    }
+
+    // ======= 6) Buttons =======
+    document.getElementById("btnPlay").addEventListener("click", () => {
+      if(!player) return;
+      const state = player.getPlayerState();
+      if(state === YT.PlayerState.PLAYING) player.pauseVideo();
+      else player.playVideo();
+    });
+    document.getElementById("btnBack").addEventListener("click", () => {
+      if(!player) return;
+      const t = player.getCurrentTime();
+      player.seekTo(Math.max(0, t - 5), true);
+    });
+    document.getElementById("btnFwd").addEventListener("click", () => {
+      if(!player) return;
+      const t = player.getCurrentTime();
+      player.seekTo(t + 5, true);
     });
 
-    // ====== The rest of your existing JS stays exactly as you had it ======
-    // Your code that opens the modal should set:
-    // seriesModal.style.display = "flex";
-    // seriesModal.setAttribute("aria-hidden","false");
-    //
-    // And when you call seriesOpenVideo({id,title,duration,level}) it will now:
-    // - load captions/correct-id.srt
-    // - render captions under the player
-    // - highlight current line using timestamps.
-
+    // ======= boot =======
+    renderVideoList();
+    // optional: auto open first
+    // selectVideo(VIDEO_IDS[0]);
   </script>
 </body>
 </html>
