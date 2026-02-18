@@ -1,124 +1,891 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Vietnamese CI</title>
-<style>
-body{font-family:Arial;margin:0;background:#f3f3f7}
-header{padding:20px;font-size:22px;font-weight:bold}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding:20px}
-.card{background:white;border-radius:14px;box-shadow:0 4px 10px rgba(0,0,0,0.1);cursor:pointer;overflow:hidden}
-.card img{width:100%;display:block}
-.card h3{font-size:15px;padding:10px}
-#playerSection{padding:20px;display:none}
-#playerWrapper{position:relative;padding-bottom:56.25%;height:0}
-#playerWrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%}
-#captions{background:white;margin-top:20px;padding:15px;border-radius:12px;max-height:300px;overflow:auto;font-size:14px;line-height:1.6}
-.caption-line{padding:3px 0;cursor:pointer}
-.caption-line.active{background:#dbeafe}
-.error{color:red;padding:10px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lazy Vietnamese | Playlists</title>
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#101a33;
+      --panel2:#0f1730;
+      --muted:#9fb0d0;
+      --text:#eaf0ff;
+      --accent:#7aa7ff;
+      --accent2:#4fe3c2;
+      --danger:#ff6b8b;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(122,167,255,.16), transparent 55%),
+        radial-gradient(900px 600px at 80% 20%, rgba(79,227,194,.10), transparent 60%),
+        radial-gradient(900px 700px at 40% 100%, rgba(255,107,139,.08), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+    }
+
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,16,32,.85), rgba(11,16,32,.55));
+      border-bottom:1px solid var(--border);
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 18px;
+      max-width:1400px;
+      margin:0 auto;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .logo{
+      width:40px; height:40px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(122,167,255,.9), rgba(79,227,194,.85));
+      box-shadow: 0 12px 30px rgba(122,167,255,.18);
+    }
+    .brand small{display:block; font-weight:600; color:var(--muted); margin-top:2px}
+
+    .pill{
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background: rgba(16,26,51,.45);
+    }
+    .pill input{
+      width:320px;
+      max-width:48vw;
+      background:transparent;
+      border:0;
+      outline:0;
+      color:var(--text);
+      font-size:14px;
+    }
+    .pill .hint{color:var(--muted); font-size:12px}
+    .kbd{
+      font-family:var(--mono);
+      font-size:11px;
+      color:var(--muted);
+      padding:2px 6px;
+      border:1px solid var(--border);
+      border-radius:7px;
+      background: rgba(255,255,255,.03);
+    }
+
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 340px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+      .pill input{width: 220px; max-width: 58vw;}
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background: rgba(16,26,51,.55);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding:14px 14px 10px 14px;
+      border-bottom:1px solid var(--border);
+      background: rgba(15,23,48,.55);
+    }
+    .cardHeader h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .list{
+      max-height: calc(100vh - 170px);
+      overflow:auto;
+    }
+    .list::-webkit-scrollbar{width:10px}
+    .list::-webkit-scrollbar-thumb{background: rgba(255,255,255,.08); border-radius:10px}
+
+    .item{
+      display:flex;
+      gap:12px;
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      cursor:pointer;
+      transition: .12s ease;
+    }
+    .item:hover{background: rgba(122,167,255,.06)}
+    .item.active{background: rgba(79,227,194,.08)}
+    .thumb{
+      width:84px; height:48px; border-radius:12px;
+      background: rgba(255,255,255,.06);
+      flex: 0 0 auto;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+    .meta{min-width:0}
+    .title{
+      font-size:13px;
+      font-weight:700;
+      margin:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .tiny{
+      margin-top:4px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .badge{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      background: rgba(255,255,255,.03);
+    }
+
+    .mainTop{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border-bottom:1px solid var(--border);
+      background: rgba(15,23,48,.55);
+    }
+    .mainTop h2{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:70%;
+    }
+    .controls{
+      display:flex; gap:10px; align-items:center;
+    }
+    .controls input{
+      width:280px; max-width:40vw;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+    }
+    .btn{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(122,167,255,.10);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      transition:.12s ease;
+    }
+    .btn:hover{background: rgba(122,167,255,.18)}
+    .btn.secondary{background: rgba(255,255,255,.04)}
+    .btn.secondary:hover{background: rgba(255,255,255,.08)}
+
+    .playerWrap{
+      padding:14px;
+    }
+    .playerBox{
+      width:100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      background:#000;
+      position:relative;
+    }
+    #player{
+      width:100%;
+      height:100%;
+    }
+
+    .below{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:14px;
+      padding:14px;
+      border-top:1px solid var(--border);
+      background: rgba(16,26,51,.40);
+    }
+    @media (max-width: 1200px){
+      .below{grid-template-columns: 1fr}
+    }
+
+    .panel{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius2);
+      background: rgba(15,23,48,.55);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding:12px 12px 10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .panelHead h4{margin:0; font-size:13px}
+    .panelHead .note{color:var(--muted); font-size:12px}
+
+    .transcript{
+      max-height: 420px;
+      overflow:auto;
+      padding:10px;
+      line-height:1.45;
+    }
+    .cue{
+      display:flex;
+      gap:10px;
+      padding:8px 8px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:.10s ease;
+      border:1px solid transparent;
+    }
+    .cue:hover{background: rgba(122,167,255,.06)}
+    .cue.active{
+      background: rgba(79,227,194,.10);
+      border-color: rgba(79,227,194,.20);
+    }
+    .ts{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      min-width:72px;
+      text-align:right;
+      padding-top:2px;
+      flex:0 0 auto;
+    }
+    .txt{
+      font-size:13px;
+      color:var(--text);
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .status{
+      padding:12px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .status strong{color:var(--text)}
+    .status.error{color: #ffd0d8}
+    .status.error strong{color: #ffd0d8}
+  </style>
 </head>
+
 <body>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        Lazy Vietnamese
+        <small>Playlists + captions desde tu repo</small>
+      </div>
+    </div>
 
-<header>Vietnamese CI</header>
+    <div class="pill" title="Filtrar playlists (barra izquierda)">
+      <span class="hint">Playlists</span>
+      <input id="playlistFilter" placeholder="filtrar… (ej: Sims, Stories, CI)" />
+      <span class="kbd">/</span>
+    </div>
+  </div>
+</header>
 
-<div id="videos" class="grid"></div>
+<div class="wrap">
+  <div class="grid">
+    <!-- LEFT: PLAYLISTS -->
+    <section class="card">
+      <div class="cardHeader">
+        <h3>Playlists</h3>
+        <div class="sub" id="plSub">Cargando…</div>
+      </div>
+      <div class="list" id="playlistList"></div>
+    </section>
 
-<div id="playerSection">
-<div id="playerWrapper"></div>
-<div id="captions">Loading captions...</div>
+    <!-- RIGHT: MAIN -->
+    <section class="card">
+      <div class="mainTop">
+        <h2 id="mainTitle">Elegí una playlist</h2>
+        <div class="controls">
+          <input id="videoSearch" placeholder="Buscar video dentro de la playlist…" disabled />
+          <button class="btn secondary" id="reloadBtn" title="Recargar playlists">Recargar</button>
+        </div>
+      </div>
+
+      <div class="playerWrap">
+        <div class="playerBox">
+          <div id="player"></div>
+        </div>
+        <div class="status" id="playerStatus">
+          <strong>Tip:</strong> seleccioná una playlist y después un video.
+        </div>
+      </div>
+
+      <div class="below">
+        <!-- Videos list -->
+        <div class="panel">
+          <div class="panelHead">
+            <h4>Videos</h4>
+            <div class="note" id="vidCount">0</div>
+          </div>
+          <div class="list" id="videoList" style="max-height:420px;"></div>
+        </div>
+
+        <!-- Transcript -->
+        <div class="panel">
+          <div class="panelHead">
+            <h4>Captions</h4>
+            <div class="note" id="capNote">—</div>
+          </div>
+          <div class="transcript" id="transcript">
+            <div class="status">Todavía no hay video seleccionado.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </div>
 
 <script>
+/* =========================
+   CONFIG (EDITÁ SOLO ESTO)
+========================= */
+
+// 1) Tu API key (la que restringiste bien)
 const API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
-const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg"; 
 
-const videosContainer = document.getElementById("videos");
-const playerSection = document.getElementById("playerSection");
-const playerWrapper = document.getElementById("playerWrapper");
-const captionsBox = document.getElementById("captions");
+// 2) Tu Channel ID (vos ya me lo diste)
+const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
 
+// 3) Carpeta en tu repo donde están los .srt
+//    En GitHub Pages esto apunta a: https://TUUSUARIO.github.io/TUREPO/captions/VIDEOID.srt
+const CAPTIONS_DIR = "captions"; // no pongas slash al final
+
+// 4) Idioma (no afecta a SRT, es sólo UI)
+const UI_LANG = "es";
+
+/* ========================= */
+
+const $ = (id) => document.getElementById(id);
+
+let playlists = [];
+let currentPlaylistId = null;
+let playlistVideos = [];
 let currentVideoId = null;
-let captionData = [];
-let player;
 
-async function loadVideos() {
-  try {
-    const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&type=video&maxResults=50`
-    );
-    const data = await res.json();
+// Captions state
+let cues = [];              // [{start,end,text}]
+let activeCueIndex = -1;
+let cueTick = null;
 
-    if (!data.items) throw new Error("Invalid API response");
+// YouTube player
+let player = null;
+let playerReady = false;
 
-    data.items.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <img src="${item.snippet.thumbnails.medium.url}">
-        <h3>${item.snippet.title}</h3>
-      `;
-      card.onclick = () => openVideo(item.id.videoId);
-      videosContainer.appendChild(card);
-    });
-  } catch (e) {
-    videosContainer.innerHTML = `<div class="error">Could not load from YouTube API. Check API key restrictions.</div>`;
-  }
-}
+/* =========================
+   YT Iframe API loader
+========================= */
+(function loadYT(){
+  const tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+})();
 
-function openVideo(videoId) {
-  currentVideoId = videoId;
-  playerSection.style.display = "block";
-  playerWrapper.innerHTML = `
-    <iframe src="https://www.youtube.com/embed/${videoId}?enablejsapi=1"
-    frameborder="0" allowfullscreen></iframe>
-  `;
-  loadCaptions(videoId);
-}
-
-async function loadCaptions(videoId) {
-  try {
-    const res = await fetch(`./captions/${videoId}.srt`);
-    if (!res.ok) throw new Error("No captions");
-    const text = await res.text();
-    parseSRT(text);
-  } catch {
-    captionsBox.innerHTML = "No captions found for this video.";
-  }
-}
-
-function parseSRT(data) {
-  captionData = [];
-  captionsBox.innerHTML = "";
-  const blocks = data.split("\n\n");
-  blocks.forEach(block => {
-    const lines = block.split("\n");
-    if (lines.length >= 3) {
-      const time = lines[1];
-      const text = lines.slice(2).join(" ");
-      const [start] = time.split(" --> ");
-      const seconds = toSeconds(start);
-      captionData.push({seconds, text});
-      const div = document.createElement("div");
-      div.className = "caption-line";
-      div.innerText = text;
-      div.onclick = () => {
-        player.seekTo(seconds);
-      };
-      captionsBox.appendChild(div);
+window.onYouTubeIframeAPIReady = function() {
+  player = new YT.Player("player", {
+    height: "100%",
+    width: "100%",
+    videoId: "",
+    playerVars: {
+      rel: 0,
+      modestbranding: 1,
+      playsinline: 1
+    },
+    events: {
+      onReady: () => {
+        playerReady = true;
+        setPlayerStatus("Listo. Elegí un video 👇");
+      },
+      onStateChange: (e) => {
+        // 1 = playing, 2 = paused, 0 ended
+        if (e.data === 1) startCueSync();
+        else stopCueSync();
+      }
     }
   });
+};
+
+/* =========================
+   UI helpers
+========================= */
+function setPlayerStatus(msg, type="ok"){
+  const el = $("playerStatus");
+  el.className = "status" + (type === "error" ? " error" : "");
+  el.innerHTML = msg;
 }
 
-function toSeconds(time) {
-  const parts = time.replace(",",".").split(":");
-  return (+parts[0])*3600 + (+parts[1])*60 + parseFloat(parts[2]);
+function formatTime(sec){
+  sec = Math.max(0, sec|0);
+  const m = Math.floor(sec/60);
+  const s = sec % 60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 }
 
-loadVideos();
+/* =========================
+   YouTube Data API calls
+========================= */
+
+async function ytFetch(url){
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+async function fetchAllPlaylists(){
+  playlists = [];
+  let pageToken = "";
+  while (true){
+    const url =
+      "https://www.googleapis.com/youtube/v3/playlists"
+      + `?part=snippet,contentDetails`
+      + `&channelId=${encodeURIComponent(CHANNEL_ID)}`
+      + `&maxResults=50`
+      + `&key=${encodeURIComponent(API_KEY)}`
+      + (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : "");
+
+    const data = await ytFetch(url);
+    const items = data.items || [];
+    for (const it of items){
+      playlists.push({
+        id: it.id,
+        title: it.snippet?.title || "Sin título",
+        thumb: it.snippet?.thumbnails?.medium?.url || it.snippet?.thumbnails?.default?.url || "",
+        count: it.contentDetails?.itemCount ?? 0
+      });
+    }
+    pageToken = data.nextPageToken || "";
+    if (!pageToken) break;
+  }
+
+  // Sort A→Z (si querés “más nuevo”, se puede cambiar)
+  playlists.sort((a,b)=> a.title.localeCompare(b.title));
+}
+
+async function fetchPlaylistVideos(playlistId){
+  playlistVideos = [];
+  let pageToken = "";
+  while (true){
+    const url =
+      "https://www.googleapis.com/youtube/v3/playlistItems"
+      + `?part=snippet,contentDetails`
+      + `&playlistId=${encodeURIComponent(playlistId)}`
+      + `&maxResults=50`
+      + `&key=${encodeURIComponent(API_KEY)}`
+      + (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : "");
+
+    const data = await ytFetch(url);
+    const items = data.items || [];
+    for (const it of items){
+      const videoId = it.contentDetails?.videoId || it.snippet?.resourceId?.videoId;
+      if (!videoId) continue;
+      playlistVideos.push({
+        videoId,
+        title: it.snippet?.title || "Video",
+        thumb: it.snippet?.thumbnails?.medium?.url || it.snippet?.thumbnails?.default?.url || "",
+        publishedAt: it.contentDetails?.videoPublishedAt || it.snippet?.publishedAt || ""
+      });
+    }
+    pageToken = data.nextPageToken || "";
+    if (!pageToken) break;
+  }
+
+  // Orden tipo “playlist” (no tocamos el orden)
+  // Si querés newest first:
+  // playlistVideos.sort((a,b)=> (b.publishedAt||"").localeCompare(a.publishedAt||""));
+
+  return playlistVideos;
+}
+
+/* =========================
+   Captions: load + parse SRT
+========================= */
+
+function srtTimeToSeconds(t){
+  // "00:01:23,456"
+  const m = t.trim().match(/^(\d+):(\d+):(\d+)[,.](\d+)$/);
+  if (!m) return 0;
+  const hh = parseInt(m[1],10);
+  const mm = parseInt(m[2],10);
+  const ss = parseInt(m[3],10);
+  const ms = parseInt(m[4].padEnd(3,"0").slice(0,3),10);
+  return hh*3600 + mm*60 + ss + ms/1000;
+}
+
+function parseSRT(srt){
+  // tolerante a \r\n
+  const blocks = srt.replace(/\r/g,"").trim().split("\n\n");
+  const out = [];
+  for (const block of blocks){
+    const lines = block.split("\n").filter(Boolean);
+    if (lines.length < 2) continue;
+
+    // Puede venir con índice o sin
+    let idxLine = 0;
+    if (/^\d+$/.test(lines[0].trim())) idxLine = 1;
+
+    const timeLine = lines[idxLine] || "";
+    const m = timeLine.match(/(.+?)\s*-->\s*(.+)/);
+    if (!m) continue;
+
+    const start = srtTimeToSeconds(m[1]);
+    const end = srtTimeToSeconds(m[2]);
+    const text = lines.slice(idxLine+1).join("\n").trim();
+
+    if (text) out.push({start, end, text});
+  }
+  return out;
+}
+
+async function tryLoadCaptionsForVideo(videoId){
+  cues = [];
+  activeCueIndex = -1;
+  $("transcript").innerHTML = `<div class="status">Cargando captions…</div>`;
+  $("capNote").textContent = "buscando…";
+
+  // Buscamos en tu repo: captions/VIDEOID.srt
+  const url = `${CAPTIONS_DIR}/${videoId}.srt`;
+
+  try{
+    const res = await fetch(url, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const txt = await res.text();
+    const parsed = parseSRT(txt);
+
+    if (!parsed.length) throw new Error("SRT vacío o no parseable");
+    cues = parsed;
+
+    renderTranscript();
+    $("capNote").textContent = `${cues.length} líneas`;
+    return true;
+  } catch (err){
+    $("capNote").textContent = "no disponible";
+    $("transcript").innerHTML =
+      `<div class="status error"><strong>No se pudieron cargar captions</strong><br/>
+       Busqué: <span style="font-family:var(--mono)">${url}</span><br/>
+       (Asegurate de que exista <span style="font-family:var(--mono)">${videoId}.srt</span> en <span style="font-family:var(--mono)">/${CAPTIONS_DIR}/</span>)</div>`;
+    return false;
+  }
+}
+
+function renderTranscript(){
+  const box = $("transcript");
+  box.innerHTML = "";
+  for (let i=0; i<cues.length; i++){
+    const c = cues[i];
+    const row = document.createElement("div");
+    row.className = "cue";
+    row.dataset.i = String(i);
+    row.innerHTML = `
+      <div class="ts">${formatTime(c.start)}</div>
+      <div class="txt">${escapeHTML(c.text)}</div>
+    `;
+    row.addEventListener("click", () => {
+      if (playerReady && currentVideoId){
+        player.seekTo(c.start + 0.01, true);
+        player.playVideo();
+      }
+    });
+    box.appendChild(row);
+  }
+}
+
+function escapeHTML(s){
+  return (s+"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+/* =========================
+   Captions sync loop
+========================= */
+
+function startCueSync(){
+  stopCueSync();
+  cueTick = setInterval(() => {
+    if (!playerReady || !cues.length) return;
+    const t = player.getCurrentTime();
+    const i = findCueIndex(t);
+    if (i !== activeCueIndex){
+      setActiveCue(i);
+    }
+  }, 120);
+}
+
+function stopCueSync(){
+  if (cueTick){
+    clearInterval(cueTick);
+    cueTick = null;
+  }
+}
+
+function findCueIndex(time){
+  // simple linear scan with last index hint
+  if (!cues.length) return -1;
+
+  // if current active still valid, keep
+  if (activeCueIndex >= 0){
+    const a = cues[activeCueIndex];
+    if (time >= a.start && time <= a.end) return activeCueIndex;
+  }
+
+  // otherwise scan (cues are in order)
+  for (let i=0; i<cues.length; i++){
+    const c = cues[i];
+    if (time >= c.start && time <= c.end) return i;
+  }
+  return -1;
+}
+
+function setActiveCue(i){
+  const list = $("transcript");
+  const prev = activeCueIndex;
+  activeCueIndex = i;
+
+  if (prev >= 0){
+    const elPrev = list.querySelector(`.cue[data-i="${prev}"]`);
+    if (elPrev) elPrev.classList.remove("active");
+  }
+  if (i >= 0){
+    const el = list.querySelector(`.cue[data-i="${i}"]`);
+    if (el){
+      el.classList.add("active");
+      // scroll suave para mantener visible
+      const top = el.offsetTop;
+      const height = list.clientHeight;
+      const scroll = list.scrollTop;
+      if (top < scroll + 40 || top > scroll + height - 80){
+        list.scrollTo({ top: Math.max(0, top - 120), behavior: "smooth" });
+      }
+    }
+  }
+}
+
+/* =========================
+   Render playlists/videos
+========================= */
+
+function renderPlaylists(){
+  const list = $("playlistList");
+  list.innerHTML = "";
+
+  const filter = ($("playlistFilter").value || "").trim().toLowerCase();
+  const visible = playlists.filter(p => p.title.toLowerCase().includes(filter));
+
+  $("plSub").textContent = `${visible.length} playlists`;
+
+  for (const p of visible){
+    const row = document.createElement("div");
+    row.className = "item" + (p.id === currentPlaylistId ? " active" : "");
+    row.innerHTML = `
+      <div class="thumb">${p.thumb ? `<img src="${p.thumb}" alt="">` : ""}</div>
+      <div class="meta">
+        <p class="title">${escapeHTML(p.title)}</p>
+        <div class="tiny">
+          <span class="badge">${p.count} videos</span>
+          <span class="badge" style="border-color:rgba(122,167,255,.25); color:#bcd1ff;">playlist</span>
+        </div>
+      </div>
+    `;
+    row.addEventListener("click", () => selectPlaylist(p.id, p.title));
+    list.appendChild(row);
+  }
+}
+
+function renderVideos(){
+  const list = $("videoList");
+  list.innerHTML = "";
+
+  const q = ($("videoSearch").value || "").trim().toLowerCase();
+  const vids = playlistVideos.filter(v => v.title.toLowerCase().includes(q));
+
+  $("vidCount").textContent = `${vids.length} / ${playlistVideos.length}`;
+
+  for (const v of vids){
+    const row = document.createElement("div");
+    row.className = "item" + (v.videoId === currentVideoId ? " active" : "");
+    row.innerHTML = `
+      <div class="thumb">${v.thumb ? `<img src="${v.thumb}" alt="">` : ""}</div>
+      <div class="meta">
+        <p class="title">${escapeHTML(v.title)}</p>
+        <div class="tiny">
+          <span class="badge" style="border-color:rgba(79,227,194,.25); color:#c8fff3;">video</span>
+          <span class="badge" style="font-family:var(--mono)">${v.videoId}</span>
+        </div>
+      </div>
+    `;
+    row.addEventListener("click", () => selectVideo(v.videoId, v.title));
+    list.appendChild(row);
+  }
+}
+
+/* =========================
+   Selection handlers
+========================= */
+
+async function selectPlaylist(playlistId, title){
+  currentPlaylistId = playlistId;
+  $("mainTitle").textContent = title;
+  $("videoSearch").disabled = true;
+  $("videoSearch").value = "";
+  $("videoList").innerHTML = `<div class="status">Cargando videos…</div>`;
+  $("vidCount").textContent = "—";
+
+  renderPlaylists();
+
+  try{
+    await fetchPlaylistVideos(playlistId);
+    $("videoSearch").disabled = false;
+    renderVideos();
+
+    setPlayerStatus(`<strong>Playlist cargada:</strong> ${escapeHTML(title)}<br/>Ahora elegí un video.`);
+  } catch (err){
+    $("videoList").innerHTML = `<div class="status error"><strong>Error cargando videos</strong><br/>${escapeHTML(err.message)}</div>`;
+    setPlayerStatus(`<strong>Error:</strong> no pude cargar la playlist.`, "error");
+  }
+}
+
+async function selectVideo(videoId, title){
+  currentVideoId = videoId;
+  renderVideos();
+
+  if (!playerReady){
+    setPlayerStatus(`<strong>Player aún no listo.</strong> Esperá 1 segundo y reintentá.`, "error");
+    return;
+  }
+
+  // Cargar video (esto evita el bug de "solo audio" porque fuerza el load correcto)
+  try{
+    setPlayerStatus(`<strong>Reproduciendo:</strong> ${escapeHTML(title)}<br/><span class="badge">cargando…</span>`);
+    player.loadVideoById({ videoId });
+  } catch (err){
+    setPlayerStatus(`<strong>Error cargando el player:</strong> ${escapeHTML(err.message)}`, "error");
+  }
+
+  // Cargar captions desde repo si existen
+  await tryLoadCaptionsForVideo(videoId);
+
+  // Si hay cues, arrancará highlight al play (por onStateChange)
+  // Si el usuario ya está reproduciendo, forzamos sync también
+  setTimeout(() => {
+    if (player.getPlayerState && player.getPlayerState() === 1) startCueSync();
+  }, 300);
+}
+
+/* =========================
+   Init + events
+========================= */
+
+async function init(){
+  $("reloadBtn").addEventListener("click", () => boot());
+
+  $("playlistFilter").addEventListener("input", () => renderPlaylists());
+  $("videoSearch").addEventListener("input", () => renderVideos());
+
+  // atajo "/" para ir al filtro de playlists
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "/" && document.activeElement !== $("playlistFilter")){
+      e.preventDefault();
+      $("playlistFilter").focus();
+    }
+  });
+
+  await boot();
+}
+
+async function boot(){
+  $("playlistList").innerHTML = `<div class="status">Cargando playlists…</div>`;
+  $("plSub").textContent = "Cargando…";
+  $("videoList").innerHTML = `<div class="status">Elegí una playlist.</div>`;
+  $("vidCount").textContent = "0";
+  $("videoSearch").disabled = true;
+  $("mainTitle").textContent = "Elegí una playlist";
+  $("transcript").innerHTML = `<div class="status">Todavía no hay video seleccionado.</div>`;
+  $("capNote").textContent = "—";
+
+  currentPlaylistId = null;
+  currentVideoId = null;
+  playlistVideos = [];
+  cues = [];
+  activeCueIndex = -1;
+
+  stopCueSync();
+
+  try{
+    await fetchAllPlaylists();
+    renderPlaylists();
+    setPlayerStatus(`<strong>Listo:</strong> cargué ${playlists.length} playlists. Elegí una 👈`);
+  } catch (err){
+    $("playlistList").innerHTML =
+      `<div class="status error"><strong>Error cargando playlists</strong><br/>
+        ${escapeHTML(err.message)}<br/><br/>
+        Si dice "API key not valid", revisá restricciones y que la API YouTube Data v3 esté habilitada.</div>`;
+    setPlayerStatus(`<strong>Error:</strong> no pude cargar playlists.`, "error");
+  }
+}
+
+init();
 </script>
 
 </body>
 </html>
-
