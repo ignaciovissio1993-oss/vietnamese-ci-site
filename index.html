@@ -22,1961 +22,822 @@
       --accent4:#a855f7;
       --accent5:#06b6d4;
 
-      --shadow: 0 16px 40px rgba(19, 35, 70, .10);
-      --shadow2: 0 12px 26px rgba(19, 35, 70, .14);
-      --radius: 18px;
-      --radius2: 26px;
+      --shadow: 0 14px 40px rgba(24, 55, 90, .12);
+      --shadow2: 0 10px 26px rgba(24, 55, 90, .10);
 
-      --max: 1240px;
-      --ring: 0 0 0 4px rgba(79,140,255,.16);
+      --r: 18px;
+      --r2: 14px;
+      --max: 1200px;
+      --gap: 18px;
+      --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color: var(--text);
+      font-family:var(--font);
+      color:var(--text);
       background:
-        radial-gradient(900px 520px at 10% -10%, rgba(168,85,247,.18), transparent 60%),
-        radial-gradient(900px 520px at 110% 0%, rgba(79,140,255,.18), transparent 55%),
-        radial-gradient(900px 520px at 30% 100%, rgba(34,197,94,.14), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
+        radial-gradient(1200px 800px at 10% 10%, rgba(79,140,255,.16), transparent 60%),
+        radial-gradient(1100px 700px at 95% 0%, rgba(168,85,247,.14), transparent 60%),
+        radial-gradient(900px 650px at 70% 100%, rgba(34,197,94,.12), transparent 60%),
+        linear-gradient(140deg, var(--bg1), var(--bg2));
     }
-    a{color:inherit; text-decoration:none}
-    a:hover{color: var(--accent)}
 
-    .app-wrap{max-width: var(--max); margin:0 auto; padding: 18px;}
-
-    /* Header + Tabs */
-    .app-header{
-      position: sticky;
-      top: 12px;
-      z-index: 100;
-      border-radius: var(--radius2);
-      overflow:hidden;
-      box-shadow: var(--shadow2);
-      border: 1px solid rgba(79,140,255,.22);
-      background:
-        radial-gradient(900px 300px at 20% 20%, rgba(79,140,255,.40), transparent 60%),
-        radial-gradient(700px 260px at 70% 30%, rgba(168,85,247,.32), transparent 60%),
-        radial-gradient(700px 260px at 40% 80%, rgba(34,197,94,.22), transparent 60%),
-        linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
-      backdrop-filter: blur(10px);
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 54px;}
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; padding:16px 18px; border:1px solid var(--line);
+      background:rgba(255,255,255,.72); backdrop-filter: blur(10px);
+      border-radius:var(--r); box-shadow:var(--shadow2);
+      position:sticky; top:10px; z-index:5;
     }
-    .app-header-inner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding: 14px 16px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-      min-width: 240px;
-    }
+    .brand{display:flex; align-items:center; gap:12px}
     .logo{
-      width:38px; height:38px; border-radius: 14px;
-      background: conic-gradient(from 210deg, #4f8cff, #a855f7, #22c55e, #f97316, #06b6d4, #4f8cff);
-      box-shadow: 0 14px 28px rgba(79,140,255,.18);
-      border: 1px solid rgba(255,255,255,.8);
-      flex: 0 0 auto;
+      width:44px; height:44px; border-radius:14px;
+      background: conic-gradient(from 220deg, var(--accent), var(--accent4), var(--accent2), var(--accent));
+      box-shadow:0 10px 22px rgba(79,140,255,.18);
+      border:1px solid rgba(255,255,255,.7);
     }
-    .brand h1{margin:0; font-size:15px; letter-spacing:.2px}
-    .brand p{margin:2px 0 0; color: var(--muted); font-size:12px}
-
-    .tabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-      flex: 1;
-    }
-    .tab-btn{
-      border:1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.85);
-      padding:10px 12px;
-      border-radius: 999px;
-      font-weight: 850;
-      font-size: 13px;
-      color: var(--text);
-      cursor:pointer;
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
-      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .tab-btn:hover{transform: translateY(-1px)}
-    .tab-btn.active{
-      border-color: rgba(79,140,255,.40);
-      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
-      box-shadow: 0 14px 26px rgba(79,140,255,.12);
-    }
-
-    .header-actions{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-      min-width: 240px;
-    }
-    .btn{
-      padding:10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.85);
-      color: var(--text);
-      font-size: 13px;
-      cursor:pointer;
-      box-shadow: 0 10px 20px rgba(19,35,70,.06);
-      transition: transform .12s ease;
-      font-weight: 800;
-    }
-    .btn.primary{
-      border-color: rgba(79,140,255,.40);
-      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
-    }
-    .btn:hover{transform: translateY(-1px)}
-
-    .tab-page{display:none; margin-top: 16px;}
-    .tab-page.active{display:block;}
-
-    /* =========================
-       SERIES PAGE
-    ========================= */
-    .series-grid{
-      display:grid;
-      grid-template-columns: 320px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .series-aside{
-      background: rgba(255,255,255,.85);
-      border: 1px solid var(--line);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      position: sticky;
-      top: 96px;
-      backdrop-filter: blur(10px);
-    }
-    .series-sideTitle{
-      margin: 0 0 8px;
-      font-size: 12px;
-      letter-spacing: .2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .series-searchBox{
-      display:flex; align-items:center; gap:10px;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(79,140,255,.22);
-      background: linear-gradient(180deg, rgba(79,140,255,.08), rgba(255,255,255,.82));
-      box-shadow: 0 10px 20px rgba(79,140,255,.10);
-      margin-bottom: 12px;
-    }
-    .series-searchBox input{
-      width:100%;
-      border:0;
-      outline:none;
-      background: transparent;
-      font-size: 14px;
-      color: var(--text);
-    }
-    .series-hint{
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-      margin: 6px 2px 12px;
-    }
-
-    .series-aside details{
-      border:1px solid rgba(25,60,110,.14);
-      border-radius: 16px;
-      padding: 10px 12px;
-      background: rgba(247,251,255,.85);
-      margin-bottom: 10px;
-    }
-    .series-aside summary{
-      cursor:pointer;
-      list-style:none;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      font-size: 14px;
-      color: var(--text);
-    }
-    .series-aside summary::-webkit-details-marker{display:none}
-    .series-chev{color: var(--muted); font-size: 12px}
-    .series-opt{
-      display:flex; flex-wrap:wrap; gap:8px;
-      padding-top: 10px;
-    }
-    .series-chip{
-      font-size: 12px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.88);
-      color: var(--muted);
-      box-shadow: 0 8px 18px rgba(19,35,70,.06);
-      cursor:pointer;
+    .brand h1{font-size:16px; margin:0; letter-spacing:.2px}
+    .brand p{margin:0; font-size:12px; color:var(--muted)}
+    .right{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:9px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.65);
+      font-size:12px;
+      color:var(--muted);
       user-select:none;
     }
-    .series-chip:hover{box-shadow: var(--ring)}
-
-    .series-playlistBox{
-      border-radius: 18px;
-      border: 1px solid rgba(168,85,247,.22);
-      background:
-        radial-gradient(220px 140px at 10% 20%, rgba(168,85,247,.14), transparent 60%),
-        radial-gradient(220px 140px at 80% 20%, rgba(79,140,255,.14), transparent 60%),
-        radial-gradient(220px 140px at 30% 100%, rgba(34,197,94,.12), transparent 60%),
-        rgba(255,255,255,.9);
-      padding: 12px 12px 14px;
-      box-shadow: 0 14px 30px rgba(168,85,247,.10);
-      margin-top: 10px;
-    }
-    .series-playlistBox b{display:block; margin-bottom:6px}
-    .series-playlistBox a{
-      display:inline-block;
-      margin-top:8px;
-      font-size: 13px;
-      color: var(--accent);
-      text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 3px;
-    }
-
-    .series-main{
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(25,60,110,.12);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      backdrop-filter: blur(10px);
-    }
-    .series-topline{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin: 2px 2px 10px;
-    }
-    .series-topline h2{margin:0; font-size: 18px}
-    .series-topline p{margin:0; color: var(--muted); font-size: 13px}
-
-    .series-cards{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 12px;
-    }
-    .series-card{
-      border: 1px solid rgba(25,60,110,.14);
-      border-radius: 20px;
-      overflow:hidden;
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 14px 30px rgba(19,35,70,.10);
-      cursor:pointer;
-      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-    }
-    .series-card:hover{
-      transform: translateY(-3px);
-      border-color: rgba(79,140,255,.35);
-      box-shadow: 0 18px 40px rgba(19,35,70,.14);
-    }
-    .series-thumb{
-      aspect-ratio: 16/9;
-      position:relative;
-      background: #eaf4ff;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      overflow:hidden;
-    }
-    .series-thumb img{
-      width:100%; height:100%;
-      object-fit: cover;
-      display:block;
-    }
-    .series-play{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.20));
-    }
-    .series-playBadge{
-      width:60px; height:60px;
-      border-radius: 22px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.85);
-      border: 1px solid rgba(79,140,255,.30);
-      box-shadow: 0 18px 40px rgba(19,35,70,.18);
-      font-size: 22px;
-      color: #1a2a44;
-    }
-    .series-meta{padding: 12px 12px 14px; text-align:left}
-    .series-title{margin:0 0 8px; font-size: 14px; line-height: 1.25}
-    .series-row{display:flex; justify-content:space-between; gap: 10px; color: var(--muted); font-size: 12px}
-    .series-row a{color: var(--accent)}
-    .series-row a:hover{text-decoration: underline}
-    .series-tags{
-      display:flex; flex-wrap:wrap; gap:8px;
-      margin-top: 10px;
-    }
-    .series-tag{
-      font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.95);
-      color: var(--muted);
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
-    }
-    .series-tag.level{border-color: rgba(79,140,255,.28); background: rgba(79,140,255,.10); color:#2f5fb8}
-    .series-tag.topic{border-color: rgba(34,197,94,.26); background: rgba(34,197,94,.10); color:#1f7a45}
-    .series-tag.extra{border-color: rgba(168,85,247,.24); background: rgba(168,85,247,.10); color:#6b2db5}
-
-    /* Series modal */
-    .series-modal{
-      position: fixed; inset: 0;
-      background: rgba(14, 25, 45, .55);
-      display:none;
-      align-items:center; justify-content:center;
-      padding: 18px;
-      z-index: 999;
-      backdrop-filter: blur(6px);
-    }
-    .series-dialog{
-      width: min(980px, 100%);
-      border-radius: 26px;
-      overflow:hidden;
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(25,60,110,.14);
-      box-shadow: 0 24px 70px rgba(19,35,70,.22);
-    }
-    .series-dialogTop{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(25,60,110,.12);
-      background: linear-gradient(135deg, rgba(79,140,255,.10), rgba(168,85,247,.10));
-    }
-    .series-dialogTitle{
-      margin:0; font-size: 14px;
-      overflow:hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .series-closeBtn{
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 8px 10px;
-      cursor:pointer;
-      font-size: 13px;
-      box-shadow: 0 10px 20px rgba(19,35,70,.10);
-      font-weight: 850;
-    }
-    .series-player{
-      aspect-ratio: 16/9;
-      background:#000;
-    }
-    .series-player iframe{width:100%; height:100%; border:0; display:block}
-
-    .series-state{
-      border: 1px solid rgba(25,60,110,.12);
-      background: rgba(255,255,255,.88);
-      border-radius: 18px;
-      padding: 12px;
-      box-shadow: 0 12px 28px rgba(19,35,70,.08);
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    /* =========================
-       BOOK PAGE (restyled)
-    ========================= */
-    .book-shell{
-      background: rgba(255,255,255,.75);
-      border: 1px solid rgba(25,60,110,.12);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      backdrop-filter: blur(10px);
-    }
-
-    .book-nav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 16px 18px;
-      gap: 12px;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      background:
-        radial-gradient(900px 260px at 20% 30%, rgba(79,140,255,.18), transparent 60%),
-        radial-gradient(700px 240px at 80% 20%, rgba(168,85,247,.14), transparent 60%),
-        rgba(255,255,255,.85);
-    }
-    .book-brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight: 950;
-      letter-spacing:.3px;
-      white-space:nowrap;
-    }
-    .book-brand .dot{
-      width:14px;height:14px;border-radius:999px;
-      background: conic-gradient(from 210deg, #4f8cff, #a855f7, #22c55e, #f97316, #06b6d4, #4f8cff);
-      box-shadow: 0 8px 18px rgba(19,35,70,.14);
-      border: 1px solid rgba(255,255,255,.7);
-    }
-    .book-links{
-      display:flex;
-      gap:18px;
-      flex-wrap:wrap;
-      color: var(--text);
-      font-weight: 800;
-      font-size: 13px;
-      opacity:.92;
-    }
-    .book-links a:hover{opacity:1}
-    .book-cta{
-      display:flex; align-items:center; gap:10px;
-    }
-    .book-pill{
-      display:flex; align-items:center; gap:10px;
-      background: rgba(79,140,255,.10);
-      border:1px solid rgba(79,140,255,.22);
-      padding:8px 12px;
+    .pill b{color:var(--text)}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.75);
       border-radius:999px;
-      font-weight: 850;
-      color: #2f5fb8;
-      font-size: 12.5px;
-      white-space:nowrap;
-      box-shadow: 0 10px 20px rgba(79,140,255,.10);
-    }
-    .book-pill .ping{
-      width:10px;height:10px;border-radius:999px;
-      background:#22c55e;
-      box-shadow: 0 0 0 4px rgba(34,197,94,.18);
-    }
-
-    .book-btn{
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      color: var(--text);
-      font-weight: 900;
       padding:10px 14px;
-      border-radius:999px;
-      cursor:pointer;
-      box-shadow: 0 12px 22px rgba(19,35,70,.10);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      transition: transform .12s ease;
-    }
-    .book-btn.primary{
-      border-color: rgba(79,140,255,.40);
-      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
-    }
-    .book-btn:hover{transform: translateY(-1px)}
-    .book-btn:active{transform: translateY(0px)}
-    .book-btn.outline{
-      background: rgba(255,255,255,.9);
-      border-color: rgba(25,60,110,.14);
-    }
-
-    .book-hero{
-      padding: 18px 18px 10px;
-      background:
-        radial-gradient(1200px 500px at 25% 35%, rgba(168,85,247,.14), transparent 60%),
-        radial-gradient(900px 480px at 75% 45%, rgba(79,140,255,.14), transparent 55%),
-        rgba(255,255,255,.7);
-    }
-    .book-heroGrid{
-      display:grid;
-      grid-template-columns: 1.08fr .92fr;
-      gap: 18px;
-      align-items:center;
-    }
-    .book-kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.9);
-      border:1px solid rgba(25,60,110,.14);
-      box-shadow: 0 10px 25px rgba(19,35,70,.06);
-      font-weight: 900;
-      color: var(--text);
-      width:fit-content;
-    }
-    .book-kicker .miniDot{
-      width:10px;height:10px;border-radius:999px;
-      background: linear-gradient(180deg,#22c55e,#06b6d4);
-    }
-    .book-h1{
-      margin:14px 0 10px;
-      font-size: clamp(34px, 4.2vw, 52px);
-      line-height:1.03;
-      letter-spacing:-.8px;
-    }
-    .book-hl{
-      background: linear-gradient(180deg, rgba(79,140,255,.0) 0 42%, rgba(79,140,255,.20) 43% 100%);
-      border-radius:14px;
-      padding:0 10px;
-      display:inline-block;
-    }
-    .book-sub{
-      color: var(--muted);
-      font-size:16px;
-      line-height:1.55;
-      max-width: 56ch;
-    }
-    .book-ctaRow{
-      margin-top:16px;
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .book-watch{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      font-weight: 900;
-      color: var(--text);
-      cursor:pointer;
-      box-shadow: 0 10px 20px rgba(19,35,70,.08);
-    }
-    .book-watch:hover{box-shadow: var(--ring)}
-    .book-playIcon{
-      width:34px;height:34px;border-radius:999px;
-      display:grid;place-items:center;
-      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
-      border:1px solid rgba(79,140,255,.22);
-    }
-
-    .book-quote{
-      margin-top:18px;
-      border-left:4px solid rgba(79,140,255,.25);
-      padding-left:14px;
-      color: var(--text);
-      opacity:.92;
-    }
-    .book-quote b{display:block; margin-top:8px; color: var(--text)}
-
-    .book-portraitWrap{
-      position:relative;
-      display:grid;
-      place-items:center;
-      padding: 14px 0;
-    }
-    .book-portraitCircle{
-      width:min(380px, 84%);
-      aspect-ratio:1/1;
-      border-radius:999px;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(79,140,255,.18), rgba(79,140,255,.02) 65%),
-        rgba(255,255,255,.7);
-      border:1px solid rgba(25,60,110,.12);
-      position:absolute;
-      z-index:0;
-      filter: drop-shadow(0 20px 34px rgba(19,35,70,.10));
-    }
-    .book-portrait{
-      width:min(360px, 82%);
-      aspect-ratio: 3 / 4;
-      border-radius: 22px;
-      z-index:1;
-      box-shadow: 0 22px 50px rgba(19,35,70,.18);
-      border: 6px solid rgba(255,255,255,.88);
-      object-fit: cover;
-      background:#fff;
-    }
-    .book-floatBadge{
-      position:absolute;
-      right: 6%;
-      top: 10%;
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(25,60,110,.14);
-      border-radius: 14px;
-      padding:10px 12px;
-      box-shadow: 0 18px 45px rgba(19,35,70,.12);
-      z-index:2;
-      width: 180px;
-      font-weight: 950;
-      color: var(--text);
-    }
-    .book-floatBadge small{
-      display:block;
-      color: var(--muted);
-      font-weight: 850;
-      margin-top:4px;
-    }
-
-    .book-stats{
-      margin-top: 18px;
-      color:#fff;
-      padding: 16px 18px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      background:
-        radial-gradient(800px 260px at 15% 20%, rgba(79,140,255,.35), transparent 60%),
-        radial-gradient(800px 260px at 75% 30%, rgba(168,85,247,.28), transparent 60%),
-        linear-gradient(135deg, rgba(26,42,68,.92), rgba(26,42,68,.88));
-    }
-    .book-stat{text-align:center; padding: 10px 8px}
-    .book-stat .num{
-      font-size: 40px;
-      font-weight: 950;
-      letter-spacing:-.8px;
-      line-height:1;
-    }
-    .book-stat .lab{margin-top:6px; opacity:.92; font-weight:850}
-
-    .book-section{padding: 22px 18px}
-    .book-sectionTitle{font-size: 22px; margin:0 0 10px; letter-spacing:-.2px}
-    .book-sectionSub{color: var(--muted); margin:0 0 16px}
-
-    .book-features{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:14px;
-    }
-    .book-card{
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(25,60,110,.14);
-      border-radius: var(--radius);
-      padding:16px;
-      box-shadow: 0 10px 26px rgba(19,35,70,.08);
-      min-height: 120px;
-    }
-    .book-icon{
-      width:40px;height:40px;border-radius:12px;
-      display:grid;place-items:center;
-      background: linear-gradient(135deg, rgba(79,140,255,.12), rgba(168,85,247,.10));
-      border:1px solid rgba(79,140,255,.18);
-      margin-bottom:10px;
-    }
-    .book-card h3{margin:0 0 6px; font-size:16px}
-    .book-card p{margin:0; color: var(--muted); line-height:1.5; font-size:14px}
-
-    .book-singlePrice{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:14px;
-      align-items:stretch;
-    }
-
-    .book-priceBox{
-      background:
-        radial-gradient(260px 200px at 85% 10%, rgba(168,85,247,.14), transparent 60%),
-        linear-gradient(180deg, rgba(79,140,255,.10), rgba(255,255,255,.75));
-      border:1px solid rgba(79,140,255,.22);
-      border-radius: var(--radius);
-      padding:16px;
-      box-shadow: 0 14px 30px rgba(19,35,70,.10);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .book-priceTag{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      background: rgba(34,197,94,.16);
-      border:1px solid rgba(34,197,94,.24);
-      color:#1f7a45;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:950;
       font-size:12px;
+      cursor:pointer;
+      box-shadow:0 10px 22px rgba(24,55,90,.08);
+      transition:transform .08s ease, box-shadow .12s ease;
     }
-    .book-amount{
-      font-size: 46px;
-      font-weight: 950;
-      letter-spacing: -.8px;
-      margin: 10px 0 6px;
-      color: var(--text);
-    }
-    .book-per{
-      color: var(--muted);
-      font-weight:900;
-      margin-bottom:12px;
-    }
-    .book-list{
-      margin:12px 0 0;
-      padding:0;
-      list-style:none;
+    .btn:hover{transform:translateY(-1px); box-shadow:0 14px 26px rgba(24,55,90,.12)}
+    .btn.primary{background:rgba(79,140,255,.14); border-color:rgba(79,140,255,.25); color:#1a3b88}
+    .btn.ghost{background:transparent}
+
+    .grid{
       display:grid;
-      gap:8px;
+      grid-template-columns: 1.35fr .65fr;
+      gap: var(--gap);
+      margin-top: 18px;
     }
-    .book-list li{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      color: var(--text);
-      font-weight:850;
-      font-size:13.5px;
-      opacity:.9;
-    }
-    .book-check{
-      width:18px;height:18px;border-radius:6px;
-      background: rgba(79,140,255,.12);
-      border:1px solid rgba(79,140,255,.18);
-      display:grid;place-items:center;
-      flex:0 0 auto;
-      margin-top:1px;
-      color:#2f5fb8;
-      font-weight: 950;
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
     }
 
-    .book-embedCard{padding:0; overflow:hidden}
-    .book-embedCard iframe{
-      width:100%;
-      height:760px;
-      border:0;
-      display:block;
-      background:#fff;
-    }
-
-    /* Reviews carousel */
-    .book-carousel{
-      position:relative;
-      border:1px solid rgba(25,60,110,.14);
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 14px 34px rgba(19,35,70,.10);
+    .card{
+      background: rgba(255,255,255,.78);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .book-carouselTrack{display:flex; transition: transform .45s cubic-bezier(.2,.8,.2,1); will-change: transform}
-    .book-reviewSlide{min-width:100%; padding:18px; display:grid; gap:10px}
-    .book-reviewHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
-    .book-who{display:flex; flex-direction:column; gap:2px}
-    .book-who b{font-size:15px}
-    .book-who span{color:var(--muted); font-weight:850; font-size:13px}
-    .book-stars{
-      font-weight:950;
-      color:#2f5fb8;
-      background: rgba(79,140,255,.12);
-      border:1px solid rgba(79,140,255,.18);
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:13px;
-      white-space:nowrap;
+    .card .hd{
+      padding:16px 18px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.6));
     }
-    .book-reviewText{margin:0; color: var(--text); line-height:1.6; font-size:14.5px; opacity:.9}
-    .book-carouselNav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding: 12px 14px 14px;
-      border-top:1px solid rgba(25,60,110,.12);
-      background: rgba(255,255,255,.92);
+    .card .hd h2{margin:0; font-size:14px}
+    .card .hd small{color:var(--muted)}
+    .card .bd{padding:16px 18px}
+
+    .seriesList{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-    .book-arrow{
-      width:44px;height:40px;
-      border-radius: 12px;
-      border:1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.92);
+    @media (max-width: 560px){
+      .seriesList{grid-template-columns:1fr}
+    }
+    .seriesItem{
+      border:1px solid var(--line);
+      border-radius:var(--r2);
+      overflow:hidden;
+      background:rgba(255,255,255,.7);
+      box-shadow:0 10px 20px rgba(24,55,90,.08);
       cursor:pointer;
+      transition:transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+      display:flex; flex-direction:column;
+    }
+    .seriesItem:hover{
+      transform:translateY(-1px);
+      box-shadow:0 16px 26px rgba(24,55,90,.12);
+      border-color: rgba(79,140,255,.28);
+    }
+    .thumb{
+      position:relative;
+      aspect-ratio: 16/9;
+      background:#0b1220;
+      overflow:hidden;
+    }
+    .thumb img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter:saturate(1.1) contrast(1.04);
+      transform:scale(1.02);
+    }
+    .badge{
+      position:absolute; left:10px; top:10px;
+      font-size:11px; padding:6px 10px; border-radius:999px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.7);
+      color:#1a2a44;
+      backdrop-filter: blur(10px);
+    }
+    .play{
+      position:absolute; inset:auto 10px 10px auto;
+      width:38px; height:38px; border-radius:14px;
       display:grid; place-items:center;
-      font-weight:950;
-      color: var(--text);
-      box-shadow: 0 10px 18px rgba(19,35,70,.08);
+      background:rgba(79,140,255,.22);
+      border:1px solid rgba(79,140,255,.25);
+      color:#153a7a;
+      backdrop-filter: blur(10px);
     }
-    .book-arrow:hover{box-shadow: var(--ring)}
-    .book-dots{display:flex; gap:8px; justify-content:center; align-items:center; flex:1}
-    .book-dotBtn{
-      width:10px;height:10px;border-radius:999px;
-      border:0;
-      background: rgba(79,140,255,.25);
-      cursor:pointer;
-    }
-    .book-dotBtn.active{background: var(--accent)}
-    .book-reviewFoot{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
-    .book-tinyLink{
-      font-weight:900;
-      color: var(--text);
-      border:1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.92);
-      padding:9px 12px;
-      border-radius:999px;
-      box-shadow: 0 10px 18px rgba(19,35,70,.08);
-    }
-    .book-tinyLink:hover{box-shadow: var(--ring)}
+    .seriesMeta{padding:12px 12px 14px}
+    .seriesMeta h3{margin:0 0 6px; font-size:13px}
+    .seriesMeta p{margin:0; font-size:12px; color:var(--muted); line-height:1.35}
 
-    .book-footer{
-      padding: 16px 18px 18px;
-      color: var(--muted);
-      border-top:1px solid rgba(25,60,110,.10);
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      justify-content:space-between;
-      align-items:center;
-      background: rgba(255,255,255,.88);
+    .miniRow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px;
+      border-top:1px dashed rgba(25,60,110,.16);
+      font-size:12px;
+      color:var(--muted);
     }
 
-    /* Book video modal */
-    .book-modalBack{
+    .bookBox{
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .bookCover{
+      border:1px solid var(--line);
+      border-radius:var(--r2);
+      overflow:hidden;
+      background:rgba(255,255,255,.75);
+      box-shadow:0 10px 22px rgba(24,55,90,.08);
+    }
+    .bookCover .img{
+      aspect-ratio: 4/5;
+      background: linear-gradient(135deg, rgba(79,140,255,.25), rgba(168,85,247,.22), rgba(34,197,94,.18));
+      display:grid; place-items:center;
+      font-weight:700; letter-spacing:.4px;
+      color:#173763;
+      font-size:14px;
+      text-align:center;
+      padding:14px;
+    }
+    .bookCover .info{padding:12px}
+    .bookCover .info h3{margin:0 0 6px; font-size:14px}
+    .bookCover .info p{margin:0; color:var(--muted); font-size:12px; line-height:1.4}
+
+    .tips{
+      border:1px solid var(--line);
+      border-radius:var(--r2);
+      padding:12px;
+      background:rgba(255,255,255,.62);
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .tips b{color:var(--text)}
+
+    /* ---------- Modal ---------- */
+    .modal{
       position:fixed; inset:0;
-      background: rgba(14, 25, 45, .55);
+      background:rgba(10,16,30,.62);
       display:none;
       align-items:center;
       justify-content:center;
       padding:18px;
-      z-index:999;
-      backdrop-filter: blur(6px);
+      z-index:50;
     }
-    .book-modal{
-      width:min(760px, 100%);
-      background: rgba(255,255,255,.94);
-      border-radius: 26px;
-      border:1px solid rgba(25,60,110,.14);
-      box-shadow: 0 30px 90px rgba(19,35,70,.28);
+    .modal.open{display:flex}
+    .series-dialog{
+      width:min(980px, 92vw);
+      background:rgba(255,255,255,.90);
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:22px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
       overflow:hidden;
+      backdrop-filter: blur(14px);
     }
-    .book-modalTop{
-      display:flex; align-items:center; justify-content:space-between;
+    .series-dialog .top{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding:14px 16px;
-      border-bottom:1px solid rgba(25,60,110,.12);
-      background: linear-gradient(135deg, rgba(79,140,255,.10), rgba(168,85,247,.10));
-      font-weight:950;
-      color: var(--text);
+      border-bottom:1px solid var(--line);
     }
-    .book-modalClose{
-      border:1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.92);
-      width:40px;height:36px;border-radius:12px;
+    .series-dialog .top h3{margin:0; font-size:14px}
+    .close{
+      width:38px; height:38px; border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.7);
       cursor:pointer;
-      font-weight:950;
-      color: var(--text);
-      box-shadow: 0 10px 18px rgba(19,35,70,.10);
+      display:grid; place-items:center;
+      font-size:18px; line-height:1;
     }
-    .book-modalBody{padding:16px}
-    .book-thumb{
-      width:100%;
-      border-radius:16px;
-      border:1px solid rgba(25,60,110,.14);
+    .series-dialog .content{
+      padding:14px 16px 16px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .series-playerBox{
+      border:1px solid var(--line);
+      border-radius:18px;
       overflow:hidden;
-      background:#fff;
-      box-shadow: 0 12px 28px rgba(19,35,70,.10);
+      background:#0b1220;
+      box-shadow:0 16px 30px rgba(24,55,90,.12);
     }
-    .book-thumb img{width:100%; display:block}
-    .book-modalNote{
-      margin:12px 0 0;
-      color: var(--muted);
-      line-height:1.5;
-      font-weight: 800;
-      font-size:14px;
+    .series-player{
+      aspect-ratio: 16 / 9;
+      width:100%;
     }
-    .book-modalActions{
-      margin-top:12px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+    .series-player iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      border-radius:18px;
+    }
+    /* --- FIX: force YouTube player to have real size (avoids audio-only) --- */
+    .series-player{width:100%}
+    #series-yt-player{width:100%; height:100%}
+    #series-yt-player iframe{width:100% !important; height:100% !important; display:block}
+
+    /* Captions panel */
+    .series-captions{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(255,255,255,.74);
+      overflow:hidden;
+    }
+    .captions-toolbar{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.72);
+    }
+    .captions-toolbar .left{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      font-size:12px; color:var(--muted);
+    }
+    .captions-toolbar .right{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+    .toggle{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.75);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .toggle.active{background:rgba(79,140,255,.14); border-color:rgba(79,140,255,.25); color:#1a3b88}
+    .captions-body{
+      padding:10px 12px;
+      max-height:260px;
+      overflow:auto;
+      font-size:15px;
+      line-height:1.85;
+    }
+    .cap-line{
+      padding:6px 8px;
+      border-radius:12px;
+      cursor:pointer;
+      transition: background .12s ease, transform .08s ease;
+    }
+    .cap-line:hover{background:rgba(79,140,255,.09)}
+    .cap-line.active{
+      background:rgba(34,197,94,.16);
+      border:1px solid rgba(34,197,94,.25);
+    }
+    .cap-word.active{
+      background:rgba(79,140,255,.22);
+      border-radius:6px;
+      padding:0 2px;
     }
 
-    @media (max-width: 980px){
-      .series-grid{grid-template-columns: 1fr}
-      .series-aside{position:relative; top:auto}
-      .series-cards{grid-template-columns: repeat(2, minmax(0,1fr));}
-      .book-heroGrid{grid-template-columns: 1fr}
-      .book-features{grid-template-columns: 1fr}
-      .book-stats{grid-template-columns: 1fr}
-      .book-links{display:none}
-      .book-singlePrice{grid-template-columns: 1fr}
-      .book-embedCard iframe{height:820px}
-      .header-actions{display:none}
-      .brand{min-width: unset}
-    }
-    @media (max-width: 560px){
-      .series-cards{grid-template-columns: 1fr;}
-      .tabs{justify-content:flex-start}
-    }
-  
-/* ===== Captions under video (SRT from /captions) ===== */
-.series-captions{
-  margin-top: 12px;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  background: rgba(0,0,0,.25);
-  overflow: hidden;
-}
-.series-captions-head{
-  display:flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255,255,255,.12);
-}
-.series-captions-title{
-  font-weight: 700;
-  letter-spacing: .2px;
-}
-.series-captions-meta{
-  font-size: 12px;
-  opacity: .8;
-  white-space: nowrap;
-}
-.series-captions-body{
-  max-height: 42vh;
-  overflow:auto;
-  padding: 10px 12px 14px;
-  line-height: 1.55;
-}
-.series-captions-empty{
-  opacity:.75;
-  font-size: 14px;
-}
-.cap-line{
-  padding: 8px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  user-select: none;
-}
-.cap-line:hover{
-  background: rgba(255,255,255,.06);
-}
-.cap-line.active{
-  background: rgba(255,255,255,.12);
-  outline: 1px solid rgba(255,255,255,.16);
-}
-.cap-time{
-  display:inline-block;
-  min-width: 64px;
-  font-size: 12px;
-  opacity: .75;
-  margin-right: 10px;
-}
-.cap-text{
-  font-size: 18px; /* keeps it readable like your screenshot */
-}
-.cap-word{
-  display:inline-block;
-  padding: 0 1px;
-  border-radius: 6px;
-}
-.cap-word.done{
-  background: rgba(255, 255, 255, .18);
-}
+    .hidden{display:none !important}
 
-</style>
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+      opacity:.9;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="app-wrap">
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Vietnamese CI Website</h1>
+          <p>Series, playlists, and reading. Slow Vietnamese, big 🧠 energy.</p>
+        </div>
+      </div>
 
-    <div class="app-header">
-      <div class="app-header-inner">
-        <div class="brand">
-          <div class="logo" aria-hidden="true"></div>
+      <div class="right">
+        <div class="pill">📺 <b id="seriesCount">0</b> videos</div>
+        <button class="btn primary" id="openFirst">Play first video</button>
+        <button class="btn ghost" id="scrollTop">Top ↑</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: SERIES -->
+      <section class="card">
+        <div class="hd">
           <div>
-            <h1>Vietnamese Comprehensible Input</h1>
-            <p>Series + booking in one place</p>
+            <h2>Video Series</h2>
+            <small>Click a video to watch + read captions below</small>
+          </div>
+          <small id="statusText">Ready</small>
+        </div>
+
+        <div class="bd">
+          <div class="seriesList" id="seriesList"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: BOOK -->
+      <aside class="card">
+        <div class="hd">
+          <div>
+            <h2>Book / Reading</h2>
+            <small>Extra content & resources</small>
           </div>
         </div>
 
-        <div class="tabs" role="tablist" aria-label="Pages">
-          <button class="tab-btn active" id="tabSeries" role="tab" aria-selected="true" aria-controls="pageSeries">🎬 Series</button>
-          <button class="tab-btn" id="tabBook" role="tab" aria-selected="false" aria-controls="pageBook">📅 Book a class with me</button>
-        </div>
+        <div class="bd">
+          <div class="bookBox">
+            <div class="bookCover">
+              <div class="img">
+                Lazy Vietnamese<br/>
+                Reading Corner 📚
+              </div>
+              <div class="info">
+                <h3>Study tip</h3>
+                <p>Watch one short clip, then read the captions. Tap a line to jump to that moment.</p>
+              </div>
+            </div>
 
-        <div class="header-actions">
-          <a class="btn primary" href="https://www.youtube.com/@VietnameseComprehensibleInput" target="_blank" rel="noreferrer">YouTube</a>
-          <a class="btn" href="https://preply.com/en/tutor/2553268" target="_blank" rel="noreferrer">Preply</a>
+            <div class="tips">
+              <b>How it works:</b><br/>
+              Captions load automatically from your <code>/captions</code> folder using the YouTube video ID.<br/>
+              Example file name: <code>hsG5_ykkkGk.vi.captions.srt</code>
+            </div>
+
+            <div class="tips">
+              <b>Keyboard:</b> <code>Esc</code> closes the player.
+            </div>
+          </div>
         </div>
-      </div>
+      </aside>
     </div>
 
-    <!-- =========================
-         TAB 1: SERIES (AUTO-LOADED)
-    ========================== -->
-    <div class="tab-page active" id="pageSeries" role="tabpanel" aria-labelledby="tabSeries">
-      <div class="series-grid">
-        <aside class="series-aside">
-          <p class="series-sideTitle">Search</p>
-          <div class="series-searchBox">
-            <span aria-hidden="true">🔎</span>
-            <input id="series-q" placeholder="Search titles…" />
-          </div>
+    <footer>
+      © Vietnamese CI Website. Built with calm vibes + captions.
+    </footer>
+  </div>
 
-          <div class="series-state" id="series-stateBox">
-            Loading playlists & videos from YouTube…
-          </div>
-
-          <div style="height:10px"></div>
-
-          <details open>
-            <summary>Level <span class="series-chev">click</span></summary>
-            <div class="series-opt" id="series-levelChips"></div>
-          </details>
-
-          <details>
-            <summary>Topic <span class="series-chev">click</span></summary>
-            <div class="series-opt" id="series-topicChips"></div>
-          </details>
-
-          <div class="series-playlistBox">
-            <b>Channel</b>
-            <div class="series-hint" style="margin:0">
-              This page stays updated as you upload new videos (via API).
-            </div>
-            <a href="https://www.youtube.com/@VietnameseComprehensibleInput/playlists" target="_blank" rel="noreferrer">
-              Open playlists on YouTube ↗
-            </a>
-          </div>
-
-          <div class="series-hint" style="margin-top:10px">
-            ⚠️ If you see an API error, your key likely needs referrer restrictions or API enabled.
-          </div>
-        </aside>
-
-        <main class="series-main">
-          <div class="series-topline">
-            <div>
-              <h2>Series</h2>
-              <p id="series-countText">0 videos</p>
-            </div>
-            <p>
-              <a href="https://www.youtube.com/@VietnameseComprehensibleInput/playlists" target="_blank" rel="noreferrer">
-                All playlists ↗
-              </a>
-            </p>
-          </div>
-
-          <div class="series-cards" id="series-cards"></div>
-        </main>
+  <!-- Modal -->
+  <div class="modal" id="seriesModal" aria-hidden="true">
+    <div class="series-dialog" role="dialog" aria-modal="true" aria-labelledby="seriesTitle">
+      <div class="top">
+        <h3 id="seriesTitle">Video</h3>
+        <button class="close" id="closeModal" aria-label="Close">×</button>
       </div>
 
-      <div class="series-modal" id="series-modal" aria-hidden="true">
-        <div class="series-dialog" role="dialog" aria-modal="true" aria-label="Video player">
-          <div class="series-dialogTop">
-            <p class="series-dialogTitle" id="series-modalTitle">Video</p>
-            <button class="series-closeBtn" id="series-closeBtn">Close ✕</button>
-          </div>
-          <div class="series-player" id="series-playerBox"></div>
-        <div class="series-captions" id="seriesCaptions" aria-label="Captions">
-          <div class="series-captions-head">
-            <div class="series-captions-title">Captions</div>
-            <div class="series-captions-meta" id="seriesCaptionsMeta"></div>
-          </div>
-          <div class="series-captions-body" id="seriesCaptionsBody">
-            <div class="series-captions-empty">No captions loaded.</div>
-          </div>
-        </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- =========================
-         TAB 2: BOOK A CLASS WITH ME
-    ========================== -->
-    <div class="tab-page" id="pageBook" role="tabpanel" aria-labelledby="tabBook">
-      <div class="book-shell">
-        <div class="book-nav">
-          <div class="book-brand">
-            <span class="dot"></span>
-            <span>DIỆP NGUYỄN • VIETNAMESE</span>
-          </div>
-
-          <nav class="book-links">
-            <a href="#book-about">About</a>
-            <a href="#book-services">Services</a>
-            <a href="#book-pricing">Price</a>
-            <a href="#book-book">Book</a>
-            <a href="#book-reviews">Reviews</a>
-            <a href="#book-contact">Contact</a>
-          </nav>
-
-          <div class="book-cta">
-            <div class="book-pill">
-              <span class="ping"></span>
-              <span>Available • Online lessons</span>
-            </div>
-            <button class="book-btn primary" onclick="document.querySelector('#book-book').scrollIntoView({behavior:'smooth'})">Book</button>
+      <div class="content">
+        <div class="series-playerBox">
+          <div class="series-player" id="seriesPlayer">
+            <div id="series-yt-player"></div>
           </div>
         </div>
 
-        <header class="book-hero" id="book-about">
-          <div class="book-heroGrid">
-            <div>
-              <div class="book-kicker">
-                <span class="miniDot"></span>
-                <span>Structured lessons + authentic Vietnamese</span>
-              </div>
-
-              <h1 class="book-h1">Learn <span class="book-hl">Vietnamese</span> with confidence.</h1>
-
-              <p class="book-sub">
-                Xin chào! I’m Diệp, a Vietnamese tutor from Vietnam, currently living in Argentina.
-                My lessons blend <b>Comprehensible Input</b>, <b>real-life conversation</b>, and <b>clear grammar support</b>
-                so you progress naturally and confidently.
-              </p>
-
-              <div class="book-ctaRow">
-                <button class="book-btn primary" onclick="document.querySelector('#book-book').scrollIntoView({behavior:'smooth'})">Check availability</button>
-
-                <button class="book-watch" id="book-watchBtn" type="button">
-                  <span class="book-playIcon" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 7.5v9l8-4.5-8-4.5Z" fill="#2f5fb8"/>
-                    </svg>
-                  </span>
-                  Watch video
-                </button>
-
-                <button class="book-btn outline" onclick="document.querySelector('#book-contact').scrollIntoView({behavior:'smooth'})">Contact</button>
-              </div>
-
-              <div class="book-quote">
-                “Learning a language should feel joyful, human, and healing.”
-                <b>— Diệp</b>
-              </div>
+        <div class="series-captions" id="captionsPanel">
+          <div class="captions-toolbar">
+            <div class="left">
+              📝 Captions:
+              <b id="capLangLabel">vi</b>
+              <span id="capFileLabel" style="opacity:.8"></span>
             </div>
-
-            <div class="book-portraitWrap">
-              <div class="book-portraitCircle"></div>
-
-              <div class="book-floatBadge">
-                5.0 ★ rating
-                <small>Encouraging • Structured</small>
-              </div>
-
-              <img class="book-portrait"
-                src="https://avatars.preply.com/i/logos/i/logos/avatar_al2t8nm2t38.jpg"
-                alt="Diệp Nguyễn profile photo" />
+            <div class="right">
+              <button class="toggle active" id="toggleHighlight">Highlight</button>
+              <button class="toggle" id="toggleAutoScroll">Auto-scroll</button>
             </div>
           </div>
-
-          <div class="book-stats">
-            <div class="book-stat"><div class="num">2141</div><div class="lab">lessons taught</div></div>
-            <div class="book-stat"><div class="num">5.0</div><div class="lab">lesson rating</div></div>
-            <div class="book-stat"><div class="num">28</div><div class="lab">public reviews</div></div>
-          </div>
-        </header>
-
-        <section class="book-section" id="book-services">
-          <h2 class="book-sectionTitle">How we’ll learn</h2>
-          <p class="book-sectionSub">A calm, structured, and very practical approach, tailored to your goals.</p>
-
-          <div class="book-features">
-            <div class="book-card"><div class="book-icon">🧠</div><h3>Comprehensible Input</h3><p>Absorb Vietnamese naturally through understandable listening and reading, even as a beginner.</p></div>
-            <div class="book-card"><div class="book-icon">💬</div><h3>Real-life conversation</h3><p>Practice speaking in a patient, relaxed space where mistakes are welcome and useful.</p></div>
-            <div class="book-card"><div class="book-icon">🧱</div><h3>Structured grammar support</h3><p>Clear explanations that help you build a solid foundation and speak with confidence.</p></div>
-          </div>
-        </section>
-
-        <section class="book-section" id="book-pricing">
-          <h2 class="book-sectionTitle">Price</h2>
-          <p class="book-sectionSub">One simple price for all lesson focuses (beginner, conversation, heritage).</p>
-
-          <div class="book-singlePrice">
-            <div class="book-card">
-              <div class="book-icon">🎯</div>
-              <h3>What you can work on</h3>
-              <p>We pick the focus based on your goals and adjust it anytime.</p>
-              <ul class="book-list" style="margin-top:12px">
-                <li><span class="book-check">✓</span>Beginner foundations (sounds, tones, questions)</li>
-                <li><span class="book-check">✓</span>Conversation & fluency projects</li>
-                <li><span class="book-check">✓</span>Heritage support + reading/writing</li>
-                <li><span class="book-check">✓</span>Homework + feedback</li>
-              </ul>
-            </div>
-
-            <div class="book-priceBox">
-              <div class="book-priceTag">USD</div>
-              <div class="book-amount">$35</div>
-              <div class="book-per">per 50-minute lesson</div>
-              <ul class="book-list">
-                <li><span class="book-check">✓</span>Personalized plan</li>
-                <li><span class="book-check">✓</span>Structured materials</li>
-                <li><span class="book-check">✓</span>Supportive correction</li>
-              </ul>
-              <div class="book-ctaRow" style="margin-top:14px">
-                <button class="book-btn primary" onclick="document.querySelector('#book-book').scrollIntoView({behavior:'smooth'})">Book a time</button>
-                <button class="book-btn outline" onclick="document.querySelector('#book-reviews').scrollIntoView({behavior:'smooth'})">See reviews</button>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px; color:var(--muted); font-weight:800; font-size:13px; line-height:1.5">
-            Payment is handled via PayPal after booking (via your Calendly confirmation page).
-          </div>
-        </section>
-
-        <section class="book-section" id="book-book">
-          <h2 class="book-sectionTitle">Book a lesson</h2>
-          <p class="book-sectionSub">Pick a time that works for you. After booking, you’ll see the PayPal payment button to confirm.</p>
-
-          <div class="book-card book-embedCard">
-            <iframe
-              src="https://calendly.com/ngocdieplindt/dangki?hide_event_type_details=1&hide_gdpr_banner=1"
-              title="Book Vietnamese with Diệp (Calendly)"
-              loading="lazy"></iframe>
-          </div>
-        </section>
-
-        <section class="book-section" id="book-reviews">
-          <h2 class="book-sectionTitle">Student reviews</h2>
-          <p class="book-sectionSub">Swipe or use arrows to browse.</p>
-
-          <div class="book-carousel" aria-roledescription="carousel">
-            <div class="book-carouselTrack" id="book-reviewsTrack"></div>
-
-            <div class="book-carouselNav">
-              <button class="book-arrow" id="book-prevBtn" aria-label="Previous review">‹</button>
-              <div class="book-dots" id="book-dots"></div>
-              <div class="book-reviewFoot">
-                <button class="book-arrow" id="book-nextBtn" aria-label="Next review">›</button>
-                <a class="book-tinyLink" href="https://preply.com/en/tutor/2553268" target="_blank" rel="noopener">View reviews on Preply</a>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px; color:var(--muted); font-weight:800; font-size:13px; line-height:1.5">
-            Want all reviews here? Add them to the <b>bookReviews</b> array in the script.
-          </div>
-        </section>
-
-        <section class="book-section" id="book-contact">
-          <h2 class="book-sectionTitle">Contact</h2>
-          <p class="book-sectionSub">Questions before booking? Send a message.</p>
-
-          <div class="book-features">
-            <div class="book-card">
-              <div class="book-icon">📩</div>
-              <h3>Message</h3>
-              <p>Add your preferred contact method here (email, Instagram, WhatsApp).</p>
-              <div class="book-ctaRow" style="margin-top:12px">
-                <a class="book-btn primary" href="#book-book">Book first</a>
-                <a class="book-btn outline" href="https://preply.com/en/tutor/2553268" target="_blank" rel="noopener">Preply profile</a>
-              </div>
-            </div>
-
-            <div class="book-card"><div class="book-icon">🧾</div><h3>Payment</h3><p>Payment is completed via PayPal after booking. Your lesson is confirmed once payment is received.</p></div>
-            <div class="book-card"><div class="book-icon">🌎</div><h3>Languages</h3><p>Vietnamese (Native), English (C2), Spanish (B1), Chinese (A2), Korean (A1).</p></div>
-          </div>
-        </section>
-
-        <div class="book-footer">
-          <div>© <span id="book-year"></span> Diệp Nguyễn • Vietnamese tutoring</div>
-          <div style="display:flex; gap:14px; flex-wrap:wrap">
-            <a href="#book-about">About</a>
-            <a href="#book-pricing">Price</a>
-            <a href="#book-book">Book</a>
-            <a href="#book-reviews">Reviews</a>
+          <div class="captions-body" id="captionsBody">
+            Loading captions…
           </div>
         </div>
       </div>
-
-      <div class="book-modalBack" id="book-videoModalBack" role="dialog" aria-modal="true" aria-label="Video modal">
-        <div class="book-modal">
-          <div class="book-modalTop">
-            <div>Watch my Preply intro video</div>
-            <button class="book-modalClose" id="book-closeModal" aria-label="Close">✕</button>
-          </div>
-          <div class="book-modalBody">
-            <div class="book-thumb">
-              <img src="https://avatars.preply.com/i/video_thumbnails/36c29f28-8047-488b-8478-7c53fcfeb9f6.png" alt="Video thumbnail"/>
-            </div>
-            <p class="book-modalNote">
-              Preply serves the intro video dynamically, so direct embed isn’t reliable.
-              Click “Play on Preply” to open your profile and play the video there.
-            </p>
-            <div class="book-modalActions">
-              <button class="book-btn outline" id="book-modalCopyLink">Copy Preply link</button>
-              <button class="book-btn primary" id="book-modalOpenPreply">Play on Preply</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
   <script>
-    /* =========================================================
-       0) CONFIG (YOUR API KEY + CHANNEL HANDLE)
-       - Key is visible in HTML. Restrict it in Google Cloud:
-         HTTP referrers: http://localhost/* and yourdomain.com/*
-         API restrictions: YouTube Data API v3 only
-    ========================================================= */
-    const YT_API_KEY = "AIzaSyDYoXV8JQraJtxaNn9eUfWoE93StWWuwvs";
-    const YT_CHANNEL_HANDLE = "VietnameseComprehensibleInput";
+    // ---------------------------
+    // CONFIG: your videos
+    // ---------------------------
+    // IMPORTANT:
+    // - Each item needs: title, id (YouTube video ID), desc (optional), tag (optional)
+    // - Captions file must exist at: captions/<ID>.vi.captions.srt
+    const VIDEOS = [
+      // Replace/extend this list with your real videos
+      { title: "Sample Video 1", id: "hsG5_ykkkGk", desc: "Vietnamese CI example", tag: "CI" },
+      // { title: "Another video", id: "XXXX", desc: "desc", tag: "Series" },
+    ];
 
-    // If forHandle ever fails, you can hardcode the channelId here:
-    // const YT_CHANNEL_ID_OVERRIDE = "UCxxxxxxxxxxxxxxxxxxxxxx";
-    const YT_CHANNEL_ID_OVERRIDE = "";
+    const CAPTIONS_LANG = "vi";
+    const CAPTIONS_SUFFIX = ".vi.captions.srt"; // file naming convention
 
-    /* =========================================================
-       1) TABS
-    ========================================================= */
-    const tabSeries = document.getElementById("tabSeries");
-    const tabBook = document.getElementById("tabBook");
-    const pageSeries = document.getElementById("pageSeries");
-    const pageBook = document.getElementById("pageBook");
+    // ---------------------------
+    // DOM
+    // ---------------------------
+    const seriesList = document.getElementById("seriesList");
+    const seriesCount = document.getElementById("seriesCount");
+    const statusText = document.getElementById("statusText");
+    const openFirst = document.getElementById("openFirst");
+    const scrollTopBtn = document.getElementById("scrollTop");
 
-    function setTab(which){
-      const isSeries = which === "series";
-      tabSeries.classList.toggle("active", isSeries);
-      tabBook.classList.toggle("active", !isSeries);
-      tabSeries.setAttribute("aria-selected", isSeries ? "true" : "false");
-      tabBook.setAttribute("aria-selected", !isSeries ? "true" : "false");
-      pageSeries.classList.toggle("active", isSeries);
-      pageBook.classList.toggle("active", !isSeries);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    tabSeries.addEventListener("click", () => setTab("series"));
-    tabBook.addEventListener("click", () => setTab("book"));
+    const modal = document.getElementById("seriesModal");
+    const closeModalBtn = document.getElementById("closeModal");
+    const seriesTitle = document.getElementById("seriesTitle");
 
-    /* =========================================================
-       2) SERIES UI HOOKS
-    ========================================================= */
-    const seriesState = { q: "", level: "All", topic: "All" };
-    const seriesCards = document.getElementById("series-cards");
-    const seriesQ = document.getElementById("series-q");
-    const seriesCountText = document.getElementById("series-countText");
-    const seriesStateBox = document.getElementById("series-stateBox");
+    const captionsPanel = document.getElementById("captionsPanel");
+    const captionsBody = document.getElementById("captionsBody");
+    const capLangLabel = document.getElementById("capLangLabel");
+    const capFileLabel = document.getElementById("capFileLabel");
 
-    const seriesModal = document.getElementById("series-modal");
-    const seriesPlayerBox = document.getElementById("series-playerBox");
-    const seriesCaptions = document.getElementById("seriesCaptions");
-    const seriesCaptionsMeta = document.getElementById("seriesCaptionsMeta");
-    const seriesCaptionsBody = document.getElementById("seriesCaptionsBody");
-    const seriesModalTitle = document.getElementById("series-modalTitle");
-    const seriesCloseBtn = document.getElementById("series-closeBtn");
+    const toggleHighlight = document.getElementById("toggleHighlight");
+    const toggleAutoScroll = document.getElementById("toggleAutoScroll");
 
-    function seriesThumb(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
-    function uniq(arr){ return [...new Set(arr)].sort((a,b)=>a.localeCompare(b)); }
-
-    
-    // ===== YouTube Player (Iframe API) + Captions (SRT) =====
+    // ---------------------------
+    // State
+    // ---------------------------
     let ytPlayer = null;
-    let ytApiReady = false;
-    let capCues = [];
-    let capNodes = []; // [{lineEl, wordEls}]
-    let capTickTimer = null;
+    let ytReady = false;
 
-    window.onYouTubeIframeAPIReady = function(){
-      ytApiReady = true;
-    };
+    let currentVideo = null;
+    let captions = []; // parsed captions [{start,end,text,words:[{w, startOffset,endOffset}]}]
+    let captionTimer = null;
 
-    function seriesEnsurePlayer(videoId){
-      // Create container
-      seriesPlayerBox.innerHTML = `<div id="series-yt-player" style="width:100%; aspect-ratio: 16/9; border-radius: 14px; overflow:hidden;"></div>`;
+    let highlightOn = true;
+    let autoScrollOn = false;
+    let activeCapIndex = -1;
 
-      // If API not ready yet, wait a tiny bit
-      const make = () => {
-        if(!window.YT || !YT.Player){
-          setTimeout(make, 120);
-          return;
-        }
-        // Destroy previous player if any
-        try { if(ytPlayer) ytPlayer.destroy(); } catch(e){}
-        ytPlayer = new YT.Player("series-yt-player", {
-          videoId,
-          playerVars: {
-            autoplay: 1,
-            rel: 0,
-            modestbranding: 1,
-            playsinline: 1
-          }
-        });
-      };
-      make();
-    }
+    // ---------------------------
+    // Render video cards
+    // ---------------------------
+    function renderVideos(){
+      seriesList.innerHTML = "";
+      seriesCount.textContent = String(VIDEOS.length);
 
-    function srtTimeToSeconds(t){
-      // "HH:MM:SS,mmm" or "HH:MM:SS.mmm"
-      const m = t.trim().match(/^(\d+):(\d+):(\d+)[,.](\d+)$/);
-      if(!m) return 0;
-      const hh = parseInt(m[1],10), mm = parseInt(m[2],10), ss = parseInt(m[3],10), ms = parseInt(m[4].padEnd(3,'0').slice(0,3),10);
-      return hh*3600 + mm*60 + ss + (ms/1000);
-    }
+      VIDEOS.forEach((v, idx) => {
+        const el = document.createElement("div");
+        el.className = "seriesItem";
+        el.tabIndex = 0;
+        el.setAttribute("role","button");
+        el.setAttribute("aria-label", "Play " + v.title);
 
-    function parseSRT(srt){
-      // Basic SRT parser -> [{start,end,text,words}]
-      const blocks = srt.replace(/\r/g,'').trim().split(/\n\n+/);
-      const cues = [];
-      for(const b of blocks){
-        const lines = b.split('\n').filter(Boolean);
-        if(lines.length < 2) continue;
-        // Some SRTs include an index line
-        let timeLineIdx = 0;
-        if(/^\d+$/.test(lines[0].trim())) timeLineIdx = 1;
+        // YouTube thumbnail
+        const thumbUrl = `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
 
-        const tl = lines[timeLineIdx] || "";
-        const tm = tl.match(/(\d+:\d+:\d+[,.]\d+)\s*-->\s*(\d+:\d+:\d+[,.]\d+)/);
-        if(!tm) continue;
-
-        const start = srtTimeToSeconds(tm[1]);
-        const end = srtTimeToSeconds(tm[2]);
-
-        const text = lines.slice(timeLineIdx+1).join(' ').replace(/<[^>]+>/g,'').trim();
-        if(!text) continue;
-
-        const words = text.split(/\s+/).filter(Boolean);
-        cues.push({ start, end, text, words });
-      }
-      return cues;
-    }
-
-    function formatClock(sec){
-      sec = Math.max(0, sec || 0);
-      const m = Math.floor(sec/60);
-      const s = Math.floor(sec%60);
-      return `${m}:${String(s).padStart(2,'0')}`;
-    }
-
-    async function fetchSrtForVideo(videoId){
-      // Try a few common filename patterns so you don't have to fight it
-      const tries = [
-        `${videoId}.srt`,
-        `${videoId}.vi.srt`,
-        `${videoId}.en.srt`,
-        `${videoId}.vi.captions.srt`,
-        `${videoId}.captions.srt`,
-      ];
-      const base = (window.CAPTIONS_BASE || "./captions/");
-
-      for(const name of tries){
-        const url = base + name;
-        try{
-          const r = await fetch(url, { cache: "no-store" });
-          if(r.ok){
-            const txt = await r.text();
-            return { name, txt };
-          }
-        }catch(e){}
-      }
-      return null;
-    }
-
-    function renderCaptions(){
-      seriesCaptionsMeta.textContent = capCues.length ? `${capCues.length} lines` : "No captions";
-      if(!capCues.length){
-        seriesCaptionsBody.innerHTML = `<div class="series-captions-empty">No captions found for this video. Put an .srt file in <b>/captions</b> named like <b>{videoId}.srt</b>.</div>`;
-        return;
-      }
-
-      capNodes = [];
-      const frag = document.createDocumentFragment();
-
-      capCues.forEach((cue, i) => {
-        const line = document.createElement("div");
-        line.className = "cap-line";
-        line.dataset.i = String(i);
-
-        const time = document.createElement("span");
-        time.className = "cap-time";
-        time.textContent = formatClock(cue.start);
-
-        const text = document.createElement("span");
-        text.className = "cap-text";
-
-        // Build word spans (for approximate "karaoke" highlight)
-        const wordEls = cue.words.map((w, idx) => {
-          const sp = document.createElement("span");
-          sp.className = "cap-word";
-          sp.textContent = w + (idx === cue.words.length-1 ? "" : " ");
-          text.appendChild(sp);
-          return sp;
-        });
-
-        line.appendChild(time);
-        line.appendChild(text);
-
-        line.addEventListener("click", () => {
-          if(ytPlayer && typeof ytPlayer.seekTo === "function"){
-            ytPlayer.seekTo(cue.start + 0.01, true);
-          }
-        });
-
-        capNodes.push({ lineEl: line, wordEls });
-        frag.appendChild(line);
-      });
-
-      seriesCaptionsBody.innerHTML = "";
-      seriesCaptionsBody.appendChild(frag);
-    }
-
-    function stopCaptionTick(){
-      if(capTickTimer){
-        clearInterval(capTickTimer);
-        capTickTimer = null;
-      }
-    }
-
-    function startCaptionTick(){
-      stopCaptionTick();
-      capTickTimer = setInterval(() => {
-        if(!ytPlayer || typeof ytPlayer.getCurrentTime !== "function") return;
-        const t = ytPlayer.getCurrentTime();
-
-        // Find active cue (simple forward scan; enough for CI videos)
-        let active = -1;
-        for(let i=0;i<capCues.length;i++){
-          const c = capCues[i];
-          if(t >= c.start && t <= c.end){
-            active = i; break;
-          }
-        }
-
-        capNodes.forEach((n, i) => {
-          if(i === active){
-            n.lineEl.classList.add("active");
-
-            // Approx word highlight by progress through the caption line
-            const c = capCues[i];
-            const dur = Math.max(0.001, c.end - c.start);
-            const p = Math.min(1, Math.max(0, (t - c.start) / dur));
-            const k = Math.floor(p * (n.wordEls.length || 1));
-
-            n.wordEls.forEach((wEl, idx) => {
-              if(idx <= k) wEl.classList.add("done");
-              else wEl.classList.remove("done");
-            });
-
-            // Keep active line in view (gentle)
-            const box = seriesCaptionsBody;
-            const top = n.lineEl.offsetTop;
-            const bot = top + n.lineEl.offsetHeight;
-            const viewTop = box.scrollTop;
-            const viewBot = viewTop + box.clientHeight;
-            if(top < viewTop + 40) box.scrollTop = Math.max(0, top - 40);
-            else if(bot > viewBot - 40) box.scrollTop = Math.max(0, bot - box.clientHeight + 40);
-          }else{
-            n.lineEl.classList.remove("active");
-            // Clear word highlight for non-active lines
-            n.wordEls.forEach(wEl => wEl.classList.remove("done"));
-          }
-        });
-      }, 180);
-    }
-
-    async function seriesLoadCaptions(videoId){
-      // Reset UI quickly
-      capCues = [];
-      seriesCaptionsMeta.textContent = "Loading…";
-      seriesCaptionsBody.innerHTML = `<div class="series-captions-empty">Loading captions…</div>`;
-
-      const res = await fetchSrtForVideo(videoId);
-      if(!res){
-        capCues = [];
-        renderCaptions();
-        return;
-      }
-
-      capCues = parseSRT(res.txt);
-      seriesCaptionsMeta.textContent = `${capCues.length} lines • ${res.name}`;
-      renderCaptions();
-      startCaptionTick();
-    }
-
-    function seriesOpenVideo(v){
-      seriesModalTitle.textContent = v.title || "Video";
-      seriesModal.classList.add("open");
-
-      seriesEnsurePlayer(v.id);
-      seriesLoadCaptions(v.id);
-    }
-
-    function seriesCloseVideo(){
-      seriesModal.classList.remove("open");
-      stopCaptionTick();
-
-      // Clean captions
-      capCues = [];
-      capNodes = [];
-      if(seriesCaptionsBody) seriesCaptionsBody.innerHTML = `<div class="series-captions-empty">No captions loaded.</div>`;
-      if(seriesCaptionsMeta) seriesCaptionsMeta.textContent = "";
-
-      // Destroy player
-      try { if(ytPlayer) ytPlayer.destroy(); } catch(e){}
-      ytPlayer = null;
-      seriesPlayerBox.innerHTML = "";
-    }
-
-    seriesCloseBtn.addEventListener("click", seriesCloseVideo);
-    seriesModal.addEventListener("click", (e) => { if(e.target === seriesModal) seriesCloseVideo(); });
-
-    window.addEventListener("keydown", (e) => {
-      if(e.key === "Escape"){
-        seriesCloseVideo();
-        bookCloseModal();
-      }
-    });
-
-    function seriesRenderChips(el, items, key){
-      el.innerHTML = "";
-
-      const mk = (label, isAll=false) => {
-        const chip = document.createElement("span");
-        chip.className = "series-chip";
-        chip.textContent = label;
-        chip.addEventListener("click", () => {
-          seriesState[key] = label;
-          seriesRender();
-        });
-        if(isAll){
-          chip.style.borderColor = "rgba(79,140,255,.25)";
-          chip.style.background = "rgba(79,140,255,.08)";
-        }
-        return chip;
-      };
-
-      el.appendChild(mk("All", true));
-      items.forEach(v => el.appendChild(mk(v)));
-    }
-
-    function seriesInferLevel(text){
-      const t = (text || "").toLowerCase();
-
-      // CEFR-ish
-      const cefr = t.match(/\b(a0|a1|a2|b1|b2|c1|c2)\b/i);
-      if(cefr) return cefr[1].toUpperCase();
-
-      if(t.includes("beginner") || t.includes("complete beginner")) return "Beginner";
-      if(t.includes("intermediate")) return "Intermediate";
-      if(t.includes("advanced")) return "Advanced";
-
-      // fallback
-      return "All levels";
-    }
-
-    function seriesMatches(v){
-      const q = seriesState.q.trim().toLowerCase();
-      const okQ = !q || (v.title || "").toLowerCase().includes(q);
-      const okL = seriesState.level === "All" || v.level === seriesState.level;
-      const okT = seriesState.topic === "All" || v.topic === seriesState.topic;
-      return okQ && okL && okT;
-    }
-
-    let seriesVideos = []; // filled by API
-
-    function seriesRender(){
-      const filtered = seriesVideos.filter(seriesMatches);
-
-      seriesCards.innerHTML = "";
-      filtered.forEach(v => {
-        const card = document.createElement("article");
-        card.className = "series-card";
-        card.innerHTML = `
-          <div class="series-thumb">
-            <img src="${seriesThumb(v.id)}" alt="${escapeHtml(v.title || "Video")}">
-            <div class="series-play"><div class="series-playBadge">▶</div></div>
+        el.innerHTML = `
+          <div class="thumb">
+            <img src="${thumbUrl}" alt="">
+            <div class="badge">${v.tag ? v.tag : "VIDEO"}</div>
+            <div class="play">▶</div>
           </div>
-          <div class="series-meta">
-            <h3 class="series-title">${escapeHtml(v.title || "Untitled")}</h3>
-            <div class="series-row">
-              <span>Click to play</span>
-              <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noreferrer">YouTube ↗</a>
-            </div>
-            <div class="series-tags">
-              <span class="series-tag level">${escapeHtml(v.level)}</span>
-              <span class="series-tag topic">${escapeHtml(v.topic)}</span>
-              <span class="series-tag extra">CI</span>
-            </div>
+          <div class="seriesMeta">
+            <h3>${escapeHtml(v.title)}</h3>
+            <p>${escapeHtml(v.desc || "")}</p>
+          </div>
+          <div class="miniRow">
+            <span>Video ID: <b>${v.id}</b></span>
+            <span>Click to open</span>
           </div>
         `;
-        card.addEventListener("click", () => seriesOpenVideo(v));
-        seriesCards.appendChild(card);
-      });
 
-      seriesCountText.textContent = `${filtered.length} video${filtered.length === 1 ? "" : "s"} shown`;
+        el.addEventListener("click", () => openVideo(v));
+        el.addEventListener("keydown", (e) => {
+          if(e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            openVideo(v);
+          }
+        });
 
-      // highlight active chips
-      document.querySelectorAll("#series-levelChips .series-chip").forEach(ch => {
-        ch.style.outline = (ch.textContent === seriesState.level) ? "2px solid rgba(79,140,255,.35)" : "none";
-      });
-      document.querySelectorAll("#series-topicChips .series-chip").forEach(ch => {
-        ch.style.outline = (ch.textContent === seriesState.topic) ? "2px solid rgba(79,140,255,.35)" : "none";
+        seriesList.appendChild(el);
       });
     }
 
-    seriesQ.addEventListener("input", () => {
-      seriesState.q = seriesQ.value;
-      seriesRender();
-    });
-
     function escapeHtml(str){
-      return (str || "")
+      return String(str || "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
+        .replaceAll("\"","&quot;")
         .replaceAll("'","&#039;");
     }
 
-    /* =========================================================
-       3) YOUTUBE DATA API (AUTO-LOAD ALL PLAYLISTS + VIDEOS)
-    ========================================================= */
-    async function ytFetch(url){
-      const res = await fetch(url);
-      if(!res.ok){
-        let msg = `${res.status} ${res.statusText}`;
-        try{
-          const j = await res.json();
-          msg = j?.error?.message || msg;
-        }catch{}
-        throw new Error(msg);
-      }
-      return res.json();
-    }
-
-    async function getChannelId(){
-      if(YT_CHANNEL_ID_OVERRIDE) return YT_CHANNEL_ID_OVERRIDE;
-
-      // forHandle is supported on YouTube Data API v3 for many channels.
-      const url = `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(YT_CHANNEL_HANDLE)}&key=${encodeURIComponent(YT_API_KEY)}`;
-      const data = await ytFetch(url);
-      const id = data?.items?.[0]?.id;
-      if(!id){
-        throw new Error(`Could not resolve channel ID from handle @${YT_CHANNEL_HANDLE}. You can hardcode YT_CHANNEL_ID_OVERRIDE.`);
-      }
-      return id;
-    }
-
-    async function getAllPlaylists(channelId){
-      const all = [];
-      let pageToken = "";
-      do{
-        const url =
-          `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&channelId=${encodeURIComponent(channelId)}&maxResults=50&pageToken=${encodeURIComponent(pageToken)}&key=${encodeURIComponent(YT_API_KEY)}`;
-        const data = await ytFetch(url);
-        all.push(...(data.items || []));
-        pageToken = data.nextPageToken || "";
-      }while(pageToken);
-      return all;
-    }
-
-    async function getAllPlaylistItems(playlistId){
-      const all = [];
-      let pageToken = "";
-      do{
-        const url =
-          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${encodeURIComponent(playlistId)}&maxResults=50&pageToken=${encodeURIComponent(pageToken)}&key=${encodeURIComponent(YT_API_KEY)}`;
-        const data = await ytFetch(url);
-        all.push(...(data.items || []));
-        pageToken = data.nextPageToken || "";
-      }while(pageToken);
-      return all;
-    }
-
-    async function loadSeriesFromYouTube(){
-      seriesStateBox.textContent = "Loading channel…";
-
-      const channelId = await getChannelId();
-      seriesStateBox.textContent = "Loading playlists…";
-
-      const playlists = await getAllPlaylists(channelId);
-
-      // Keep out “Liked videos” etc (usually not returned anyway). Filter to public-ish playlists that have items.
-      const usable = playlists
-        .filter(p => (p?.contentDetails?.itemCount ?? 0) > 0)
-        .map(p => ({
-          id: p.id,
-          title: p?.snippet?.title || "Playlist",
-          count: p?.contentDetails?.itemCount || 0
-        }));
-
-      seriesStateBox.innerHTML =
-        `Found <b>${usable.length}</b> playlists. Loading videos…`;
-
-      // Fetch playlist items sequentially (more reliable with quota/limits)
-      const videoMap = new Map(); // videoId -> video object
-      let loadedPlaylists = 0;
-
-      for(const pl of usable){
-        loadedPlaylists++;
-        seriesStateBox.innerHTML =
-          `Loading videos… <b>${loadedPlaylists}/${usable.length}</b> playlists<br><span style="font-weight:800; color:var(--muted)">${escapeHtml(pl.title)}</span>`;
-
-        const items = await getAllPlaylistItems(pl.id);
-
-        for(const it of items){
-          const vid = it?.contentDetails?.videoId;
-          if(!vid) continue;
-
-          const title = it?.snippet?.title || "";
-          const topic = pl.title;               // Topic = playlist title
-          const level = seriesInferLevel(pl.title); // Level inferred from playlist title
-
-          // Deduplicate video IDs (video can appear in multiple playlists)
-          if(!videoMap.has(vid)){
-            videoMap.set(vid, {
-              id: vid,
-              title,
-              topic,
-              level,
-            });
-          } else {
-            // If already exists, you could choose to keep the "best" topic/level.
-            // We'll keep the first, but you can change this behavior.
-          }
-        }
-      }
-
-      seriesVideos = [...videoMap.values()];
-
-      // Build filter chips
-      const levels = uniq(seriesVideos.map(v => v.level));
-      const topics = uniq(seriesVideos.map(v => v.topic));
-
-      seriesRenderChips(document.getElementById("series-levelChips"), levels, "level");
-      seriesRenderChips(document.getElementById("series-topicChips"), topics, "topic");
-
-      seriesStateBox.innerHTML =
-        `✅ Loaded <b>${seriesVideos.length}</b> videos from <b>${usable.length}</b> playlists.<br>
-         <span style="font-weight:800; color:var(--muted)">Use search + filters on the left.</span>`;
-
-      seriesRender();
-    }
-
-    // Kick off loading
-    loadSeriesFromYouTube().catch(err => {
-      console.error(err);
-      seriesStateBox.innerHTML =
-        `❌ Could not load from YouTube API.<br><br>
-         <b>Error:</b> ${escapeHtml(err.message)}<br><br>
-         <span style="font-weight:800; color:var(--muted)">
-           Fix checklist:
-           <br>1) Enable “YouTube Data API v3” for this project
-           <br>2) Restrict key: API restrictions = YouTube Data API v3
-           <br>3) Restrict key: HTTP referrers include <code>http://localhost/*</code> (and your domain)
-           <br>4) If handle lookup fails, set <b>YT_CHANNEL_ID_OVERRIDE</b>
-         </span>`;
-    });
-
-    /* =========================================================
-       4) BOOK PAGE SCRIPT (year + reviews carousel + modal)
-    ========================================================= */
-    document.getElementById("book-year").textContent = new Date().getFullYear();
-
-    const bookReviews = [
-      { name: "Marie", date: "December 4, 2025", rating: 5, text: "If you want to learn Vietnamese, don't hesitate for a second to take lessons with Diệp! She adapts to our needs, is very dynamic, makes us practice a lot, and does so with a good mood." },
-      { name: "Duy", date: "June 20, 2025 (edited)", rating: 5, text: "Diep is an excellent teacher who makes the lessons varied and motivating. She challenges me specifically so that I can speak the language even better. The lessons are a lot of fun with her - Thank you very much." },
-      { name: "van", date: "April 25, 2025 (edited)", rating: 5, text: "Diệp is an excellent tutor who is so patient, effusive, fun, relatable, personable, and prepared to guide you through learning Vietnamese... Highly recommend, it's been a true delight so far!" },
-      { name: "Juan", date: "March 7, 2025", rating: 5, text: "Amazing teacher, she puts a lot on the class preparation, makes great exercises to practice, is very patient and generous." },
-      { name: "Kelly", date: "February 7, 2025", rating: 5, text: "Diệp is an incredible tutor! She's a fantastic conversation partner and I learn so much with her... Highly recommend her to anyone looking to learn!" },
-      { name: "Caity", date: "December 17, 2024", rating: 5, text: "I love learning with Diệp! My Vietnamese has progressed enormously... I highly recommend working with her!" }
-    ];
-
-    const bookTrack = document.getElementById("book-reviewsTrack");
-    const bookDotsWrap = document.getElementById("book-dots");
-
-    function bookStarString(n){
-      return "★".repeat(n) + "☆".repeat(Math.max(0, 5-n));
-    }
-
-    bookReviews.forEach((r, i) => {
-      const slide = document.createElement("div");
-      slide.className = "book-reviewSlide";
-      slide.innerHTML = `
-        <div class="book-reviewHead">
-          <div class="book-who">
-            <b>${escapeHtml(r.name)}</b>
-            <span>${escapeHtml(r.date)}</span>
-          </div>
-          <div class="book-stars" aria-label="${r.rating} out of 5">
-            ${bookStarString(r.rating)}
-          </div>
-        </div>
-        <p class="book-reviewText">${escapeHtml(r.text)}</p>
-      `;
-      bookTrack.appendChild(slide);
-
-      const dot = document.createElement("button");
-      dot.className = "book-dotBtn" + (i===0 ? " active" : "");
-      dot.type = "button";
-      dot.setAttribute("aria-label", `Go to review ${i+1}`);
-      dot.addEventListener("click", () => bookGoTo(i, true));
-      bookDotsWrap.appendChild(dot);
-    });
-
-    const bookDots = [...document.querySelectorAll(".book-dotBtn")];
-    let bookIndex = 0;
-    let bookAutoTimer = null;
-
-    function bookPaint(){
-      bookTrack.style.transform = `translateX(${-bookIndex * 100}%)`;
-      bookDots.forEach((d, i) => d.classList.toggle("active", i===bookIndex));
-    }
-
-    function bookGoTo(i, userAction=false){
-      bookIndex = (i + bookReviews.length) % bookReviews.length;
-      bookPaint();
-      if(userAction) bookRestartAuto();
-    }
-
-    document.getElementById("book-prevBtn").addEventListener("click", () => bookGoTo(bookIndex-1, true));
-    document.getElementById("book-nextBtn").addEventListener("click", () => bookGoTo(bookIndex+1, true));
-
-    function bookRestartAuto(){
-      clearInterval(bookAutoTimer);
-      bookAutoTimer = setInterval(() => bookGoTo(bookIndex+1, false), 6500);
-    }
-    bookRestartAuto();
-
-    let bookStartX = null;
-    bookTrack.addEventListener("pointerdown", (e) => { bookStartX = e.clientX; });
-    bookTrack.addEventListener("pointerup", (e) => {
-      if(bookStartX === null) return;
-      const dx = e.clientX - bookStartX;
-      if(Math.abs(dx) > 40){
-        bookGoTo(bookIndex + (dx < 0 ? 1 : -1), true);
-      }
-      bookStartX = null;
-    });
-
-    // Book modal (Preply)
-    const bookModalBack = document.getElementById("book-videoModalBack");
-    const bookOpenBtn = document.getElementById("book-watchBtn");
-    const bookCloseBtn = document.getElementById("book-closeModal");
-    const bookOpenPreplyBtn = document.getElementById("book-modalOpenPreply");
-    const bookCopyBtn = document.getElementById("book-modalCopyLink");
-    const preplyUrl = "https://preply.com/en/tutor/2553268";
-
-    function bookOpenModal(){
-      bookModalBack.style.display = "flex";
+    // ---------------------------
+    // Modal open/close
+    // ---------------------------
+    function openModal(){
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden","false");
       document.body.style.overflow = "hidden";
     }
-    function bookCloseModal(){
-      bookModalBack.style.display = "none";
+    function closeModal(){
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden","true");
       document.body.style.overflow = "";
+      stopCaptionLoop();
+
+      if(ytPlayer){
+        try{ ytPlayer.stopVideo(); }catch(_){}
+      }
     }
 
-    bookOpenBtn.addEventListener("click", bookOpenModal);
-    bookCloseBtn.addEventListener("click", bookCloseModal);
-    bookModalBack.addEventListener("click", (e) => { if(e.target === bookModalBack) bookCloseModal(); });
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeModal(); });
 
-    bookOpenPreplyBtn.addEventListener("click", () => {
-      window.open(preplyUrl, "_blank", "noopener");
-      bookCloseModal();
+    openFirst.addEventListener("click", () => {
+      if(VIDEOS[0]) openVideo(VIDEOS[0]);
     });
 
-    bookCopyBtn.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(preplyUrl);
-        bookCopyBtn.textContent = "Copied!";
-        setTimeout(()=> bookCopyBtn.textContent = "Copy Preply link", 1400);
-      }catch(err){
-        prompt("Copy this link:", preplyUrl);
+    scrollTopBtn.addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+    // ---------------------------
+    // YouTube IFrame API
+    // ---------------------------
+    window.onYouTubeIframeAPIReady = () => {
+      ytReady = true;
+      statusText.textContent = "Player ready";
+      // Create player once (we'll load videos into it)
+      ytPlayer = new YT.Player("series-yt-player", {
+        videoId: VIDEOS[0] ? VIDEOS[0].id : "",
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          rel: 0,
+          modestbranding: 1
+        },
+        events: {
+          onReady: () => {},
+          onStateChange: (e) => {
+            // When playing, start sync loop
+            if(e.data === YT.PlayerState.PLAYING){
+              startCaptionLoop();
+            } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED){
+              stopCaptionLoop();
+            }
+          }
+        }
+      });
+    };
+
+    // ---------------------------
+    // Open video + load captions
+    // ---------------------------
+    async function openVideo(v){
+      currentVideo = v;
+      seriesTitle.textContent = v.title;
+      openModal();
+
+      // Load video
+      if(ytReady && ytPlayer){
+        try{
+          ytPlayer.loadVideoById(v.id);
+        }catch(err){
+          console.warn("YT load error:", err);
+        }
+      } else {
+        statusText.textContent = "Waiting for player…";
       }
-    });
-  </script>
 
-<script src="https://www.youtube.com/iframe_api"></script>
+      // Load captions
+      capLangLabel.textContent = CAPTIONS_LANG;
+      const capFile = `captions/${v.id}${CAPTIONS_SUFFIX}`;
+      capFileLabel.textContent = `(${capFile})`;
+
+      captionsBody.textContent = "Loading captions…";
+      captions = [];
+      activeCapIndex = -1;
+
+      try{
+        const res = await fetch(capFile, { cache: "no-store" });
+        if(!res.ok){
+          throw new Error(`Captions not found: ${capFile} (${res.status})`);
+        }
+        const srtText = await res.text();
+        captions = parseSRT(srtText);
+        renderCaptions();
+        statusText.textContent = "Captions loaded";
+      }catch(err){
+        console.warn(err);
+        captionsBody.innerHTML = `<div style="color:#b42318;padding:8px 4px">
+          ❌ Couldn’t load captions for this video.<br/>
+          <span style="color:#587194">Expected file:</span> <code>${capFile}</code>
+        </div>`;
+        statusText.textContent = "Missing captions";
+      }
+    }
+
+    // ---------------------------
+    // Captions UI
+    // ---------------------------
+    function renderCaptions(){
+      captionsBody.innerHTML = "";
+      if(!captions.length){
+        captionsBody.textContent = "No captions.";
+        return;
+      }
+
+      captions.forEach((cap, i) => {
+        const line = document.createElement("div");
+        line.className = "cap-line";
+        line.dataset.index = String(i);
+        line.dataset.start = String(cap.start);
+
+        // words (for highlight)
+        const frag = document.createDocumentFragment();
+        cap.words.forEach((wObj) => {
+          const sp = document.createElement("span");
+          sp.textContent = wObj.w + " ";
+          sp.className = "cap-word";
+          sp.dataset.wstart = String(wObj.absStart);
+          sp.dataset.wend = String(wObj.absEnd);
+          frag.appendChild(sp);
+        });
+        line.appendChild(frag);
+
+        line.addEventListener("click", () => {
+          if(ytPlayer){
+            ytPlayer.seekTo(cap.start, true);
+            try{ ytPlayer.playVideo(); }catch(_){}
+          }
+          setActiveCaption(i, true);
+        });
+
+        captionsBody.appendChild(line);
+      });
+    }
+
+    function setActiveCaption(i, userClick=false){
+      if(i === activeCapIndex) return;
+
+      const prev = captionsBody.querySelector(".cap-line.active");
+      if(prev) prev.classList.remove("active");
+
+      const next = captionsBody.querySelector(`.cap-line[data-index="${i}"]`);
+      if(next){
+        next.classList.add("active");
+        activeCapIndex = i;
+
+        if(autoScrollOn || userClick){
+          next.scrollIntoView({block:"center", behavior: userClick ? "smooth" : "auto"});
+        }
+      }
+    }
+
+    // Toggle buttons
+    toggleHighlight.addEventListener("click", () => {
+      highlightOn = !highlightOn;
+      toggleHighlight.classList.toggle("active", highlightOn);
+      clearWordHighlights();
+    });
+
+    toggleAutoScroll.addEventListener("click", () => {
+      autoScrollOn = !autoScrollOn;
+      toggleAutoScroll.classList.toggle("active", autoScrollOn);
+    });
+
+    function clearWordHighlights(){
+      captionsBody.querySelectorAll(".cap-word.active").forEach(el => el.classList.remove("active"));
+    }
+
+    // ---------------------------
+    // Sync loop (timestamps)
+    // ---------------------------
+    function startCaptionLoop(){
+      if(captionTimer) return;
+      captionTimer = setInterval(() => {
+        if(!ytPlayer || !captions.length) return;
+
+        const t = ytPlayer.getCurrentTime();
+        const idx = findCaptionIndex(t);
+
+        if(idx !== -1){
+          setActiveCaption(idx);
+          if(highlightOn) highlightWords(idx, t);
+        }
+      }, 120);
+    }
+
+    function stopCaptionLoop(){
+      if(captionTimer){
+        clearInterval(captionTimer);
+        captionTimer = null;
+      }
+      clearWordHighlights();
+    }
+
+    function findCaptionIndex(time){
+      // Simple linear search (fine for small/medium SRT). If big, we can binary search.
+      for(let i=0;i<captions.length;i++){
+        const c = captions[i];
+        if(time >= c.start && time <= c.end) return i;
+      }
+      return -1;
+    }
+
+    function highlightWords(idx, t){
+      const line = captionsBody.querySelector(`.cap-line[data-index="${idx}"]`);
+      if(!line) return;
+
+      // Clear old highlights only within this line
+      line.querySelectorAll(".cap-word.active").forEach(el => el.classList.remove("active"));
+
+      // Highlight word approximations
+      const words = line.querySelectorAll(".cap-word");
+      words.forEach(w => {
+        const ws = parseFloat(w.dataset.wstart || "0");
+        const we = parseFloat(w.dataset.wend || "0");
+        if(t >= ws && t <= we){
+          w.classList.add("active");
+        }
+      });
+    }
+
+    // ---------------------------
+    // SRT parser
+    // ---------------------------
+    function parseSRT(srt){
+      // Normalize newlines
+      const blocks = srt.replace(/\r/g,"").trim().split("\n\n");
+      const out = [];
+
+      for(const b of blocks){
+        const lines = b.split("\n").filter(Boolean);
+        if(lines.length < 2) continue;
+
+        // lines[0] is index, lines[1] is time
+        const timeLine = lines[1];
+        const m = timeLine.match(/(\d+:\d+:\d+,\d+)\s*-->\s*(\d+:\d+:\d+,\d+)/);
+        if(!m) continue;
+
+        const start = toSeconds(m[1]);
+        const end = toSeconds(m[2]);
+        const text = lines.slice(2).join(" ").trim();
+
+        // naive word timing: distribute across the caption duration
+        const rawWords = text.split(/\s+/).filter(Boolean);
+        const dur = Math.max(0.001, end - start);
+        const step = dur / Math.max(1, rawWords.length);
+
+        const words = rawWords.map((w, i) => ({
+          w,
+          absStart: start + step * i,
+          absEnd: start + step * (i + 1)
+        }));
+
+        out.push({ start, end, text, words });
+      }
+      return out;
+    }
+
+    function toSeconds(ts){
+      // "HH:MM:SS,mmm"
+      const [hms, ms] = ts.split(",");
+      const [hh, mm, ss] = hms.split(":").map(Number);
+      return hh*3600 + mm*60 + ss + (Number(ms)/1000);
+    }
+
+    // ---------------------------
+    // Init
+    // ---------------------------
+    renderVideos();
+    statusText.textContent = "Ready";
+  </script>
 </body>
 </html>
