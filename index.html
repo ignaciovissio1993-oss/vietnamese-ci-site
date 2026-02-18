@@ -2,1514 +2,1073 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Vietnamese CI | Series + Book</title>
 
   <style>
     :root{
-      --bg1:#fff6fb;
-      --bg2:#f2fbff;
-      --panel:#ffffff;
-      --panel2:#f7fbff;
-      --line: rgba(25, 60, 110, .14);
-
-      --text:#1a2a44;
-      --muted:#587194;
-
-      --accent:#4f8cff;
-      --accent2:#22c55e;
-      --accent3:#f97316;
-      --accent4:#a855f7;
-      --accent5:#06b6d4;
-
-      --shadow: 0 16px 40px rgba(19, 35, 70, .10);
-      --shadow2: 0 12px 26px rgba(19, 35, 70, .14);
-      --radius: 18px;
-      --radius2: 26px;
-
-      --max: 1240px;
-      --ring: 0 0 0 4px rgba(79,140,255,.16);
+      --bg1:#efe7ff;
+      --bg2:#e7f3ff;
+      --card:#ffffffcc;
+      --card2:#ffffffee;
+      --stroke:#d7def0;
+      --text:#1e2430;
+      --muted:#5a6476;
+      --accent:#5b7cff;
+      --accent2:#8d5bff;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --shadow: 0 12px 30px rgba(20,30,60,.10);
+      --radius: 22px;
     }
 
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color: var(--text);
-      background:
-        radial-gradient(900px 520px at 10% -10%, rgba(168,85,247,.18), transparent 60%),
-        radial-gradient(900px 520px at 110% 0%, rgba(79,140,255,.18), transparent 55%),
-        radial-gradient(900px 520px at 30% 100%, rgba(34,197,94,.14), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 10%, var(--bg2), transparent 60%),
+                  radial-gradient(1200px 700px at 80% 0%, var(--bg1), transparent 55%),
+                  linear-gradient(180deg, #f9fbff 0%, #f7f3ff 100%);
+      min-height:100vh;
     }
-    a{color:inherit; text-decoration:none}
-    a:hover{color: var(--accent)}
 
-    .app-wrap{max-width: var(--max); margin:0 auto; padding: 18px;}
-
-    /* Header + Tabs */
-    .app-header{
+    .topbar{
       position: sticky;
-      top: 12px;
-      z-index: 100;
-      border-radius: var(--radius2);
-      overflow:hidden;
-      box-shadow: var(--shadow2);
-      border: 1px solid rgba(79,140,255,.22);
-      background:
-        radial-gradient(900px 300px at 20% 20%, rgba(79,140,255,.40), transparent 60%),
-        radial-gradient(700px 260px at 70% 30%, rgba(168,85,247,.32), transparent 60%),
-        radial-gradient(700px 260px at 40% 80%, rgba(34,197,94,.22), transparent 60%),
-        linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      top:0;
+      z-index:10;
+      padding: 16px 18px;
       backdrop-filter: blur(10px);
+      background: linear-gradient(90deg, rgba(255,255,255,.60), rgba(255,255,255,.25));
+      border-bottom:1px solid rgba(215,222,240,.7);
     }
-    .app-header-inner{
+
+    .topbar-inner{
+      max-width: 1200px;
+      margin: 0 auto;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding: 14px 16px;
+      gap:14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(215,222,240,.85);
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(210,245,255,.55), rgba(235,220,255,.55));
+      box-shadow: var(--shadow);
     }
+
     .brand{
-      display:flex; align-items:center; gap:12px;
-      min-width: 240px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 220px;
     }
     .logo{
-      width:38px; height:38px; border-radius: 14px;
-      background: conic-gradient(from 210deg, #4f8cff, #a855f7, #22c55e, #f97316, #06b6d4, #4f8cff);
-      box-shadow: 0 14px 28px rgba(79,140,255,.18);
-      border: 1px solid rgba(255,255,255,.8);
-      flex: 0 0 auto;
+      width:34px;height:34px;border-radius:12px;
+      background: conic-gradient(from 210deg, #6ee7ff, #a78bfa, #60a5fa, #f0abfc);
+      border:1px solid rgba(255,255,255,.8);
+      box-shadow: 0 6px 18px rgba(90,124,255,.20);
     }
-    .brand h1{margin:0; font-size:15px; letter-spacing:.2px}
-    .brand p{margin:2px 0 0; color: var(--muted); font-size:12px}
+    .brand-title{
+      line-height:1.1;
+    }
+    .brand-title b{display:block;font-size:14px}
+    .brand-title span{display:block;font-size:12px;color:var(--muted)}
 
     .tabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-      flex: 1;
+      display:flex; gap:10px; margin-left:auto; margin-right:auto;
     }
-    .tab-btn{
-      border:1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.85);
-      padding:10px 12px;
+    .tab{
+      padding: 10px 14px;
       border-radius: 999px;
-      font-weight: 850;
-      font-size: 13px;
-      color: var(--text);
-      cursor:pointer;
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
-      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .tab-btn:hover{transform: translateY(-1px)}
-    .tab-btn.active{
-      border-color: rgba(79,140,255,.40);
-      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
-      box-shadow: 0 14px 26px rgba(79,140,255,.12);
-    }
-
-    .header-actions{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-      min-width: 240px;
-    }
-    .btn{
-      padding:10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.85);
-      color: var(--text);
-      font-size: 13px;
-      cursor:pointer;
-      box-shadow: 0 10px 20px rgba(19,35,70,.06);
-      transition: transform .12s ease;
-      font-weight: 800;
-    }
-    .btn.primary{
-      border-color: rgba(79,140,255,.40);
-      background: linear-gradient(135deg, rgba(79,140,255,.14), rgba(168,85,247,.12));
-    }
-    .btn:hover{transform: translateY(-1px)}
-
-    .tab-page{display:none; margin-top: 16px;}
-    .tab-page.active{display:block;}
-
-    /* =========================
-       SERIES PAGE
-    ========================= */
-    .series-grid{
-      display:grid;
-      grid-template-columns: 320px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .series-aside{
-      background: rgba(255,255,255,.85);
-      border: 1px solid var(--line);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      position: sticky;
-      top: 96px;
-      backdrop-filter: blur(10px);
-    }
-    .series-sideTitle{
-      margin: 0 0 8px;
-      font-size: 12px;
-      letter-spacing: .2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .series-searchBox{
-      display:flex; align-items:center; gap:10px;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(79,140,255,.22);
-      background: linear-gradient(180deg, rgba(79,140,255,.08), rgba(255,255,255,.82));
-      box-shadow: 0 10px 20px rgba(79,140,255,.10);
-      margin-bottom: 12px;
-    }
-    .series-searchBox input{
-      width:100%;
-      border:0;
-      outline:none;
-      background: transparent;
-      font-size: 14px;
-      color: var(--text);
-    }
-    .series-hint{
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-      margin: 6px 2px 12px;
-    }
-
-    .series-aside details{
-      border:1px solid rgba(25,60,110,.14);
-      border-radius: 16px;
-      padding: 10px 12px;
-      background: rgba(247,251,255,.85);
-      margin-bottom: 10px;
-    }
-    .series-aside summary{
-      cursor:pointer;
-      list-style:none;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      font-size: 14px;
-      color: var(--text);
-    }
-    .series-aside summary::-webkit-details-marker{display:none}
-    .series-chev{color: var(--muted); font-size: 12px}
-    .series-opt{
-      display:flex; flex-wrap:wrap; gap:8px;
-      padding-top: 10px;
-    }
-    .series-chip{
-      font-size: 12px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.88);
-      color: var(--muted);
-      box-shadow: 0 8px 18px rgba(19,35,70,.06);
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.55);
+      color:var(--text);
+      font-weight:600;
       cursor:pointer;
       user-select:none;
     }
-    .series-chip:hover{box-shadow: var(--ring)}
-
-    .series-playlistBox{
-      border-radius: 18px;
-      border: 1px solid rgba(168,85,247,.22);
-      background:
-        radial-gradient(220px 140px at 10% 20%, rgba(168,85,247,.14), transparent 60%),
-        radial-gradient(220px 140px at 80% 20%, rgba(79,140,255,.14), transparent 60%),
-        radial-gradient(220px 140px at 30% 100%, rgba(34,197,94,.12), transparent 60%),
-        rgba(255,255,255,.9);
-      padding: 12px 12px 14px;
-      box-shadow: 0 14px 30px rgba(168,85,247,.10);
-      margin-top: 10px;
-    }
-    .series-playlistBox b{display:block; margin-bottom:6px}
-    .series-playlistBox a{
-      display:inline-block;
-      margin-top:8px;
-      font-size: 13px;
-      color: var(--accent);
-      text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 3px;
+    .tab.active{
+      background: rgba(91,124,255,.12);
+      border-color: rgba(91,124,255,.35);
     }
 
-    .series-main{
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(25,60,110,.12);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      backdrop-filter: blur(10px);
+    .top-links{
+      display:flex; gap:10px;
     }
-    .series-topline{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin: 2px 2px 10px;
+    .pill{
+      padding: 10px 14px;
+      border-radius: 999px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.72);
+      color:var(--text);
+      text-decoration:none;
+      font-weight:600;
     }
-    .series-topline h2{margin:0; font-size: 18px}
-    .series-topline p{margin:0; color: var(--muted); font-size: 13px}
 
-    .series-cards{
+    .layout{
+      max-width: 1200px;
+      margin: 18px auto 40px;
+      padding: 0 18px;
       display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 12px;
+      grid-template-columns: 320px 1fr;
+      gap:18px;
     }
-    .series-card{
-      border: 1px solid rgba(25,60,110,.14);
-      border-radius: 20px;
-      overflow:hidden;
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 14px 30px rgba(19,35,70,.10);
+
+    .panel{
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid rgba(215,222,240,.85);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar{
+      padding: 14px;
+      position: sticky;
+      top: 92px;
+      height: calc(100vh - 120px);
+      overflow:auto;
+    }
+
+    .content{
+      padding: 14px;
+    }
+
+    .section-title{
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 10px 6px 8px;
+    }
+
+    .search{
+      display:flex;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.75);
+      align-items:center;
+      margin: 6px 0 12px;
+    }
+    .search input{
+      border:none; outline:none; width:100%;
+      font-size:14px; background:transparent;
+    }
+
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+
+    .btn{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.78);
       cursor:pointer;
-      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      font-weight:700;
+      color: var(--text);
+      user-select:none;
     }
-    .series-card:hover{
-      transform: translateY(-3px);
-      border-color: rgba(79,140,255,.35);
-      box-shadow: 0 18px 40px rgba(19,35,70,.14);
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(91,124,255,.18), rgba(141,91,255,.14));
+      border-color: rgba(91,124,255,.35);
     }
-    .series-thumb{
-      aspect-ratio: 16/9;
-      position:relative;
-      background: #eaf4ff;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      overflow:hidden;
+    .btn.danger{
+      background: rgba(239,68,68,.12);
+      border-color: rgba(239,68,68,.35);
     }
-    .series-thumb img{
-      width:100%; height:100%;
-      object-fit: cover;
-      display:block;
+
+    .dropdown{
+      width:100%;
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.78);
+      display:flex; justify-content:space-between; align-items:center;
+      cursor:pointer; user-select:none;
+      margin-bottom: 10px;
     }
-    .series-play{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.20));
+    .dropdown small{color:var(--muted); font-weight:700}
+    .dropdown span{font-weight:800}
+
+    .status{
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 18px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.75);
     }
-    .series-playBadge{
-      width:60px; height:60px;
-      border-radius: 22px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.85);
-      border: 1px solid rgba(79,140,255,.30);
-      box-shadow: 0 18px 40px rgba(19,35,70,.18);
-      font-size: 22px;
-      color: #1a2a44;
-    }
-    .series-meta{padding: 12px 12px 14px; text-align:left}
-    .series-title{margin:0 0 8px; font-size: 14px; line-height: 1.25}
-    .series-row{display:flex; justify-content:space-between; gap: 10px; color: var(--muted); font-size: 12px}
-    .series-row a{color: var(--accent)}
-    .series-row a:hover{text-decoration: underline}
-    .series-tags{
-      display:flex; flex-wrap:wrap; gap:8px;
-      margin-top: 10px;
-    }
-    .series-tag{
-      font-size: 11px;
+    .status b{display:block; margin-bottom:6px}
+    .status .msg{color:var(--muted); font-size:13px; line-height:1.35}
+    .status .line{margin-top:10px; font-size:12px; color:var(--muted)}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.95);
-      color: var(--muted);
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.75);
+      font-size:12px; font-weight:800;
+      margin-top:8px;
+    }
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.good{background:var(--good)}
+    .dot.bad{background:var(--bad)}
+    .dot.warn{background:var(--warn)}
+
+    .header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px 6px;
+      margin-bottom: 6px;
+    }
+    .header h2{
+      margin:0;
+      font-size: 18px;
+    }
+    .header .sub{
+      margin:0;
+      color:var(--muted);
+      font-size: 12px;
+      font-weight:700;
     }
 
-    /* Player + Captions panel */
-    .series-playerWrap{
-      display:none;
-      margin-top: 14px;
-      border-radius: var(--radius2);
-      border: 1px solid rgba(79,140,255,.20);
-      overflow:hidden;
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 40px rgba(19,35,70,.14);
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+      padding: 0 14px 14px;
     }
-    .series-playerTop{
+    @media (max-width: 1020px){
+      .layout{grid-template-columns: 1fr}
+      .sidebar{position:relative; top:auto; height:auto}
+      .grid{grid-template-columns: repeat(2, minmax(0,1fr))}
+    }
+    @media (max-width: 640px){
+      .grid{grid-template-columns: 1fr}
+    }
+
+    .card{
+      border-radius: 18px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 10px 24px rgba(20,30,60,.08);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .card:hover{transform: translateY(-2px); box-shadow: 0 16px 30px rgba(20,30,60,.10)}
+    .thumb{
+      width:100%;
+      aspect-ratio: 16/9;
+      background:#0b1020;
+      position:relative;
+    }
+    .thumb img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      opacity:.92;
+    }
+    .thumb .play{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:42px;
+      color:white;
+      text-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .card-body{padding: 12px 12px 14px}
+    .card-title{
+      margin:0 0 6px;
+      font-size: 14px;
+      font-weight:900;
+      line-height:1.2;
+    }
+    .meta{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+
+    .player-wrap{
+      margin-top: 12px;
+      padding: 14px;
+    }
+    .player-card{
+      border-radius: 18px;
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 12px 30px rgba(20,30,60,.10);
+      overflow:hidden;
+    }
+    .player-top{
+      padding: 12px 14px 10px;
+      border-bottom:1px solid rgba(215,222,240,.8);
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      background:
-        radial-gradient(420px 160px at 20% 50%, rgba(79,140,255,.14), transparent 70%),
-        radial-gradient(420px 160px at 70% 30%, rgba(168,85,247,.12), transparent 70%),
-        rgba(255,255,255,.90);
     }
-    .series-playerTop h3{margin:0; font-size: 14px}
-    .series-playerTop small{color: var(--muted); font-weight: 750}
-    .series-playerClose{
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.85);
-      cursor:pointer;
-      font-weight: 850;
+    .player-top h3{
+      margin:0;
+      font-size: 16px;
+      font-weight: 950;
     }
-    .series-playerClose:hover{box-shadow: var(--ring)}
+    .player-top p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+    .player-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+    }
 
-    /* IMPORTANT: fixed aspect wrapper so iframe always shows video (no "audio only") */
-    .series-iframeWrap{
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #000;
-    }
-    .series-iframeWrap iframe{
-      position:absolute;
-      inset:0;
+    /* The actual iframe container */
+    .player-frame{
       width:100%;
-      height:100%;
+      aspect-ratio: 16/9;
+      background:#0b1020;
+    }
+    .player-frame iframe{
+      width:100%; height:100%;
       border:0;
       display:block;
       background:#000;
     }
 
-    .series-captionsWrap{
-      padding: 14px;
-      border-top: 1px solid rgba(25,60,110,.10);
-      background: rgba(247,251,255,.75);
+    /* Captions */
+    .captions{
+      padding: 12px 14px 14px;
+      border-top:1px solid rgba(215,222,240,.8);
+      background: rgba(255,255,255,.6);
     }
-    .cap-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+    .cap-toolbar{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
       margin-bottom: 10px;
     }
-    .cap-head b{font-size: 13px}
-    .cap-pill{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      color: var(--muted);
-      font-weight: 800;
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
+    .cap-toolbar .left{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .cap-toolbar .hint{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
     }
     .cap-box{
-      border: 1px solid rgba(25,60,110,.14);
+      border:1px solid rgba(215,222,240,.9);
+      background: rgba(255,255,255,.82);
       border-radius: 16px;
-      background: rgba(255,255,255,.90);
       padding: 12px;
       max-height: 360px;
       overflow:auto;
-      line-height: 1.65;
-      font-size: 14px;
+      line-height:1.55;
+      font-size: 15px;
     }
     .cap-line{
-      padding: 8px 10px;
+      padding: 6px 8px;
       border-radius: 12px;
-      border: 1px solid rgba(25,60,110,.10);
-      background: rgba(255,255,255,.92);
-      margin-bottom: 8px;
       cursor:pointer;
-    }
-    .cap-line:hover{box-shadow: var(--ring)}
-    .cap-time{
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 850;
-      margin-bottom: 4px;
-    }
-    .cap-active{
-      border-color: rgba(34,197,94,.45);
-      background: radial-gradient(260px 120px at 20% 40%, rgba(34,197,94,.16), transparent 60%), rgba(255,255,255,.95);
-      box-shadow: 0 14px 26px rgba(34,197,94,.10);
-    }
-
-    /* =========================
-       BOOK PAGE (kept from your original)
-    ========================= */
-    .book-wrap{
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(25,60,110,.12);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      backdrop-filter: blur(10px);
-    }
-    .book-hero{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 16px;
-      align-items: start;
-    }
-    .book-card{
-      border-radius: 24px;
-      border: 1px solid rgba(79,140,255,.18);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 40px rgba(19,35,70,.12);
-      overflow:hidden;
-    }
-    .book-cardInner{padding: 16px}
-    .book-title{margin:0 0 8px; font-size: 22px}
-    .book-sub{margin:0; color: var(--muted); font-weight: 750}
-    .book-badges{display:flex; flex-wrap:wrap; gap:10px; margin: 12px 0 4px}
-    .badge{
-      font-size: 12px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(247,251,255,.95);
-      color: var(--muted);
-      font-weight: 850;
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
-    }
-    .book-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top: 14px}
-    .book-btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      cursor:pointer;
-      font-weight: 900;
-      box-shadow: 0 14px 26px rgba(19,35,70,.08);
-      transition: transform .12s ease;
-    }
-    .book-btn:hover{transform: translateY(-1px)}
-    .book-btn.primary{
-      border-color: rgba(79,140,255,.35);
-      background: linear-gradient(135deg, rgba(79,140,255,.16), rgba(168,85,247,.12));
-    }
-
-    .book-side{
-      display:grid;
-      gap: 14px;
-    }
-    .book-mini{
-      border-radius: 24px;
-      border: 1px solid rgba(168,85,247,.18);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 40px rgba(19,35,70,.12);
-      overflow:hidden;
-    }
-    .book-miniTop{
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      background:
-        radial-gradient(420px 160px at 20% 50%, rgba(168,85,247,.14), transparent 70%),
-        radial-gradient(420px 160px at 70% 30%, rgba(79,140,255,.12), transparent 70%),
-        rgba(255,255,255,.92);
-    }
-    .book-miniTop b{display:block}
-    .book-miniTop span{color: var(--muted); font-size: 13px; font-weight: 800}
-    .book-miniInner{padding: 14px 16px}
-
-    .book-reviewsWrap{
-      margin-top: 16px;
-      border-radius: 24px;
-      border: 1px solid rgba(25,60,110,.12);
-      background: rgba(255,255,255,.9);
-      box-shadow: 0 18px 40px rgba(19,35,70,.12);
-      overflow:hidden;
-    }
-    .book-reviewsHead{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      background:
-        radial-gradient(420px 160px at 20% 50%, rgba(34,197,94,.14), transparent 70%),
-        radial-gradient(420px 160px at 70% 30%, rgba(79,140,255,.12), transparent 70%),
-        rgba(255,255,255,.92);
-    }
-    .book-reviewsHead b{font-size: 14px}
-    .book-navBtns{display:flex; gap:10px}
-    .book-navBtns button{
-      width:38px; height:38px;
-      border-radius: 14px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      cursor:pointer;
-      font-weight: 900;
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
-    }
-    .book-navBtns button:hover{box-shadow: var(--ring)}
-    .book-reviewsViewport{
-      overflow:hidden;
-      position: relative;
-    }
-    .book-reviewsTrack{
-      display:flex;
-      transition: transform .35s ease;
-      will-change: transform;
-    }
-    .book-reviewSlide{
-      min-width: 100%;
-      padding: 16px;
-    }
-    .book-reviewHead{
-      display:flex;
+      gap:10px;
       align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom: 8px;
     }
-    .book-who b{display:block}
-    .book-who span{color: var(--muted); font-size: 12px; font-weight: 800}
-    .book-stars{color: #f59e0b; font-weight: 900; letter-spacing: .6px}
-    .book-reviewText{margin: 0; color: var(--text); line-height: 1.6}
-
-    .book-dots{
-      display:flex; justify-content:center; gap:10px;
-      padding: 10px 12px 14px;
-      border-top: 1px solid rgba(25,60,110,.10);
-      background: rgba(247,251,255,.85);
-    }
-    .book-dotBtn{
-      width:10px; height:10px;
-      border-radius: 999px;
-      border:0;
-      background: rgba(88,113,148,.35);
-      cursor:pointer;
-    }
-    .book-dotBtn.active{background: rgba(79,140,255,.95)}
-
-    /* Modal */
-    .book-modalBack{
-      position: fixed;
-      inset: 0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      background: rgba(15,23,42,.55);
-      z-index: 200;
-      backdrop-filter: blur(6px);
-    }
-    .book-modal{
-      width:min(860px, 100%);
-      border-radius: 26px;
-      border: 1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 30px 80px rgba(0,0,0,.28);
-      overflow:hidden;
-    }
-    .book-modalTop{
-      padding: 14px 16px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      border-bottom: 1px solid rgba(25,60,110,.10);
-      background:
-        radial-gradient(420px 160px at 20% 50%, rgba(79,140,255,.14), transparent 70%),
-        radial-gradient(420px 160px at 70% 30%, rgba(168,85,247,.12), transparent 70%),
-        rgba(255,255,255,.92);
-    }
-    .book-modalTop b{font-size: 14px}
-    .book-modalClose{
-      width:40px; height:40px;
-      border-radius: 14px;
-      border: 1px solid rgba(25,60,110,.14);
-      background: rgba(255,255,255,.9);
-      cursor:pointer;
+    .cap-line:hover{background: rgba(91,124,255,.08)}
+    .cap-time{
+      min-width: 84px;
+      font-size:12px;
+      color:var(--muted);
       font-weight: 900;
-      box-shadow: 0 10px 18px rgba(19,35,70,.06);
+      padding-top: 2px;
     }
-    .book-modalBody{padding: 16px}
-    .book-modalBody p{margin:0 0 12px; color: var(--muted); font-weight: 800}
-    .book-modalBtns{display:flex; flex-wrap:wrap; gap:10px}
-    .book-modalBtns .book-btn{flex:1; min-width: 220px}
+    .cap-text{
+      flex:1;
+      font-weight: 800;
+    }
+    .cap-line.active{
+      background: rgba(141,91,255,.14);
+      border:1px solid rgba(141,91,255,.22);
+    }
 
-    /* Responsive */
-    @media (max-width: 980px){
-      .series-grid{grid-template-columns: 1fr}
-      .series-aside{position: static; top:auto}
-      .series-cards{grid-template-columns: repeat(2, minmax(0, 1fr))}
-      .book-hero{grid-template-columns: 1fr}
-      .brand, .header-actions{min-width:auto}
+    .small-note{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      margin-top:10px;
     }
-    @media (max-width: 620px){
-      .series-cards{grid-template-columns: 1fr}
-      .tab-btn{font-size:12px}
-      .brand p{display:none}
-    }
+
+    /* Modal-ish simple (optional) */
+    .hidden{display:none !important;}
   </style>
+
+  <!-- YouTube IFrame API (we use it for syncing captions to playback time) -->
+  <script>
+    // Load YouTube IFrame API
+    (function(){
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+    })();
+  </script>
 </head>
 
 <body>
-  <div class="app-wrap">
-    <header class="app-header">
-      <div class="app-header-inner">
-        <div class="brand">
-          <div class="logo" aria-hidden="true"></div>
-          <div>
-            <h1>Vietnamese CI</h1>
-            <p>Series + Book</p>
-          </div>
-        </div>
-
-        <nav class="tabs" aria-label="Pages">
-          <button class="tab-btn active" data-tab="series">🎬 Series</button>
-          <button class="tab-btn" data-tab="book">📘 Book</button>
-        </nav>
-
-        <div class="header-actions">
-          <button class="btn" onclick="window.open('https://www.youtube.com/@LazyVietnamese', '_blank', 'noopener')">YouTube</button>
-          <button class="btn primary" onclick="window.open('https://www.patreon.com/lazyvietnamese', '_blank', 'noopener')">Patreon</button>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="brand-title">
+          <b>Vietnamese CI</b>
+          <span>Series + Book</span>
         </div>
       </div>
-    </header>
 
-    <!-- =========================
-         SERIES TAB
-    ========================== -->
-    <section id="tab-series" class="tab-page active">
-      <div class="series-grid">
-
-        <!-- Left panel -->
-        <aside class="series-aside">
-          <div class="series-sideTitle">Browse</div>
-
-          <div class="series-searchBox">
-            🔎 <input id="series-search" type="text" placeholder="Search video title…" autocomplete="off" />
-          </div>
-
-          <div class="series-hint">
-            This loads all playlists from your channel and shows every video (deduped).
-            Captions appear below the player if an <code>.srt</code> exists in your repo.
-          </div>
-
-          <details open>
-            <summary>
-              Filters <span class="series-chev">▼</span>
-            </summary>
-            <div class="series-opt" id="series-filterChips">
-              <!-- chips injected -->
-            </div>
-          </details>
-
-          <details>
-            <summary>
-              Levels <span class="series-chev">▼</span>
-            </summary>
-            <div class="series-opt" id="series-levelChips"></div>
-          </details>
-
-          <details>
-            <summary>
-              Topics <span class="series-chev">▼</span>
-            </summary>
-            <div class="series-opt" id="series-topicChips"></div>
-          </details>
-
-          <div class="series-playlistBox">
-            <b>Status</b>
-            <div id="series-state" style="color:var(--muted); font-weight:800; line-height:1.5">
-              Ready…
-            </div>
-            <a id="series-openChannel" href="#" target="_blank" rel="noopener">Open channel ↗</a>
-          </div>
-        </aside>
-
-        <!-- Right panel -->
-        <main class="series-main">
-          <div class="series-topline">
-            <div>
-              <h2>All Series</h2>
-              <p id="series-subtitle">Loading playlists…</p>
-            </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-              <button class="btn" id="series-clearFilters">Clear filters</button>
-            </div>
-          </div>
-
-          <!-- Player + captions -->
-          <div class="series-playerWrap" id="series-playerWrap">
-            <div class="series-playerTop">
-              <div>
-                <h3 id="series-playerTitle">Video</h3>
-                <small id="series-playerMeta"> </small>
-              </div>
-              <button class="series-playerClose" id="series-playerClose">✕ Close</button>
-            </div>
-
-            <div class="series-iframeWrap">
-              <iframe id="series-iframe"
-                      title="YouTube player"
-                      loading="lazy"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowfullscreen></iframe>
-            </div>
-
-            <div class="series-captionsWrap">
-              <div class="cap-head">
-                <b>Captions</b>
-                <span class="cap-pill" id="cap-status">Not loaded</span>
-              </div>
-              <div class="cap-box" id="cap-box">
-                <div style="color:var(--muted); font-weight:800">
-                  Select a video to load captions…
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cards -->
-          <div class="series-cards" id="series-cards">
-            <!-- cards injected -->
-          </div>
-        </main>
-
+      <div class="tabs">
+        <div class="tab active" id="tabSeries">📚 Series</div>
+        <div class="tab" id="tabBook">📘 Book</div>
       </div>
-    </section>
 
-    <!-- =========================
-         BOOK TAB
-    ========================== -->
-    <section id="tab-book" class="tab-page">
-      <div class="book-wrap">
-        <div class="book-hero">
-          <div class="book-card">
-            <div class="book-cardInner">
-              <h2 class="book-title">Learn Vietnamese (CI style)</h2>
-              <p class="book-sub">Stories, slow Vietnamese, and a cozy learning vibe.</p>
-
-              <div class="book-badges">
-                <span class="badge">A0–B1</span>
-                <span class="badge">Comprehensible Input</span>
-                <span class="badge">Slow + Clear</span>
-                <span class="badge">Updated <span id="book-year"></span></span>
-              </div>
-
-              <div class="book-actions">
-                <button class="book-btn primary" id="book-watchBtn">Watch intro</button>
-                <button class="book-btn" onclick="window.open('https://preply.com/en/tutor/2553268', '_blank', 'noopener')">Book on Preply</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="book-side">
-            <div class="book-mini">
-              <div class="book-miniTop">
-                <b>Support the project</b>
-                <span>Patreon keeps the CI machine alive 🧠⚡</span>
-              </div>
-              <div class="book-miniInner">
-                <button class="book-btn primary" style="width:100%" onclick="window.open('https://www.patreon.com/lazyvietnamese', '_blank', 'noopener')">
-                  Join Patreon
-                </button>
-              </div>
-            </div>
-
-            <div class="book-mini">
-              <div class="book-miniTop">
-                <b>Channel</b>
-                <span>More videos, more Vietnamese</span>
-              </div>
-              <div class="book-miniInner">
-                <button class="book-btn" style="width:100%" onclick="window.open('https://www.youtube.com/@LazyVietnamese', '_blank', 'noopener')">
-                  Open YouTube
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Reviews -->
-        <div class="book-reviewsWrap">
-          <div class="book-reviewsHead">
-            <b>What students say</b>
-            <div class="book-navBtns">
-              <button id="book-prevBtn" aria-label="Previous review">‹</button>
-              <button id="book-nextBtn" aria-label="Next review">›</button>
-            </div>
-          </div>
-
-          <div class="book-reviewsViewport">
-            <div class="book-reviewsTrack" id="book-reviewsTrack"></div>
-          </div>
-
-          <div class="book-dots" id="book-dots"></div>
-        </div>
+      <div class="top-links">
+        <a class="pill" href="#" id="btnYoutube">YouTube</a>
+        <a class="pill" href="#" id="btnPatreon">Patreon</a>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <!-- Book modal -->
-    <div class="book-modalBack" id="book-videoModalBack" role="dialog" aria-modal="true" aria-label="Intro video modal">
-      <div class="book-modal">
-        <div class="book-modalTop">
-          <b>Intro</b>
-          <button class="book-modalClose" id="book-closeModal" aria-label="Close modal">✕</button>
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="panel sidebar">
+      <div class="section-title">Browse</div>
+
+      <div class="search">
+        🔎 <input id="searchInput" placeholder="Search video title..." />
+      </div>
+
+      <div style="margin-bottom:10px" class="row">
+        <button class="btn primary" id="btnSetApiKey">Set API Key</button>
+        <button class="btn danger" id="btnClearApiKey">Clear API Key</button>
+      </div>
+
+      <div class="dropdown" id="ddFilters">
+        <small>Filters</small>
+        <span>▾</span>
+      </div>
+      <div class="dropdown" id="ddLevels">
+        <small>Levels</small>
+        <span>▾</span>
+      </div>
+      <div class="dropdown" id="ddTopics">
+        <small>Topics</small>
+        <span>▾</span>
+      </div>
+
+      <div class="status" id="statusBox">
+        <b>Status</b>
+        <div class="msg" id="statusMsg">Loading playlists...</div>
+        <div class="badge" id="statusBadge">
+          <span class="dot warn" id="statusDot"></span>
+          <span id="statusLabel">Working…</span>
         </div>
-        <div class="book-modalBody">
-          <p>Open my Preply profile:</p>
-          <div class="book-modalBtns">
-            <button class="book-btn primary" id="book-modalOpenPreply">Open Preply</button>
-            <button class="book-btn" id="book-modalCopyLink">Copy Preply link</button>
-          </div>
-        </div>
+        <div class="line" id="statusLine"></div>
+      </div>
+
+      <div class="small-note">
+        Captions appear below the player if a <b>.srt</b> exists in your repo at
+        <b>/captions/&lt;VIDEO_ID&gt;.srt</b>.
       </div>
     </div>
 
-  </div>
+    <!-- Main content -->
+    <div class="panel content">
+      <div class="header">
+        <div>
+          <h2 id="pageTitle">All Series</h2>
+          <p class="sub" id="pageSub">Loading playlists...</p>
+        </div>
+        <button class="btn" id="btnClearFilters">Clear filters</button>
+      </div>
 
-  <script>
-    /* =========================================================
-       1) TABS
-    ========================================================= */
-    const tabButtons = document.querySelectorAll(".tab-btn");
-    const tabPages = {
-      series: document.getElementById("tab-series"),
-      book: document.getElementById("tab-book"),
-    };
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        tabButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        Object.values(tabPages).forEach(p => p.classList.remove("active"));
-        tabPages[btn.dataset.tab].classList.add("active");
-      });
-    });
-
-    /* =========================================================
-       2) CONFIG YOU MUST SET (ONLY THESE)
-       - keep everything else as-is
-    ========================================================= */
-    const YT_API_KEY = "PASTE_YOUR_API_KEY_HERE"; // YouTube Data API v3 key
-    const YT_CHANNEL_HANDLE = "@LazyVietnamese";  // your channel handle
-    const YT_CHANNEL_ID_OVERRIDE = "";            // optional: paste channelId if handle lookup fails
-
-    // Your GitHub repo where the .srt files live
-    // Example: https://raw.githubusercontent.com/USER/REPO/main/captions/<VIDEO_ID>.srt
-    const SRT_BASE_URL = "https://raw.githubusercontent.com/USER/REPO/main/captions";
-
-    // If your SRT naming is different, change this function only:
-    function srtUrlForVideo(videoId){
-      return `${SRT_BASE_URL}/${videoId}.srt`;
-    }
-
-    /* =========================================================
-       3) SERIES PAGE SCRIPT (YouTube playlists -> cards)
-    ========================================================= */
-    const seriesCardsEl = document.getElementById("series-cards");
-    const seriesSubtitle = document.getElementById("series-subtitle");
-    const seriesStateBox = document.getElementById("series-state");
-    const seriesOpenChannel = document.getElementById("series-openChannel");
-
-    const seriesSearch = document.getElementById("series-search");
-    const seriesClearFiltersBtn = document.getElementById("series-clearFilters");
-
-    const playerWrap = document.getElementById("series-playerWrap");
-    const iframe = document.getElementById("series-iframe");
-    const playerTitle = document.getElementById("series-playerTitle");
-    const playerMeta = document.getElementById("series-playerMeta");
-    const playerClose = document.getElementById("series-playerClose");
-
-    const capStatus = document.getElementById("cap-status");
-    const capBox = document.getElementById("cap-box");
-
-    let seriesVideos = [];     // full list
-    let filters = {
-      search: "",
-      level: null,
-      topic: null,
-    };
-
-    // Open channel link
-    seriesOpenChannel.href = `https://www.youtube.com/${YT_CHANNEL_HANDLE}`;
-    seriesOpenChannel.textContent = `Open channel ${YT_CHANNEL_HANDLE} ↗`;
-
-    function escapeHtml(str){
-      return (str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function uniq(arr){
-      return [...new Set(arr.filter(Boolean))].sort((a,b)=> a.localeCompare(b));
-    }
-
-    function seriesInferLevel(playlistTitle){
-      const t = (playlistTitle || "").toLowerCase();
-      if(t.includes("a0")) return "A0";
-      if(t.includes("a1")) return "A1";
-      if(t.includes("a2")) return "A2";
-      if(t.includes("b1")) return "B1";
-      if(t.includes("b2")) return "B2";
-      return "Mixed";
-    }
-
-    function seriesRenderChips(container, values, key){
-      container.innerHTML = "";
-      values.forEach(v => {
-        const chip = document.createElement("div");
-        chip.className = "series-chip";
-        chip.textContent = v;
-        chip.addEventListener("click", () => {
-          filters[key] = (filters[key] === v) ? null : v;
-          seriesRender();
-        });
-        container.appendChild(chip);
-      });
-    }
-
-    function seriesApplyFilters(list){
-      const q = (filters.search || "").trim().toLowerCase();
-      return list.filter(v => {
-        if(q && !(v.title || "").toLowerCase().includes(q)) return false;
-        if(filters.level && v.level !== filters.level) return false;
-        if(filters.topic && v.topic !== filters.topic) return false;
-        return true;
-      });
-    }
-
-    function seriesRender(){
-      const filtered = seriesApplyFilters(seriesVideos);
-
-      seriesSubtitle.textContent =
-        `${filtered.length} videos shown · ${seriesVideos.length} total`;
-
-      seriesCardsEl.innerHTML = "";
-
-      filtered.forEach(v => {
-        const card = document.createElement("div");
-        card.className = "series-card";
-        const thumb = `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
-
-        card.innerHTML = `
-          <div class="series-thumb">
-            <img src="${thumb}" alt="${escapeHtml(v.title)} thumbnail" loading="lazy" />
-            <div class="series-play">
-              <div class="series-playBadge">▶</div>
+      <!-- Player + captions -->
+      <div class="player-wrap" id="playerWrap" style="display:none;">
+        <div class="player-card">
+          <div class="player-top">
+            <div>
+              <h3 id="playerTitle">Video</h3>
+              <p id="playerMeta"> </p>
+            </div>
+            <div class="player-actions">
+              <button class="btn" id="btnOpenYT">Open on YouTube</button>
+              <button class="btn" id="btnToggleCaps">Toggle captions</button>
             </div>
           </div>
-          <div class="series-meta">
-            <h3 class="series-title">${escapeHtml(v.title)}</h3>
-            <div class="series-row">
-              <span><b>Level:</b> ${escapeHtml(v.level)}</span>
-              <a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}" target="_blank" rel="noopener">YouTube ↗</a>
+
+          <div class="player-frame">
+            <!-- We mount the YT iframe here -->
+            <div id="ytMount"></div>
+          </div>
+
+          <div class="captions" id="captionsWrap">
+            <div class="cap-toolbar">
+              <div class="left">
+                <span class="badge">
+                  <span class="dot" id="capDot"></span>
+                  <span id="capStatus">Captions</span>
+                </span>
+                <span class="hint" id="capHint">Click a line to jump.</span>
+              </div>
+              <div class="right">
+                <button class="btn" id="btnReloadCaps">Reload captions</button>
+              </div>
             </div>
-            <div class="series-tags">
-              <span class="series-tag">${escapeHtml(v.topic)}</span>
+
+            <div class="cap-box" id="capBox">
+              <div class="msg" style="color:var(--muted);font-weight:800">
+                Select a video to load captions…
+              </div>
             </div>
-          </div>
-        `;
-
-        card.addEventListener("click", () => openVideo(v));
-        seriesCardsEl.appendChild(card);
-      });
-    }
-
-    /* --------------------------
-       Captions: SRT parsing + syncing
-    -------------------------- */
-    function parseSrtTimeToSeconds(t){
-      // "HH:MM:SS,mmm"
-      const m = (t || "").trim().match(/^(\d+):(\d+):(\d+)[,\.](\d+)$/);
-      if(!m) return null;
-      const hh = parseInt(m[1],10);
-      const mm = parseInt(m[2],10);
-      const ss = parseInt(m[3],10);
-      const ms = parseInt(m[4].padEnd(3,"0").slice(0,3),10);
-      return hh*3600 + mm*60 + ss + ms/1000;
-    }
-
-    function parseSrt(srtText){
-      const blocks = (srtText || "")
-        .replace(/\r/g, "")
-        .split("\n\n")
-        .map(b => b.trim())
-        .filter(Boolean);
-
-      const cues = [];
-      for(const block of blocks){
-        const lines = block.split("\n").map(l=>l.trim()).filter(Boolean);
-        if(lines.length < 2) continue;
-
-        // First line might be index number
-        let i = 0;
-        if(/^\d+$/.test(lines[0])) i = 1;
-
-        const timeLine = lines[i] || "";
-        const tm = timeLine.match(/(.+?)\s*-->\s*(.+)/);
-        if(!tm) continue;
-
-        const start = parseSrtTimeToSeconds(tm[1].trim());
-        const end = parseSrtTimeToSeconds(tm[2].trim().split(" ")[0]); // drop any settings
-        if(start == null || end == null) continue;
-
-        const text = lines.slice(i+1).join(" ").replace(/\s+/g," ").trim();
-        if(!text) continue;
-
-        cues.push({start, end, text});
-      }
-      return cues.sort((a,b)=>a.start-b.start);
-    }
-
-    function formatTime(seconds){
-      const s = Math.max(0, seconds|0);
-      const hh = Math.floor(s/3600);
-      const mm = Math.floor((s%3600)/60);
-      const ss = s%60;
-      const pad = n => String(n).padStart(2,"0");
-      return hh>0 ? `${hh}:${pad(mm)}:${pad(ss)}` : `${mm}:${pad(ss)}`;
-    }
-
-    let currentCues = [];
-    let cueEls = [];
-    let activeIndex = -1;
-
-    function renderCues(cues){
-      capBox.innerHTML = "";
-      cueEls = [];
-      activeIndex = -1;
-
-      if(!cues.length){
-        capBox.innerHTML = `<div style="color:var(--muted); font-weight:800">No captions found.</div>`;
-        return;
-      }
-
-      cues.forEach((c, idx) => {
-        const el = document.createElement("div");
-        el.className = "cap-line";
-        el.innerHTML = `
-          <div class="cap-time">${formatTime(c.start)} → ${formatTime(c.end)}</div>
-          <div class="cap-text">${escapeHtml(c.text)}</div>
-        `;
-        el.addEventListener("click", () => {
-          if(player && typeof player.seekTo === "function"){
-            player.seekTo(c.start + 0.01, true);
-          }else{
-            // fallback: reload iframe with start time
-            const url = iframe.dataset.baseEmbed || "";
-            if(url){
-              iframe.src = url + `&start=${Math.floor(c.start)}`;
-            }
-          }
-        });
-        capBox.appendChild(el);
-        cueEls.push(el);
-      });
-    }
-
-    function setActiveCue(i){
-      if(i === activeIndex) return;
-      if(activeIndex >= 0 && cueEls[activeIndex]) cueEls[activeIndex].classList.remove("cap-active");
-      activeIndex = i;
-      if(activeIndex >= 0 && cueEls[activeIndex]){
-        cueEls[activeIndex].classList.add("cap-active");
-        cueEls[activeIndex].scrollIntoView({block:"nearest", behavior:"smooth"});
-      }
-    }
-
-    function findCueIndexByTime(t){
-      // simple linear scan is fine for typical captions; can optimize later
-      for(let i=0;i<currentCues.length;i++){
-        const c = currentCues[i];
-        if(t >= c.start && t < c.end) return i;
-      }
-      return -1;
-    }
-
-    async function loadCaptionsForVideo(videoId){
-      capStatus.textContent = "Loading…";
-      capStatus.style.color = "var(--muted)";
-      capBox.innerHTML = `<div style="color:var(--muted); font-weight:800">Loading captions…</div>`;
-      currentCues = [];
-
-      const url = srtUrlForVideo(videoId);
-
-      try{
-        const res = await fetch(url, {cache:"no-store"});
-        if(!res.ok){
-          throw new Error(`SRT not found (${res.status})`);
-        }
-        const text = await res.text();
-        const cues = parseSrt(text);
-
-        if(!cues.length){
-          capStatus.textContent = "Empty captions";
-          capStatus.style.color = "var(--accent3)";
-          renderCues([]);
-          return;
-        }
-
-        currentCues = cues;
-        renderCues(cues);
-        capStatus.textContent = "Loaded ✅";
-        capStatus.style.color = "var(--accent2)";
-      }catch(err){
-        console.warn("Captions load failed:", err);
-        capStatus.textContent = "No captions for this video";
-        capStatus.style.color = "var(--accent3)";
-        capBox.innerHTML = `
-          <div style="color:var(--muted); font-weight:800; line-height:1.6">
-            Could not load captions.<br>
-            Expected: <code>${escapeHtml(url)}</code>
-          </div>
-        `;
-      }
-    }
-
-    /* --------------------------
-       YouTube player (for syncing captions)
-    -------------------------- */
-    let player = null;
-    let tickTimer = null;
-
-    // The IFrame API will call this when ready
-    window.onYouTubeIframeAPIReady = function(){ /* no-op until we open a video */ };
-
-    function ensurePlayer(videoId){
-      // If player exists, just load by id
-      if(player){
-        player.loadVideoById(videoId);
-        return;
-      }
-
-      player = new YT.Player("series-iframe", {
-        videoId,
-        playerVars: {
-          autoplay: 1,
-          modestbranding: 1,
-          rel: 0
-        },
-        events: {
-          onReady: () => {
-            // Start caption sync loop
-            if(tickTimer) clearInterval(tickTimer);
-            tickTimer = setInterval(() => {
-              if(!player || !currentCues.length) return;
-              const t = player.getCurrentTime ? player.getCurrentTime() : 0;
-              const i = findCueIndexByTime(t);
-              setActiveCue(i);
-            }, 250);
-          }
-        }
-      });
-    }
-
-    /* --------------------------
-       Open/Close video
-    -------------------------- */
-    async function openVideo(v){
-      playerWrap.style.display = "block";
-      playerTitle.textContent = v.title || "Video";
-      playerMeta.textContent = `${v.level} · ${v.topic}`;
-
-      // Set iframe embed (fallback if API not ready)
-      const embedBase = `https://www.youtube.com/embed/${encodeURIComponent(v.id)}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-      iframe.dataset.baseEmbed = embedBase;
-      iframe.src = embedBase;
-
-      // Load captions
-      await loadCaptionsForVideo(v.id);
-
-      // If YT API loaded, create player for syncing
-      if(window.YT && window.YT.Player){
-        ensurePlayer(v.id);
-      }
-
-      // scroll into view
-      playerWrap.scrollIntoView({behavior:"smooth", block:"start"});
-    }
-
-    playerClose.addEventListener("click", () => {
-      playerWrap.style.display = "none";
-      capStatus.textContent = "Not loaded";
-      capStatus.style.color = "var(--muted)";
-      capBox.innerHTML = `<div style="color:var(--muted); font-weight:800">Select a video to load captions…</div>`;
-      currentCues = [];
-      activeIndex = -1;
-
-      // Stop playback
-      if(player && typeof player.stopVideo === "function") player.stopVideo();
-      iframe.src = "";
-    });
-
-    /* --------------------------
-       UI wiring
-    -------------------------- */
-    seriesSearch.addEventListener("input", (e) => {
-      filters.search = e.target.value;
-      seriesRender();
-    });
-
-    seriesClearFiltersBtn.addEventListener("click", () => {
-      filters.search = "";
-      filters.level = null;
-      filters.topic = null;
-      seriesSearch.value = "";
-      seriesRender();
-    });
-
-    /* --------------------------
-       YouTube Data API loading
-    -------------------------- */
-    async function ytFetch(url){
-      const res = await fetch(url);
-      const data = await res.json();
-      if(!res.ok){
-        const msg = data?.error?.message || `HTTP ${res.status}`;
-        throw new Error(msg);
-      }
-      return data;
-    }
-
-    async function getChannelId(){
-      if(YT_CHANNEL_ID_OVERRIDE) return YT_CHANNEL_ID_OVERRIDE;
-
-      // Lookup by "forHandle" (works for handles)
-      const url =
-        `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(YT_CHANNEL_HANDLE.replace("@",""))}&key=${encodeURIComponent(YT_API_KEY)}`;
-      const data = await ytFetch(url);
-      const id = data?.items?.[0]?.id;
-      if(!id){
-        throw new Error(`Could not resolve channel ID from handle ${YT_CHANNEL_HANDLE}. You can hardcode YT_CHANNEL_ID_OVERRIDE.`);
-      }
-      return id;
-    }
-
-    async function getAllPlaylists(channelId){
-      const all = [];
-      let pageToken = "";
-      do{
-        const url =
-          `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&channelId=${encodeURIComponent(channelId)}&maxResults=50&pageToken=${encodeURIComponent(pageToken)}&key=${encodeURIComponent(YT_API_KEY)}`;
-        const data = await ytFetch(url);
-        all.push(...(data.items || []));
-        pageToken = data.nextPageToken || "";
-      }while(pageToken);
-      return all;
-    }
-
-    async function getAllPlaylistItems(playlistId){
-      const all = [];
-      let pageToken = "";
-      do{
-        const url =
-          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${encodeURIComponent(playlistId)}&maxResults=50&pageToken=${encodeURIComponent(pageToken)}&key=${encodeURIComponent(YT_API_KEY)}`;
-        const data = await ytFetch(url);
-        all.push(...(data.items || []));
-        pageToken = data.nextPageToken || "";
-      }while(pageToken);
-      return all;
-    }
-
-    async function loadSeriesFromYouTube(){
-      seriesStateBox.textContent = "Loading channel…";
-
-      const channelId = await getChannelId();
-      seriesStateBox.textContent = "Loading playlists…";
-
-      const playlists = await getAllPlaylists(channelId);
-
-      const usable = playlists
-        .filter(p => (p?.contentDetails?.itemCount ?? 0) > 0)
-        .map(p => ({
-          id: p.id,
-          title: p?.snippet?.title || "Playlist",
-          count: p?.contentDetails?.itemCount || 0
-        }));
-
-      seriesStateBox.innerHTML =
-        `Found <b>${usable.length}</b> playlists. Loading videos…`;
-
-      const videoMap = new Map(); // videoId -> video object
-      let loadedPlaylists = 0;
-
-      for(const pl of usable){
-        loadedPlaylists++;
-        seriesStateBox.innerHTML =
-          `Loading videos… <b>${loadedPlaylists}/${usable.length}</b> playlists<br><span style="font-weight:800; color:var(--muted)">${escapeHtml(pl.title)}</span>`;
-
-        const items = await getAllPlaylistItems(pl.id);
-
-        for(const it of items){
-          const vid = it?.contentDetails?.videoId;
-          if(!vid) continue;
-
-          const title = it?.snippet?.title || "";
-          const topic = pl.title;
-          const level = seriesInferLevel(pl.title);
-
-          if(!videoMap.has(vid)){
-            videoMap.set(vid, {
-              id: vid,
-              title,
-              topic,
-              level,
-            });
-          }
-        }
-      }
-
-      seriesVideos = [...videoMap.values()];
-
-      const levels = uniq(seriesVideos.map(v => v.level));
-      const topics = uniq(seriesVideos.map(v => v.topic));
-
-      seriesRenderChips(document.getElementById("series-levelChips"), levels, "level");
-      seriesRenderChips(document.getElementById("series-topicChips"), topics, "topic");
-
-      seriesStateBox.innerHTML =
-        `✅ Loaded <b>${seriesVideos.length}</b> videos from <b>${usable.length}</b> playlists.<br>
-         <span style="font-weight:800; color:var(--muted)">Use search + filters on the left.</span>`;
-
-      seriesRender();
-    }
-
-    loadSeriesFromYouTube().catch(err => {
-      console.error(err);
-      seriesStateBox.innerHTML =
-        `❌ Could not load from YouTube API.<br><br>
-         <b>Error:</b> ${escapeHtml(err.message)}<br><br>
-         <span style="font-weight:800; color:var(--muted)">
-           Fix checklist:
-           <br>1) Enable “YouTube Data API v3” for this project
-           <br>2) Restrict key: API restrictions = YouTube Data API v3
-           <br>3) Restrict key: HTTP referrers include <code>http://localhost/*</code> (and your domain)
-           <br>4) If handle lookup fails, set <b>YT_CHANNEL_ID_OVERRIDE</b>
-         </span>`;
-    });
-
-    /* =========================================================
-       4) BOOK PAGE SCRIPT (year + reviews carousel + modal)
-    ========================================================= */
-    document.getElementById("book-year").textContent = new Date().getFullYear();
-
-    const bookReviews = [
-      { name: "Marie", date: "December 4, 2025", rating: 5, text: "If you want to learn Vietnamese, don't hesitate for a second to take lessons with Diệp! She adapts to our needs, is very dynamic, makes us practice a lot, and does so with a good mood." },
-      { name: "Duy", date: "June 20, 2025 (edited)", rating: 5, text: "Diep is an excellent teacher who makes the lessons varied and motivating. She challenges me specifically so that I can speak the language even better. The lessons are a lot of fun with her - Thank you very much." },
-      { name: "van", date: "April 25, 2025 (edited)", rating: 5, text: "Diệp is an excellent tutor who is so patient, effusive, fun, relatable, personable, and prepared to guide you through learning Vietnamese... Highly recommend, it's been a true delight so far!" },
-      { name: "Juan", date: "March 7, 2025", rating: 5, text: "Amazing teacher, she puts a lot on the class preparation, makes great exercises to practice, is very patient and generous." },
-      { name: "Kelly", date: "February 7, 2025", rating: 5, text: "Diệp is an incredible tutor! She's a fantastic conversation partner and I learn so much with her... Highly recommend her to anyone looking to learn!" },
-      { name: "Caity", date: "December 17, 2024", rating: 5, text: "I love learning with Diệp! My Vietnamese has progressed enormously... I highly recommend working with her!" }
-    ];
-
-    const bookTrack = document.getElementById("book-reviewsTrack");
-    const bookDotsWrap = document.getElementById("book-dots");
-
-    function bookStarString(n){
-      return "★".repeat(n) + "☆".repeat(Math.max(0, 5-n));
-    }
-
-    bookReviews.forEach((r, i) => {
-      const slide = document.createElement("div");
-      slide.className = "book-reviewSlide";
-      slide.innerHTML = `
-        <div class="book-reviewHead">
-          <div class="book-who">
-            <b>${escapeHtml(r.name)}</b>
-            <span>${escapeHtml(r.date)}</span>
-          </div>
-          <div class="book-stars" aria-label="${r.rating} out of 5">
-            ${bookStarString(r.rating)}
           </div>
         </div>
-        <p class="book-reviewText">${escapeHtml(r.text)}</p>
+      </div>
+
+      <!-- Video grid -->
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+<script>
+  /************************************************************
+   * CONFIG (no hardcoded API key)
+   ************************************************************/
+  const CONFIG = {
+    // Option A: Load from YouTube API (needs API key)
+    // Option B: fallback if API fails:
+    // Put a file in your repo called videos.json (root) to load from it.
+    FALLBACK_VIDEOS_JSON: "videos.json",
+
+    // Captions location in repo:
+    CAPTIONS_DIR: "captions",
+
+    // If you want fixed links
+    YOUTUBE_CHANNEL_URL: "https://www.youtube.com",
+    PATREON_URL: "https://www.patreon.com"
+  };
+
+  /************************************************************
+   * STATE
+   ************************************************************/
+  let API_KEY = localStorage.getItem("YT_API_KEY") || "";
+  let allVideos = [];   // flattened list of videos
+  let filteredVideos = [];
+  let currentVideo = null;
+
+  // YouTube player API
+  let ytPlayer = null;
+  let ytReady = false;
+  let syncTimer = null;
+
+  // captions parsed lines:
+  // [{start,end,text,rawTime}]
+  let capLines = [];
+  let capsVisible = true;
+
+  const el = (id)=>document.getElementById(id);
+
+  /************************************************************
+   * UI helpers
+   ************************************************************/
+  function setStatus({type="warn", title="Working…", msg="", line=""}){
+    const dot = el("statusDot");
+    const label = el("statusLabel");
+    const smsg = el("statusMsg");
+    const sline = el("statusLine");
+    dot.className = "dot " + (type==="good"?"good":type==="bad"?"bad":"warn");
+    label.textContent = title;
+    smsg.textContent = msg;
+    sline.textContent = line || "";
+  }
+
+  function setCapStatus(type, text, hint){
+    const dot = el("capDot");
+    dot.className = "dot " + (type==="good"?"good":type==="bad"?"bad":"warn");
+    el("capStatus").textContent = text;
+    el("capHint").textContent = hint || "";
+  }
+
+  function escapeHtml(s){
+    return (s||"").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  /************************************************************
+   * YouTube API load (channel -> playlists -> items)
+   * IMPORTANT: This code expects you already had a working flow.
+   * If API key is invalid or restricted, we fallback.
+   ************************************************************/
+  async function ytFetch(url){
+    const res = await fetch(url);
+    if(!res.ok){
+      const txt = await res.text().catch(()=> "");
+      throw new Error(`HTTP ${res.status} ${txt}`.slice(0,200));
+    }
+    return res.json();
+  }
+
+  async function loadFromYouTubeAPI(){
+    if(!API_KEY) throw new Error("Missing API key (set it with the button).");
+
+    // Minimal approach: if you already had a channelId stored in localStorage from before, reuse it.
+    // Otherwise, we can ask the user for a channelId once.
+    let channelId = localStorage.getItem("YT_CHANNEL_ID") || "";
+    if(!channelId){
+      channelId = prompt("Paste your YouTube channelId (starts with UC...)");
+      if(!channelId) throw new Error("No channelId provided.");
+      localStorage.setItem("YT_CHANNEL_ID", channelId);
+    }
+
+    // Get playlists
+    const playlists = [];
+    let nextPageToken = "";
+    do{
+      const u = new URL("https://www.googleapis.com/youtube/v3/playlists");
+      u.searchParams.set("part","snippet,contentDetails");
+      u.searchParams.set("channelId", channelId);
+      u.searchParams.set("maxResults","50");
+      u.searchParams.set("key", API_KEY);
+      if(nextPageToken) u.searchParams.set("pageToken", nextPageToken);
+
+      const data = await ytFetch(u.toString());
+      (data.items||[]).forEach(pl=>{
+        playlists.push({
+          playlistId: pl.id,
+          title: pl.snippet?.title || "Playlist",
+          count: pl.contentDetails?.itemCount || 0
+        });
+      });
+      nextPageToken = data.nextPageToken || "";
+    } while(nextPageToken);
+
+    // For each playlist, get videos
+    const videos = [];
+    for(const pl of playlists){
+      let token = "";
+      do{
+        const u = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
+        u.searchParams.set("part","snippet,contentDetails");
+        u.searchParams.set("playlistId", pl.playlistId);
+        u.searchParams.set("maxResults","50");
+        u.searchParams.set("key", API_KEY);
+        if(token) u.searchParams.set("pageToken", token);
+
+        const data = await ytFetch(u.toString());
+        (data.items||[]).forEach(it=>{
+          const vid = it.contentDetails?.videoId || it.snippet?.resourceId?.videoId;
+          if(!vid) return;
+          videos.push({
+            videoId: vid,
+            title: it.snippet?.title || "Untitled",
+            playlistTitle: pl.title,
+            playlistId: pl.playlistId,
+            thumb: it.snippet?.thumbnails?.medium?.url || it.snippet?.thumbnails?.default?.url || "",
+          });
+        });
+        token = data.nextPageToken || "";
+      } while(token);
+    }
+
+    // Deduplicate by videoId
+    const seen = new Set();
+    const dedup = [];
+    for(const v of videos){
+      if(seen.has(v.videoId)) continue;
+      seen.add(v.videoId);
+      dedup.push(v);
+    }
+    return dedup;
+  }
+
+  /************************************************************
+   * Fallback videos.json
+   ************************************************************/
+  async function loadFromFallbackJson(){
+    const res = await fetch(CONFIG.FALLBACK_VIDEOS_JSON, {cache:"no-store"});
+    if(!res.ok) throw new Error(`Could not load ${CONFIG.FALLBACK_VIDEOS_JSON}`);
+    const data = await res.json();
+    // Expect either {videos:[...]} or [...]
+    const arr = Array.isArray(data) ? data : (data.videos || []);
+    return arr.map(v=>({
+      videoId: v.videoId || v.id,
+      title: v.title || "Untitled",
+      playlistTitle: v.playlistTitle || v.playlist || "Videos",
+      playlistId: v.playlistId || "",
+      thumb: v.thumb || v.thumbnail || ""
+    })).filter(v=>v.videoId);
+  }
+
+  /************************************************************
+   * Render grid
+   ************************************************************/
+  function renderGrid(list){
+    const grid = el("grid");
+    grid.innerHTML = "";
+    if(!list.length){
+      grid.innerHTML = `<div style="padding:14px;color:var(--muted);font-weight:800">
+        No videos found.
+      </div>`;
+      return;
+    }
+
+    for(const v of list){
+      const card = document.createElement("div");
+      card.className = "card";
+      card.onclick = ()=> selectVideo(v);
+
+      const thumb = v.thumb || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`;
+
+      card.innerHTML = `
+        <div class="thumb">
+          <img src="${escapeHtml(thumb)}" alt="">
+          <div class="play">▶</div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${escapeHtml(v.title)}</div>
+          <div class="meta">
+            <span>${escapeHtml(v.playlistTitle || "Series")}</span>
+            <span>•</span>
+            <span>${escapeHtml(v.videoId)}</span>
+          </div>
+        </div>
       `;
-      bookTrack.appendChild(slide);
+      grid.appendChild(card);
+    }
+  }
 
-      const dot = document.createElement("button");
-      dot.className = "book-dotBtn" + (i===0 ? " active" : "");
-      dot.type = "button";
-      dot.setAttribute("aria-label", `Go to review ${i+1}`);
-      dot.addEventListener("click", () => bookGoTo(i, true));
-      bookDotsWrap.appendChild(dot);
-    });
+  /************************************************************
+   * YouTube Player (iframe api) + captions sync
+   ************************************************************/
+  window.onYouTubeIframeAPIReady = function(){
+    ytReady = true;
+  };
 
-    const bookDots = [...document.querySelectorAll(".book-dotBtn")];
-    let bookIndex = 0;
-    let bookAutoTimer = null;
+  function mountPlayer(videoId){
+    // Clear previous
+    if(syncTimer){ clearInterval(syncTimer); syncTimer = null; }
+    if(ytPlayer && ytPlayer.destroy){
+      try{ ytPlayer.destroy(); }catch(e){}
+      ytPlayer = null;
+    }
+    el("ytMount").innerHTML = `<div id="ytPlayer"></div>`;
 
-    function bookPaint(){
-      bookTrack.style.transform = `translateX(${-bookIndex * 100}%)`;
-      bookDots.forEach((d, i) => d.classList.toggle("active", i===bookIndex));
+    // Create player only when API is ready; if not ready, fallback to plain iframe.
+    if(!ytReady || !window.YT || !YT.Player){
+      // Plain iframe fallback: captions sync will NOT work, but video will show.
+      el("ytMount").innerHTML = `
+        <iframe
+          src="https://www.youtube.com/embed/${encodeURIComponent(videoId)}?rel=0&modestbranding=1"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      `;
+      return;
     }
 
-    function bookGoTo(i, userAction=false){
-      bookIndex = (i + bookReviews.length) % bookReviews.length;
-      bookPaint();
-      if(userAction) bookRestartAuto();
-    }
-
-    document.getElementById("book-prevBtn").addEventListener("click", () => bookGoTo(bookIndex-1, true));
-    document.getElementById("book-nextBtn").addEventListener("click", () => bookGoTo(bookIndex+1, true));
-
-    function bookRestartAuto(){
-      clearInterval(bookAutoTimer);
-      bookAutoTimer = setInterval(() => bookGoTo(bookIndex+1, false), 6500);
-    }
-    bookRestartAuto();
-
-    let bookStartX = null;
-    bookTrack.addEventListener("pointerdown", (e) => { bookStartX = e.clientX; });
-    bookTrack.addEventListener("pointerup", (e) => {
-      if(bookStartX === null) return;
-      const dx = e.clientX - bookStartX;
-      if(Math.abs(dx) > 40){
-        bookGoTo(bookIndex + (dx < 0 ? 1 : -1), true);
-      }
-      bookStartX = null;
-    });
-
-    // Book modal (Preply)
-    const bookModalBack = document.getElementById("book-videoModalBack");
-    const bookOpenBtn = document.getElementById("book-watchBtn");
-    const bookCloseBtn = document.getElementById("book-closeModal");
-    const bookOpenPreplyBtn = document.getElementById("book-modalOpenPreply");
-    const bookCopyBtn = document.getElementById("book-modalCopyLink");
-    const preplyUrl = "https://preply.com/en/tutor/2553268";
-
-    function bookOpenModal(){
-      bookModalBack.style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-    function bookCloseModal(){
-      bookModalBack.style.display = "none";
-      document.body.style.overflow = "";
-    }
-
-    bookOpenBtn.addEventListener("click", bookOpenModal);
-    bookCloseBtn.addEventListener("click", bookCloseModal);
-    bookModalBack.addEventListener("click", (e) => { if(e.target === bookModalBack) bookCloseModal(); });
-
-    bookOpenPreplyBtn.addEventListener("click", () => {
-      window.open(preplyUrl, "_blank", "noopener");
-      bookCloseModal();
-    });
-
-    bookCopyBtn.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(preplyUrl);
-        bookCopyBtn.textContent = "Copied!";
-        setTimeout(()=> bookCopyBtn.textContent = "Copy Preply link", 1400);
-      }catch(err){
-        prompt("Copy this link:", preplyUrl);
+    ytPlayer = new YT.Player("ytPlayer", {
+      width: "100%",
+      height: "100%",
+      videoId,
+      playerVars: {
+        rel: 0,
+        modestbranding: 1
+      },
+      events: {
+        onReady: () => {
+          // Start sync loop if captions exist
+          startSyncLoop();
+        },
+        onStateChange: () => {}
       }
     });
-  </script>
+  }
 
-  <!-- YouTube IFrame API (needed for caption syncing) -->
-  <script src="https://www.youtube.com/iframe_api"></script>
+  function getCurrentTime(){
+    try{
+      if(ytPlayer && typeof ytPlayer.getCurrentTime === "function"){
+        return ytPlayer.getCurrentTime();
+      }
+    }catch(e){}
+    return null;
+  }
+
+  function seekTo(seconds){
+    if(ytPlayer && typeof ytPlayer.seekTo === "function"){
+      ytPlayer.seekTo(seconds, true);
+      ytPlayer.playVideo?.();
+    }
+  }
+
+  function startSyncLoop(){
+    if(syncTimer){ clearInterval(syncTimer); syncTimer = null; }
+    if(!capLines.length) return;
+
+    syncTimer = setInterval(()=>{
+      const t = getCurrentTime();
+      if(t == null) return;
+
+      // find active line
+      // simple linear scan is ok for moderate size; can optimize later
+      let activeIndex = -1;
+      for(let i=0;i<capLines.length;i++){
+        if(t >= capLines[i].start && t < capLines[i].end){
+          activeIndex = i; break;
+        }
+      }
+      highlightCaption(activeIndex);
+    }, 250);
+  }
+
+  function highlightCaption(index){
+    const box = el("capBox");
+    const nodes = box.querySelectorAll(".cap-line");
+    nodes.forEach(n=>n.classList.remove("active"));
+    if(index < 0) return;
+    const active = nodes[index];
+    if(!active) return;
+    active.classList.add("active");
+
+    // scroll into view gently
+    const top = active.offsetTop - 60;
+    if(Math.abs(box.scrollTop - top) > 120){
+      box.scrollTop = top;
+    }
+  }
+
+  /************************************************************
+   * Captions: load / parse SRT
+   ************************************************************/
+  function parseSrtTime(t){
+    // "HH:MM:SS,mmm"
+    const m = t.trim().match(/^(\d+):(\d+):(\d+)[,\.](\d+)$/);
+    if(!m) return 0;
+    const hh = parseInt(m[1],10);
+    const mm = parseInt(m[2],10);
+    const ss = parseInt(m[3],10);
+    const ms = parseInt(m[4].padEnd(3,"0").slice(0,3),10);
+    return hh*3600 + mm*60 + ss + ms/1000;
+  }
+
+  function parseSrt(srt){
+    // Basic SRT parsing
+    const blocks = srt.replace(/\r/g,"").split("\n\n").map(b=>b.trim()).filter(Boolean);
+    const lines = [];
+    for(const b of blocks){
+      const parts = b.split("\n").map(x=>x.trim());
+      if(parts.length < 2) continue;
+
+      // parts[0] may be index
+      let timeLineIndex = 0;
+      if(/^\d+$/.test(parts[0])) timeLineIndex = 1;
+      const timeLine = parts[timeLineIndex] || "";
+      const m = timeLine.match(/(.+?)\s*-->\s*(.+)/);
+      if(!m) continue;
+
+      const start = parseSrtTime(m[1]);
+      const end = parseSrtTime(m[2]);
+      const text = parts.slice(timeLineIndex+1).join(" ").replace(/\s+/g," ").trim();
+
+      if(text){
+        lines.push({start,end,text,rawTime:`${m[1].trim()} → ${m[2].trim()}`});
+      }
+    }
+    return lines;
+  }
+
+  async function loadCaptionsFor(videoId){
+    capLines = [];
+    el("capBox").innerHTML = `<div class="msg" style="color:var(--muted);font-weight:800">Loading captions…</div>`;
+    setCapStatus("warn","Captions","Loading…");
+
+    const url = `${CONFIG.CAPTIONS_DIR}/${encodeURIComponent(videoId)}.srt`;
+
+    try{
+      const res = await fetch(url, {cache:"no-store"});
+      if(!res.ok) throw new Error("No captions file in repo");
+      const srt = await res.text();
+      capLines = parseSrt(srt);
+
+      if(!capLines.length){
+        setCapStatus("bad","Captions","File exists but could not parse.");
+        el("capBox").innerHTML = `<div class="msg" style="color:var(--muted);font-weight:800">
+          Captions file found, but parsing failed. Make sure it’s valid .srt.
+        </div>`;
+        return;
+      }
+
+      setCapStatus("good","Captions","Click a line to jump.");
+      renderCaptions();
+      startSyncLoop();
+    }catch(e){
+      setCapStatus("bad","Captions","No captions for this video.");
+      el("capBox").innerHTML = `<div class="msg" style="color:var(--muted);font-weight:800">
+        No captions found for this video.<br>
+        Expected: <b>${escapeHtml(url)}</b>
+      </div>`;
+    }
+  }
+
+  function renderCaptions(){
+    const box = el("capBox");
+    box.innerHTML = "";
+    capLines.forEach((l, idx)=>{
+      const div = document.createElement("div");
+      div.className = "cap-line";
+      div.innerHTML = `
+        <div class="cap-time">${escapeHtml(l.rawTime.split("→")[0].trim())}</div>
+        <div class="cap-text">${escapeHtml(l.text)}</div>
+      `;
+      div.onclick = ()=>{
+        // jump to start time
+        seekTo(l.start);
+        highlightCaption(idx);
+      };
+      box.appendChild(div);
+    });
+  }
+
+  /************************************************************
+   * Select video
+   ************************************************************/
+  function selectVideo(v){
+    currentVideo = v;
+    el("playerWrap").style.display = "block";
+    el("playerTitle").textContent = v.title || "Video";
+    el("playerMeta").textContent = (v.playlistTitle ? `Series: ${v.playlistTitle}` : "") + (v.videoId ? ` • ${v.videoId}` : "");
+
+    // Mount player
+    mountPlayer(v.videoId);
+
+    // Buttons
+    el("btnOpenYT").onclick = ()=>{
+      window.open(`https://www.youtube.com/watch?v=${encodeURIComponent(v.videoId)}`, "_blank");
+    };
+
+    // Captions
+    loadCaptionsFor(v.videoId);
+  }
+
+  /************************************************************
+   * Filtering
+   ************************************************************/
+  function applyFilters(){
+    const q = (el("searchInput").value || "").trim().toLowerCase();
+    filteredVideos = allVideos.filter(v=>{
+      if(!q) return true;
+      return (v.title||"").toLowerCase().includes(q) ||
+             (v.playlistTitle||"").toLowerCase().includes(q) ||
+             (v.videoId||"").toLowerCase().includes(q);
+    });
+    renderGrid(filteredVideos);
+    el("pageSub").textContent = `${filteredVideos.length} video(s)`;
+  }
+
+  /************************************************************
+   * Init
+   ************************************************************/
+  async function init(){
+    // Links
+    el("btnYoutube").href = CONFIG.YOUTUBE_CHANNEL_URL;
+    el("btnPatreon").href = CONFIG.PATREON_URL;
+
+    // Buttons
+    el("btnSetApiKey").onclick = ()=>{
+      const key = prompt("Paste your YouTube Data API key (AIza...)");
+      if(!key) return;
+      API_KEY = key.trim();
+      localStorage.setItem("YT_API_KEY", API_KEY);
+      setStatus({type:"good", title:"Saved", msg:"API key saved in this browser.", line:"Reloading…"});
+      initLoad();
+    };
+
+    el("btnClearApiKey").onclick = ()=>{
+      localStorage.removeItem("YT_API_KEY");
+      API_KEY = "";
+      setStatus({type:"warn", title:"Cleared", msg:"API key cleared. Will use fallback if available.", line:""});
+    };
+
+    el("btnClearFilters").onclick = ()=>{
+      el("searchInput").value = "";
+      applyFilters();
+    };
+
+    el("searchInput").addEventListener("input", ()=>{
+      applyFilters();
+    });
+
+    el("btnToggleCaps").onclick = ()=>{
+      capsVisible = !capsVisible;
+      el("captionsWrap").style.display = capsVisible ? "block" : "none";
+    };
+
+    el("btnReloadCaps").onclick = ()=>{
+      if(currentVideo?.videoId) loadCaptionsFor(currentVideo.videoId);
+    };
+
+    // Tabs (only visual)
+    el("tabSeries").onclick = ()=>{
+      el("tabSeries").classList.add("active");
+      el("tabBook").classList.remove("active");
+      el("pageTitle").textContent = "All Series";
+    };
+    el("tabBook").onclick = ()=>{
+      el("tabBook").classList.add("active");
+      el("tabSeries").classList.remove("active");
+      el("pageTitle").textContent = "Book";
+    };
+
+    await initLoad();
+  }
+
+  async function initLoad(){
+    el("pageSub").textContent = "Loading playlists...";
+    setStatus({type:"warn", title:"Working…", msg:"Loading from YouTube API…", line: API_KEY ? "Using API key from browser storage." : "No API key set yet."});
+
+    // First try YouTube API if key exists
+    try{
+      const vids = await loadFromYouTubeAPI();
+      allVideos = vids;
+      setStatus({type:"good", title:"Loaded", msg:`Loaded ${allVideos.length} videos from YouTube API.`, line:""});
+      el("pageSub").textContent = `${allVideos.length} video(s)`;
+      applyFilters();
+      return;
+    }catch(e){
+      // Fallback
+      const reason = (e && e.message) ? e.message : String(e);
+      setStatus({type:"warn", title:"API failed", msg:"Falling back to videos.json…", line: reason});
+    }
+
+    // Try fallback json
+    try{
+      const vids = await loadFromFallbackJson();
+      allVideos = vids;
+      setStatus({type:"good", title:"Loaded", msg:`Loaded ${allVideos.length} videos from videos.json.`, line:"(YouTube API is optional in this mode.)"});
+      el("pageSub").textContent = `${allVideos.length} video(s)`;
+      applyFilters();
+    }catch(e2){
+      const reason2 = (e2 && e2.message) ? e2.message : String(e2);
+      allVideos = [];
+      renderGrid([]);
+      setStatus({
+        type:"bad",
+        title:"Could not load",
+        msg:"Could not load from YouTube API or videos.json.",
+        line:`Fix: click "Set API Key" OR add a videos.json file. Details: ${reason2}`
+      });
+      el("pageSub").textContent = "No videos loaded";
+    }
+  }
+
+  init();
+</script>
 </body>
 </html>
-```0
