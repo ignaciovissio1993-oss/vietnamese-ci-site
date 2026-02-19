@@ -293,6 +293,11 @@
       overflow:auto;
       padding:10px;
       line-height:1.5;
+
+      /* ✅ FIX (mobile highlight jump) */
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      overflow-anchor: none;
     }
     .capEmpty{color:rgba(29,27,43,.7);font-size:13px;padding:8px}
     .capLine{
@@ -301,6 +306,9 @@
       cursor:pointer;
       user-select:none;
       border:1px solid transparent;
+
+      /* ✅ FIX (prevent scroll anchoring jumps) */
+      overflow-anchor: none;
     }
     .capLine:hover{background: rgba(106,92,255,.06)}
     .capLine.active{
@@ -692,6 +700,54 @@
       return String(v);
     }
 
+    /* ✅ NEW: phrase support (2+ words, longest match) */
+    function normalizePhraseKey(s){
+      return (s || "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/^[^a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]+/iu,"")
+        .replace(/[^a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]+$/iu,"");
+    }
+
+    // Intenta longest-match: 4 palabras -> 3 -> 2 -> 1
+    function lookupBestPhraseFromSpan(spanEl, maxWords = 4){
+      if(!spanEl) return { phrase: "", def: null };
+
+      const words = [];
+      const w0 = spanEl.getAttribute("data-w") || "";
+      if(w0) words.push(w0);
+
+      // mirar adelante dentro del mismo capText
+      let node = spanEl.nextSibling;
+      while(node && words.length < maxWords){
+        if(node.nodeType === 3){ // spaces
+          node = node.nextSibling;
+          continue;
+        }
+        if(node.nodeType === 1){
+          const el = node;
+          if(el.classList && el.classList.contains("w")){
+            const w = el.getAttribute("data-w") || "";
+            if(w) words.push(w);
+            node = node.nextSibling;
+            continue;
+          }
+        }
+        break; // punctuation/other
+      }
+
+      for(let k = Math.min(words.length, maxWords); k >= 1; k--){
+        const phrase = normalizePhraseKey(words.slice(0, k).join(" "));
+        if(!phrase) continue;
+        const def = lookupWord(phrase);
+        if(def) return { phrase, def };
+      }
+
+      const single = normalizeWord(w0);
+      return { phrase: single || w0, def: lookupWord(single || w0) };
+    }
+
     function openDictPopup(word, definition, anchorRect){
       dictWordEl.textContent = word;
       dictDefEl.textContent = definition;
@@ -828,7 +884,6 @@
       // click line -> seek
       capBody.querySelectorAll(".capLine").forEach(el => {
         el.addEventListener("click", (ev) => {
-          // if user clicked a word, let that handler run, but still allow line click if not
           const i = parseInt(el.getAttribute("data-i"),10);
           const t = cues[i]?.start ?? 0;
           if(player && typeof player.seekTo === "function"){
@@ -839,18 +894,18 @@
         });
       });
 
-      // word click -> dictionary popup
+      // ✅ UPDATED: word click -> dictionary popup (supports multi-word phrases)
       capBody.querySelectorAll(".w").forEach(wel => {
         wel.addEventListener("click", (ev) => {
           ev.stopPropagation();
-          const w = wel.getAttribute("data-w") || "";
-          const def = lookupWord(w);
 
           const rect = wel.getBoundingClientRect();
+          const { phrase, def } = lookupBestPhraseFromSpan(wel, 4);
+
           if(def){
-            openDictPopup(w, def, rect);
+            openDictPopup(phrase, def, rect);
           }else{
-            openDictPopup(w, dict ? "Not found in dictionary." : "Dictionary not loaded.", rect);
+            openDictPopup(phrase || (wel.getAttribute("data-w")||""), dict ? "Not found in dictionary." : "Dictionary not loaded.", rect);
           }
         });
       });
@@ -870,6 +925,7 @@
       return -1;
     }
 
+    /* ✅ REPLACED: Mobile-safe active cue scroll (no jump) */
     function setActiveCue(i, userInitiated=false){
       if(i === activeCueIndex) return;
       activeCueIndex = i;
@@ -881,13 +937,20 @@
       if(!el) return;
       el.classList.add("active");
 
-      // scroll INSIDE captions only (no page jump)
-      const top = el.offsetTop;
-      const h = el.offsetHeight;
-      const viewH = capBody.clientHeight;
-      const target = top - (viewH/2) + (h/2);
+      // Only scroll if the active line is not visible (prevents mobile "push down" jump)
+      const elTop = el.offsetTop;
+      const elBottom = elTop + el.offsetHeight;
+      const viewTop = capBody.scrollTop;
+      const viewBottom = viewTop + capBody.clientHeight;
 
-      capBody.scrollTo({ top: Math.max(0, target), behavior: userInitiated ? "smooth" : "auto" });
+      const pad = 28;
+      const isAbove = elTop < (viewTop + pad);
+      const isBelow = elBottom > (viewBottom - pad);
+
+      if(isAbove || isBelow){
+        const target = Math.max(0, elTop - (capBody.clientHeight * 0.35));
+        capBody.scrollTo({ top: target, behavior: userInitiated ? "smooth" : "auto" });
+      }
     }
 
     // Stable sync loop (fixes "highlight stopped working")
