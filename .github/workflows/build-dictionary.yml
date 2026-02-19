@@ -1,0 +1,54 @@
+name: Build Vietnamese Dictionary (Top 5000)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "scripts/**"
+      - ".github/workflows/build-dictionary.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build_dict:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install wordfreq
+
+      - name: Download Vietnamese-English dictionary data (stardict-vi)
+        run: |
+          rm -rf _dict_tmp
+          mkdir -p _dict_tmp
+          # Repo con diccionarios stardict vietnamita (fuente abierta)
+          # Descargamos el zip del repo completo (simple y robusto)
+          curl -L -o _dict_tmp/stardict-vi.zip https://github.com/opensource-dictionaries/stardict-vi/archive/refs/heads/master.zip
+          unzip -q _dict_tmp/stardict-vi.zip -d _dict_tmp
+
+      - name: Build dict JSON
+        run: |
+          python scripts/build_vi_dict.py
+
+      - name: Commit dict
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add assets/dict_vi_en.json
+            git commit -m "Auto-build Vietnamese dictionary JSON"
+            git push
+          else
+            echo "No changes to commit"
+          fi
