@@ -1,624 +1,940 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Lazy Vietnamese | Playlists</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Lazy Vietnamese | Playlists</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#11131a;
+      --text:#e9ecf1;
+      --muted:#a6adbb;
+      --line:#222633;
+      --accent:#7dd3fc;
+      --accent2:#a78bfa;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --ok:#34d399;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1000px 600px at 20% 10%, rgba(125,211,252,.12), transparent 60%),
+                  radial-gradient(900px 600px at 80% 0%, rgba(167,139,250,.10), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: rgba(11,12,16,.7);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      max-width: 1400px; margin:0 auto;
+    }
+    .brand{display:flex; gap:10px; align-items:center; min-width: 260px;}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: linear-gradient(135deg, rgba(125,211,252,.9), rgba(167,139,250,.9));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .brand h1{margin:0; font-size:16px; letter-spacing:.2px; line-height:1.1;}
+    .brand p{margin:0; color:var(--muted); font-size:12px;}
+    .controls{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      justify-content:flex-end; width: 100%;
+    }
+    .input{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline:none;
+      min-width: 220px;
+    }
+    .btn{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor:pointer;
+      transition: transform .05s ease, background .15s ease;
+      display:inline-flex; gap:8px; align-items:center;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{background: rgba(255,255,255,.09)}
+    .btn:active{transform: translateY(1px)}
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+    }
+    main{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
 
-<style>
-:root{
-  --bg:#0b1020;
-  --panel:#101a33;
-  --muted:#9fb0d0;
-  --text:#eaf0ff;
-  --accent:#7aa7ff;
-  --accent2:#4fe3c2;
-  --danger:#ff6b8b;
-  --border:rgba(255,255,255,.08);
-  --radius:18px;
-  --radius2:14px;
-  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-}
+    /* Player */
+    .playerWrap{
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      overflow:hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+    .playerHeader{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding: 12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .playerTitle{display:flex; flex-direction:column; gap:2px; min-width:0;}
+    .playerTitle .h{font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .playerTitle .sub{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:var(--sans);
-  color:var(--text);
-  background: var(--bg);
-  min-height:100vh;
-}
+    .playerGrid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 0;
+      min-height: 420px;
+    }
+    @media (max-width: 980px){ .playerGrid{grid-template-columns: 1fr} }
 
-header{
-  position:sticky;
-  top:0;
-  backdrop-filter: blur(10px);
-  background: rgba(11,16,32,.9);
-  border-bottom:1px solid var(--border);
-  z-index:10;
-}
+    .videoPane{background:#000; position:relative;}
+    .yt{
+      width:100%;
+      aspect-ratio: 16 / 9;
+      display:block;
+      border:0;
+      background:#000;
+    }
 
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 18px;
-}
+    .captionPane{
+      background: rgba(10,12,18,.6);
+      border-left:1px solid rgba(255,255,255,.08);
+      display:flex;
+      flex-direction:column;
+      min-height: 100%;
+    }
+    @media (max-width: 980px){
+      .captionPane{border-left:0; border-top:1px solid rgba(255,255,255,.08)}
+    }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:800;
-}
+    .capHeader{
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .capHeader .left{display:flex; flex-direction:column; gap:2px; min-width:0;}
+    .capHeader .left .t{font-weight:700; font-size:13px;}
+    .capHeader .left .m{
+      color:var(--muted); font-size:12px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
 
-.logo{
-  width:40px;
-  height:40px;
-  border-radius:12px;
-  background: linear-gradient(135deg, #7aa7ff, #4fe3c2);
-}
+    .capBody{
+      padding: 8px;
+      overflow:auto;
+      height: 100%;
+      max-height: 520px;
+    }
+    @media (max-width: 980px){ .capBody{max-height: 420px;} }
 
-.wrap{
-  max-width:1400px;
-  margin:0 auto;
-  padding:18px;
-}
+    .capLine{
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.03);
+      margin: 8px 0;
+      cursor:pointer;
+      transition: background .12s ease, border-color .12s ease, transform .05s ease;
+      line-height: 1.35;
+    }
+    .capLine:hover{background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.10);}
+    .capLine:active{transform: translateY(1px)}
+    .capLine.active{
+      border-color: rgba(125,211,252,.45);
+      background: rgba(125,211,252,.12);
+      box-shadow: inset 0 0 0 1px rgba(125,211,252,.15);
+    }
+    .capLine .time{display:block; font-size:11px; color: var(--muted); margin-bottom:6px;}
+    .capLine .text{font-size: 14px;}
 
-.grid{
-  display:grid;
-  grid-template-columns: 340px 1fr;
-  gap:16px;
-}
+    .capBadge{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .capBadge.ok{border-color: rgba(52,211,153,.35); color: rgba(52,211,153,.95); background: rgba(52,211,153,.10);}
+    .capBadge.warn{border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95); background: rgba(251,191,36,.10);}
+    .capBadge.bad{border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95); background: rgba(251,113,133,.10);}
 
-@media (max-width: 980px){
-  .grid{grid-template-columns:1fr}
-}
+    /* Playlists rows */
+    .section{
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .sectionHead{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .sectionHead .title{display:flex; flex-direction:column; gap:2px; min-width:0;}
+    .sectionHead .title .h{font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .sectionHead .title .m{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
-.card{
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  background: var(--panel);
-  overflow:hidden;
-}
+    .row{padding: 12px 12px 14px; overflow-x:auto;}
+    .cards{display:flex; gap: 12px; align-items:stretch; min-width: min(100%, 1200px);}
+    .card{
+      width: 250px;
+      flex: 0 0 auto;
+      border-radius: 18px;
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      cursor:pointer;
+      transition: transform .07s ease, border-color .15s ease, background .15s ease;
+      box-shadow: 0 20px 40px rgba(0,0,0,.22);
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(125,211,252,.30);
+      background: rgba(255,255,255,.05);
+    }
+    .thumb{width:100%; aspect-ratio: 16/9; background: #000; display:block;}
+    .cardBody{padding: 10px 10px 12px; display:flex; flex-direction:column; gap:6px;}
+    .cardTitle{font-weight:700; font-size: 13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .cardMeta{color: var(--muted); font-size: 12px; display:flex; gap:8px; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .miniTag{
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+    }
 
-.cardHeader{
-  padding:14px;
-  border-bottom:1px solid var(--border);
-}
+    .status{
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: 13px;
+    }
 
-.list{
-  max-height: calc(100vh - 180px);
-  overflow:auto;
-}
-
-.item{
-  display:flex;
-  gap:12px;
-  padding:12px;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  cursor:pointer;
-}
-
-.item:hover{background: rgba(122,167,255,.08)}
-.item.active{background: rgba(79,227,194,.12)}
-
-.thumb{
-  width:84px;
-  height:48px;
-  border-radius:10px;
-  overflow:hidden;
-  flex:0 0 auto;
-}
-
-.thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.title{
-  font-size:13px;
-  font-weight:700;
-  margin:0;
-}
-
-.playerArea{
-  padding:14px;
-  display:grid;
-  grid-template-columns: 1fr 420px;
-  gap:14px;
-}
-
-@media (max-width:1200px){
-  .playerArea{grid-template-columns:1fr}
-}
-
-.playerBox{
-  width:100%;
-  aspect-ratio:16/9;
-  background:#000;
-  border-radius:var(--radius);
-  overflow:hidden;
-}
-
-#player{
-  width:100%;
-  height:100%;
-}
-
-.transcript{
-  max-height:520px;
-  overflow:auto;
-  padding:12px;
-  line-height:1.5;
-  scroll-behavior:smooth;
-}
-
-.transcript .hint{
-  color: var(--muted);
-  font-size: 13px;
-  padding: 6px 4px;
-}
-
-.cue{
-  padding:7px 10px;
-  border-radius:12px;
-  cursor:pointer;
-  margin: 4px 0;
-  border: 1px solid rgba(255,255,255,.06);
-  background: rgba(255,255,255,.03);
-}
-
-.cue:hover{
-  background: rgba(122,167,255,.10);
-}
-
-.cue.active{
-  background: rgba(79,227,194,.18);
-  border-color: rgba(79,227,194,.35);
-}
-
-.cue .t{
-  display:block;
-  color: var(--muted);
-  font-size: 11px;
-  margin-bottom: 2px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-</style>
+    /* Word popup dictionary */
+    #viDictPopup{
+      position: fixed;
+      z-index: 99999;
+      max-width: 380px;
+      background: rgba(17,17,20,.98);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    #viDictPopup .w{font-weight:900;font-size:16px;margin-bottom:6px}
+    #viDictPopup .g{opacity:.92;white-space:pre-wrap}
+    #viDictPopup .actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+    #viDictPopup .a{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      text-decoration:none;
+      font-size:12px;
+    }
+    #viDictPopup .a:hover{background: rgba(255,255,255,.10)}
+  </style>
 </head>
+
 <body>
-
-<header>
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo"></div>
-      Lazy Vietnamese
-    </div>
-  </div>
-</header>
-
-<div class="wrap">
-  <div class="grid">
-
-    <section class="card">
-      <div class="cardHeader">
-        <h3 style="margin:0">Playlists</h3>
-      </div>
-      <div class="list" id="playlistList"></div>
-    </section>
-
-    <section class="card">
-      <div class="playerArea">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
         <div>
-          <div class="playerBox">
-            <div id="player"></div>
+          <h1>Lazy Vietnamese</h1>
+          <p>Playlists + captions (.srt) desde GitHub + diccionario click</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="searchInput" class="input" placeholder="Buscar video / playlist…" />
+        <button id="reloadBtn" class="btn" title="Recargar">🔄 <span>Reload</span></button>
+        <span id="apiBadge" class="pill">API: (no cargada)</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- PLAYER -->
+    <div class="playerWrap" id="playerWrap">
+      <div class="playerHeader">
+        <div class="playerTitle">
+          <div class="h" id="playerTitle">Elegí un video 👇</div>
+          <div class="sub" id="playerSubtitle">Se abre acá con captions si existen</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <span id="capStatus" class="capBadge">Captions: -</span>
+          <span id="dictStatus" class="capBadge">Dict: …</span>
+          <span class="capBadge">Click oración = saltar</span>
+        </div>
+      </div>
+
+      <div class="playerGrid">
+        <div class="videoPane">
+          <iframe
+            id="ytFrame"
+            class="yt"
+            src="about:blank"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <div class="captionPane">
+          <div class="capHeader">
+            <div class="left">
+              <div class="t">Captions</div>
+              <div class="m" id="capMeta">Busca: captions/&lt;VIDEO_ID&gt;.srt</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button id="toggleAutoScroll" class="btn" style="padding:8px 10px;border-radius:12px;font-size:12px;">
+                🧲 Auto-scroll: ON
+              </button>
+            </div>
+          </div>
+          <div class="capBody" id="capBody">
+            <div class="status">Abrí un video para cargar captions (si existen).</div>
           </div>
         </div>
-
-        <div class="transcript" id="transcript">
-          <div class="hint">Select a video 👈</div>
-        </div>
       </div>
+    </div>
 
-      <div class="list" id="videoList"></div>
-    </section>
+    <!-- PLAYLISTS -->
+    <div id="content"></div>
+  </main>
 
-  </div>
-</div>
+  <script>
+    /*****************************************************************
+     * CONFIG
+     *****************************************************************/
+    // ✅ PONÉ TU API KEY ACÁ (pegala entre comillas):
+    const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
 
-<script>
-/** =========================
- *  CONFIG
- *  ========================= */
-const API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
-const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
-const CAPTIONS_DIR = "captions";
+    // ✅ Tu Channel ID:
+    const YT_CHANNEL_ID = "hsG5_ykkkGk";
 
-/** =========================
- *  STATE
- *  ========================= */
-let playlists = [];
-let videos = [];
-let player;
+    const MAX_PLAYLISTS = 50;
+    const MAX_ITEMS_PER_PLAYLIST = 50;
 
-let cues = [];            // sentence-level cues (generated)
-let activeCue = -1;
+    // captions/VIDEO_ID.srt
+    const CAPTIONS_DIR = "./captions";
 
-let syncRunning = false;
-let rafId = null;
+    // Diccionario local (opcional pero recomendado)
+    // assets/dict_vi_en.json  (formato: { "an": { "gloss": "..." }, ... })
+    const DICT_PATH = "./assets/dict_vi_en.json";
 
-const $ = (id) => document.getElementById(id);
+    /*****************************************************************
+     * STATE
+     *****************************************************************/
+    let ALL_PLAYLISTS = [];
+    let FILTER = "";
+    let AUTO_SCROLL = true;
 
-/** =========================
- *  LOAD YT IFRAME API
- *  ========================= */
-const tag = document.createElement("script");
-tag.src = "https://www.youtube.com/iframe_api";
-document.head.appendChild(tag);
+    let currentVideoId = null;
+    let ytTimePoll = null;
 
-window.onYouTubeIframeAPIReady = function(){
-  player = new YT.Player("player", {
-    height:"100%",
-    width:"100%",
-    videoId:"",
-    playerVars:{ rel:0 },
-    events:{
-      onStateChange: e=>{
-        // 1 = playing, 2 = paused, 0 = ended
-        if(e.data===1){
-          startSync();
-        }else{
-          stopSync();
-        }
+    let CAPTIONS = [];
+    let activeCaptionIndex = -1;
+
+    // Dict: null = no cargado aún, {} = cargado, false = no existe
+    let VI_DICT = null;
+
+    /*****************************************************************
+     * HELPERS
+     *****************************************************************/
+    const $ = (sel) => document.querySelector(sel);
+
+    function escapeHtml(s) {
+      return (s || "").replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    function setApiBadge() {
+      const ok = (YT_API_KEY && YT_API_KEY !== "PASTE_YOUR_API_KEY_HERE" && YT_API_KEY.startsWith("AIza"));
+      const badge = $("#apiBadge");
+      badge.textContent = ok ? "API: OK ✅" : "API: falta ⚠️";
+      badge.style.color = ok ? "rgba(52,211,153,.95)" : "rgba(251,191,36,.95)";
+      badge.style.borderColor = ok ? "rgba(52,211,153,.25)" : "rgba(251,191,36,.25)";
+      badge.style.background = ok ? "rgba(52,211,153,.08)" : "rgba(251,191,36,.08)";
+    }
+
+    function formatDate(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"2-digit"});
+      } catch { return ""; }
+    }
+
+    function normalizeLookupToken(token) {
+      // Limpia puntuación pero deja diacríticos
+      return (token || "")
+        .toLowerCase()
+        .replace(/[\"'“”‘’\(\)\[\]\{\}<>\.,;:!?]+/g, "")
+        .trim();
+    }
+
+    function secondsToClock(s) {
+      const total = Math.max(0, s|0);
+      const hh = Math.floor(total / 3600);
+      const mm = Math.floor((total % 3600) / 60);
+      const ss = Math.floor(total % 60);
+      if (hh > 0) return `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+      return `${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+    }
+
+    function setCapStatus(kind, text) {
+      const el = $("#capStatus");
+      el.textContent = `Captions: ${text}`;
+      el.classList.remove("ok","warn","bad");
+      if (kind) el.classList.add(kind);
+    }
+
+    function setDictStatus(kind, text) {
+      const el = $("#dictStatus");
+      el.textContent = `Dict: ${text}`;
+      el.classList.remove("ok","warn","bad");
+      if (kind) el.classList.add(kind);
+    }
+
+    /*****************************************************************
+     * DICTIONARY (local JSON)
+     *****************************************************************/
+    async function loadViDictOnce() {
+      if (VI_DICT !== null) return VI_DICT;
+
+      try {
+        const res = await fetch(DICT_PATH, { cache: "no-cache" });
+        if (!res.ok) throw new Error("dict missing");
+        VI_DICT = await res.json();
+        setDictStatus("ok", "OK ✅");
+      } catch (e) {
+        VI_DICT = false; // no existe
+        setDictStatus("warn", "no encontrado (igual funciona)");
       }
-    }
-  });
-};
-
-/** =========================
- *  YOUTUBE DATA API
- *  ========================= */
-async function fetchPlaylists(){
-  const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${CHANNEL_ID}&maxResults=50&key=${API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  playlists = data.items || [];
-  renderPlaylists();
-}
-
-function renderPlaylists(){
-  const list = $("playlistList");
-  list.innerHTML="";
-  playlists.forEach(p=>{
-    const row=document.createElement("div");
-    row.className="item";
-    row.innerHTML=`
-      <div class="thumb"><img src="${p.snippet.thumbnails?.medium?.url || p.snippet.thumbnails?.default?.url || ""}"></div>
-      <div class="title">${escapeHtml(p.snippet.title)}</div>
-    `;
-    row.onclick=()=>loadVideos(p.id);
-    list.appendChild(row);
-  });
-}
-
-async function loadVideos(pid){
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${pid}&maxResults=50&key=${API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  videos = data.items || [];
-  renderVideos();
-}
-
-function renderVideos(){
-  const list=$("videoList");
-  list.innerHTML="";
-  videos.forEach(v=>{
-    const id=v.snippet?.resourceId?.videoId;
-    if(!id) return;
-
-    const row=document.createElement("div");
-    row.className="item";
-    row.innerHTML=`
-      <div class="thumb"><img src="${v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || ""}"></div>
-      <div class="title">${escapeHtml(v.snippet.title || "Untitled")}</div>
-    `;
-    row.onclick=()=>selectVideo(id);
-    list.appendChild(row);
-  });
-}
-
-/** =========================
- *  VIDEO SELECT + CAPTIONS
- *  ========================= */
-async function selectVideo(id){
-  activeCue = -1;
-  cues = [];
-  renderTranscriptMessage("Loading captions…");
-
-  if(player && player.loadVideoById){
-    player.loadVideoById(id);
-  }
-
-  await loadCaptions(id);
-}
-
-async function loadCaptions(id){
-  try{
-    const res = await fetch(`${CAPTIONS_DIR}/${id}.srt`, { cache: "no-store" });
-    if(!res.ok) throw new Error("No captions file");
-
-    const srt = await res.text();
-    const baseCues = parseSRT(srt);             // original SRT cues
-    cues = explodeCuesToSentences(baseCues);    // sentence-level cues
-
-    if(!cues.length){
-      renderTranscriptMessage("Captions file is empty.");
-      return;
+      return VI_DICT;
     }
 
-    renderTranscript();
-  }catch{
-    cues = [];
-    renderTranscriptMessage("No captions found for this video.");
-  }
-}
+    function showWordPopup(anchorEl, wordKey, rawWord) {
+      const old = document.getElementById("viDictPopup");
+      if (old) old.remove();
 
-function renderTranscriptMessage(msg){
-  $("transcript").innerHTML = `<div class="hint">${escapeHtml(msg)}</div>`;
-}
+      const dict = (VI_DICT && VI_DICT !== false) ? VI_DICT : null;
+      const entry = dict ? dict[wordKey] : null;
 
-/** =========================
- *  SRT PARSER
- *  ========================= */
-function parseSRT(data){
-  const clean = data.replace(/\r/g, "").trim();
-  if(!clean) return [];
+      const gloss = entry?.gloss || "No encontrada en el diccionario local.";
+      const gtUrl = `https://translate.google.com/?sl=vi&tl=en&text=${encodeURIComponent(wordKey || rawWord)}&op=translate`;
 
-  const blocks = clean.split("\n\n");
-  const out = [];
+      const div = document.createElement("div");
+      div.id = "viDictPopup";
+      div.innerHTML = `
+        <div class="w">${escapeHtml(wordKey || rawWord)}</div>
+        <div class="g">${escapeHtml(gloss)}</div>
+        <div class="actions">
+          <a class="a" href="${gtUrl}" target="_blank" rel="noopener">🌐 Abrir en Google Translate</a>
+          <a class="a" href="#" id="closePop">✖ Cerrar</a>
+        </div>
+      `;
+      document.body.appendChild(div);
 
-  for(const b of blocks){
-    const lines = b.split("\n").filter(Boolean);
-    if(lines.length < 2) continue;
+      const r = anchorEl.getBoundingClientRect();
+      const pad = 10;
 
-    // Some SRTs include index line, some don't. We'll detect time line.
-    let timeLineIdx = 0;
-    if(lines[0].includes("-->")) timeLineIdx = 0;
-    else if(lines[1] && lines[1].includes("-->")) timeLineIdx = 1;
-    else continue;
+      let top = r.bottom + 10;
+      let left = Math.min(window.innerWidth - div.offsetWidth - pad, Math.max(pad, r.left));
 
-    const times = lines[timeLineIdx].split(" --> ");
-    if(times.length !== 2) continue;
+      if (top + div.offsetHeight > window.innerHeight - pad) {
+        top = r.top - div.offsetHeight - 10;
+      }
+      div.style.top = `${Math.max(pad, top)}px`;
+      div.style.left = `${left}px`;
 
-    const start = toSec(times[0]);
-    const end = toSec(times[1]);
-
-    const textLines = lines.slice(timeLineIdx + 1);
-    const text = textLines.join(" ").replace(/\s+/g, " ").trim();
-
-    if(Number.isFinite(start) && Number.isFinite(end) && end > start && text){
-      out.push({ start, end, text });
-    }
-  }
-  return out;
-}
-
-function toSec(t){
-  // "00:01:02,500" or "00:01:02.500"
-  const s = (t || "").trim().replace(",", ".");
-  const parts = s.split(":");
-  if(parts.length !== 3) return NaN;
-  const hh = Number(parts[0]);
-  const mm = Number(parts[1]);
-  const ss = Number(parts[2]);
-  return hh*3600 + mm*60 + ss;
-}
-
-/** =========================
- *  SENTENCE SPLIT (ORACIONES)
- *  - Split cue text into sentences and distribute timing proportionally.
- *  ========================= */
-function explodeCuesToSentences(baseCues){
-  const out = [];
-
-  for(const cue of baseCues){
-    const sentences = splitIntoSentences(cue.text);
-
-    // If no real split, keep as-is (still works and stays synced)
-    if(sentences.length <= 1){
-      out.push({ start: cue.start, end: cue.end, text: cue.text });
-      continue;
-    }
-
-    // Distribute time based on character weight (simple, surprisingly good)
-    const duration = cue.end - cue.start;
-    const weights = sentences.map(s => Math.max(1, s.replace(/\s+/g,"").length));
-    const total = weights.reduce((a,b)=>a+b,0);
-
-    let curStart = cue.start;
-
-    for(let i=0;i<sentences.length;i++){
-      const share = weights[i] / total;
-      let segDur = duration * share;
-
-      // guardrail: avoid microscopic segments
-      segDur = Math.max(0.18, segDur);
-
-      let segEnd = curStart + segDur;
-
-      // for last sentence, snap to cue.end
-      if(i === sentences.length - 1) segEnd = cue.end;
-
-      out.push({
-        start: curStart,
-        end: segEnd,
-        text: sentences[i]
+      div.querySelector("#closePop").addEventListener("click", (e) => {
+        e.preventDefault();
+        div.remove();
       });
 
-      curStart = segEnd;
+      setTimeout(() => {
+        const handler = (ev) => {
+          if (!div.contains(ev.target)) {
+            div.remove();
+            document.removeEventListener("click", handler, true);
+          }
+        };
+        document.addEventListener("click", handler, true);
+      }, 0);
     }
-  }
 
-  // Ensure strictly increasing times (and avoid overlaps issues)
-  for(let i=1;i<out.length;i++){
-    if(out[i].start < out[i-1].end){
-      out[i].start = out[i-1].end;
-    }
-    if(out[i].end <= out[i].start){
-      out[i].end = out[i].start + 0.18;
-    }
-  }
+    function renderCaptionSentence(container, sentenceText) {
+      container.innerHTML = "";
 
-  return out;
-}
+      // Si no hay dict, igual hacemos palabras clickeables pero mostrando "no encontrada"
+      const parts = sentenceText.split(/\s+/).filter(Boolean);
 
-function splitIntoSentences(text){
-  const t = (text || "").trim();
-  if(!t) return [];
+      for (const raw of parts) {
+        const span = document.createElement("span");
+        span.textContent = raw + " ";
+        span.dataset.word = "1";
+        span.style.cursor = "pointer";
+        span.style.textDecoration = "underline";
+        span.style.textDecorationColor = "rgba(255,255,255,.22)";
+        span.style.textUnderlineOffset = "3px";
 
-  // Split after . ! ? (including Spanish ¡¿ and ellipsis)
-  // Keeps punctuation with sentence.
-  const parts = t
-    .replace(/\s+/g, " ")
-    .split(/(?<=[.!?…])\s+/g)
-    .map(s=>s.trim())
-    .filter(Boolean);
+        const key = normalizeLookupToken(raw);
+        span.addEventListener("click", (e) => {
+          e.stopPropagation();
+          showWordPopup(span, key, raw);
+        });
 
-  // If it didn't split but has separators like " - " we can do a fallback split
-  if(parts.length === 1){
-    const alt = t.split(/\s+\-\s+/g).map(s=>s.trim()).filter(Boolean);
-    return alt.length > 1 ? alt : parts;
-  }
-
-  return parts;
-}
-
-/** =========================
- *  RENDER TRANSCRIPT
- *  ========================= */
-function renderTranscript(){
-  const box = $("transcript");
-  box.innerHTML = "";
-
-  cues.forEach((c,i)=>{
-    const div = document.createElement("div");
-    div.className = "cue";
-    div.dataset.i = String(i);
-    div.innerHTML = `<span class="t">${fmtTime(c.start)} → ${fmtTime(c.end)}</span>${escapeHtml(c.text)}`;
-
-    div.onclick = ()=>{
-      if(player && player.seekTo){
-        player.seekTo(c.start, true);
+        container.appendChild(span);
       }
-      setActive(i, true);
-    };
-
-    box.appendChild(div);
-  });
-}
-
-function fmtTime(sec){
-  const s = Math.max(0, sec);
-  const m = Math.floor(s/60);
-  const r = s - m*60;
-  return `${String(m).padStart(2,"0")}:${String(Math.floor(r)).padStart(2,"0")}.${String(Math.floor((r%1)*10))}`;
-}
-
-/** =========================
- *  SYNC LOOP (stable)
- *  ========================= */
-function startSync(){
-  if(syncRunning) return;
-  syncRunning = true;
-
-  const tick = ()=>{
-    if(!syncRunning || !player || !cues.length){
-      rafId = requestAnimationFrame(tick);
-      return;
     }
 
-    const t = player.getCurrentTime ? player.getCurrentTime() : 0;
-    const idx = findCueIndex(t);
-
-    if(idx !== -1){
-      setActive(idx, false);
+    /*****************************************************************
+     * YOUTUBE DATA API
+     *****************************************************************/
+    async function ytFetch(url) {
+      const res = await fetch(url);
+      if (!res.ok) {
+        const txt = await res.text().catch(()=> "");
+        throw new Error(`YT API error ${res.status}: ${txt.slice(0,200)}`);
+      }
+      return res.json();
     }
 
-    rafId = requestAnimationFrame(tick);
-  };
+    async function fetchAllPlaylists() {
+      const base = "https://www.googleapis.com/youtube/v3/playlists";
+      let pageToken = "";
+      const playlists = [];
 
-  rafId = requestAnimationFrame(tick);
-}
+      for (let i = 0; i < 20; i++) {
+        const url = new URL(base);
+        url.searchParams.set("part", "snippet,contentDetails");
+        url.searchParams.set("channelId", YT_CHANNEL_ID);
+        url.searchParams.set("maxResults", "50");
+        url.searchParams.set("key", YT_API_KEY);
+        if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-function stopSync(){
-  syncRunning = false;
-  if(rafId) cancelAnimationFrame(rafId);
-  rafId = null;
-}
-
-function findCueIndex(time){
-  // Binary search for performance and correctness
-  let lo = 0, hi = cues.length - 1;
-
-  while(lo <= hi){
-    const mid = (lo + hi) >> 1;
-    const c = cues[mid];
-
-    if(time < c.start) hi = mid - 1;
-    else if(time > c.end) lo = mid + 1;
-    else return mid;
-  }
-
-  // If between cues, keep last active (don’t flash)
-  return activeCue;
-}
-
-function setActive(i, userTriggered){
-  if(i === activeCue) return;
-
-  const prev = document.querySelector(".cue.active");
-  if(prev) prev.classList.remove("active");
-
-  const cur = document.querySelector(`.cue[data-i="${i}"]`);
-  if(cur){
-    cur.classList.add("active");
-
-    // Only autoscroll when playing (not when user clicked fast)
-    // and keep it centered so it doesn't "slide way down"
-    if(!userTriggered){
-      const box = $("transcript");
-      const boxRect = box.getBoundingClientRect();
-      const curRect = cur.getBoundingClientRect();
-
-      const curTop = curRect.top - boxRect.top + box.scrollTop;
-      const target = curTop - (box.clientHeight / 2) + (cur.clientHeight / 2);
-
-      box.scrollTop = Math.max(0, target);
+        const data = await ytFetch(url.toString());
+        for (const pl of (data.items || [])) {
+          playlists.push({
+            id: pl.id,
+            title: pl.snippet?.title || "Untitled",
+            desc: pl.snippet?.description || "",
+            count: pl.contentDetails?.itemCount ?? 0,
+            items: []
+          });
+        }
+        pageToken = data.nextPageToken || "";
+        if (!pageToken) break;
+        if (playlists.length >= MAX_PLAYLISTS) break;
+      }
+      return playlists.slice(0, MAX_PLAYLISTS);
     }
-  }
 
-  activeCue = i;
-}
+    async function fetchPlaylistItems(playlistId) {
+      const base = "https://www.googleapis.com/youtube/v3/playlistItems";
+      let pageToken = "";
+      const items = [];
 
-/** =========================
- *  UTIL
- *  ========================= */
-function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
+      for (let i = 0; i < 10; i++) {
+        const url = new URL(base);
+        url.searchParams.set("part", "snippet,contentDetails");
+        url.searchParams.set("playlistId", playlistId);
+        url.searchParams.set("maxResults", String(Math.min(50, MAX_ITEMS_PER_PLAYLIST)));
+        url.searchParams.set("key", YT_API_KEY);
+        if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-/** =========================
- *  INIT
- *  ========================= */
-fetchPlaylists();
-</script>
+        const data = await ytFetch(url.toString());
+        for (const it of (data.items || [])) {
+          const vid = it.contentDetails?.videoId;
+          const sn = it.snippet || {};
+          if (!vid) continue;
 
+          items.push({
+            videoId: vid,
+            title: sn.title || "Untitled video",
+            thumb: sn.thumbnails?.medium?.url || sn.thumbnails?.default?.url || "",
+            publishedAt: sn.publishedAt || "",
+          });
+        }
+
+        pageToken = data.nextPageToken || "";
+        if (!pageToken) break;
+      }
+      return items;
+    }
+
+    /*****************************************************************
+     * CAPTIONS (.srt from GitHub)
+     *****************************************************************/
+    function parseSrtTimeToSeconds(t) {
+      const m = (t || "").trim().match(/^(\d{2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
+      if (!m) return 0;
+      const hh = parseInt(m[1], 10);
+      const mm = parseInt(m[2], 10);
+      const ss = parseInt(m[3], 10);
+      const ms = parseInt(m[4].padEnd(3,"0"), 10);
+      return hh*3600 + mm*60 + ss + ms/1000;
+    }
+
+    function parseSrt(srtText) {
+      const blocks = srtText
+        .replace(/\r/g, "")
+        .split("\n\n")
+        .map(b => b.trim())
+        .filter(Boolean);
+
+      const out = [];
+      for (const b of blocks) {
+        const lines = b.split("\n").map(x => x.trim()).filter(Boolean);
+        if (lines.length < 2) continue;
+
+        let idxLine = 0;
+        if (/^\d+$/.test(lines[0])) idxLine = 1;
+
+        const timeLine = lines[idxLine] || "";
+        const tm = timeLine.match(/(.+?)\s*-->\s*(.+)/);
+        if (!tm) continue;
+
+        const start = parseSrtTimeToSeconds(tm[1]);
+        const end = parseSrtTimeToSeconds((tm[2] || "").split(" ")[0]);
+
+        const text = lines.slice(idxLine+1).join(" ").replace(/\s+/g, " ").trim();
+        if (!text) continue;
+
+        out.push({ start, end, text });
+      }
+      return out.sort((a,b)=> a.start - b.start);
+    }
+
+    async function fetchCaptionsForVideo(videoId) {
+      const url = `${CAPTIONS_DIR}/${videoId}.srt`;
+      const res = await fetch(url, { cache: "no-cache" });
+      if (!res.ok) throw new Error("No captions");
+      const txt = await res.text();
+      return parseSrt(txt);
+    }
+
+    function renderCaptions() {
+      const capBody = $("#capBody");
+      capBody.innerHTML = "";
+
+      if (!CAPTIONS || CAPTIONS.length === 0) {
+        capBody.innerHTML = `<div class="status">No se pudieron cargar captions para este video.</div>`;
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+
+      CAPTIONS.forEach((c, i) => {
+        const line = document.createElement("div");
+        line.className = "capLine";
+        line.dataset.index = String(i);
+        line.dataset.start = String(c.start);
+
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = `${secondsToClock(c.start)} → ${secondsToClock(c.end)}`;
+
+        const text = document.createElement("div");
+        text.className = "text";
+        // 👇 acá queda la magia: palabras clickeables
+        renderCaptionSentence(text, c.text);
+
+        line.appendChild(time);
+        line.appendChild(text);
+
+        line.addEventListener("click", (e) => {
+          // Si clickeaste una palabra (span), NO saltar
+          if (e.target && e.target.dataset && e.target.dataset.word === "1") return;
+          seekTo(c.start + 0.01);
+        });
+
+        frag.appendChild(line);
+      });
+
+      capBody.appendChild(frag);
+      activeCaptionIndex = -1;
+    }
+
+    /*****************************************************************
+     * YT iframe postMessage API
+     *****************************************************************/
+    function openVideo(videoId, title, subtitle) {
+      currentVideoId = videoId;
+      activeCaptionIndex = -1;
+
+      $("#playerTitle").textContent = title || "Video";
+      $("#playerSubtitle").textContent = subtitle || "";
+
+      const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+      $("#ytFrame").src = src;
+
+      CAPTIONS = [];
+      $("#capBody").innerHTML = `<div class="status">Cargando captions…</div>`;
+      setCapStatus("warn", "cargando…");
+
+      fetchCaptionsForVideo(videoId)
+        .then(caps => {
+          CAPTIONS = caps;
+          if (!CAPTIONS.length) throw new Error("empty captions");
+          renderCaptions();
+          setCapStatus("ok", "OK ✅");
+        })
+        .catch(() => {
+          CAPTIONS = [];
+          renderCaptions();
+          setCapStatus("bad", "no disponibles ❌");
+        });
+
+      startTimePolling();
+    }
+
+    function postToPlayer(messageObj) {
+      const frame = $("#ytFrame");
+      if (!frame || !frame.contentWindow) return;
+      frame.contentWindow.postMessage(JSON.stringify(messageObj), "*");
+    }
+
+    function seekTo(seconds) {
+      postToPlayer({ event: "command", func: "seekTo", args: [seconds, true] });
+    }
+
+    function startTimePolling() {
+      stopTimePolling();
+      ytTimePoll = setInterval(() => {
+        if (!currentVideoId) return;
+        postToPlayer({ event: "command", func: "getCurrentTime", args: [] });
+      }, 250);
+    }
+
+    function stopTimePolling() {
+      if (ytTimePoll) clearInterval(ytTimePoll);
+      ytTimePoll = null;
+    }
+
+    window.addEventListener("message", (event) => {
+      if (!event.data) return;
+      let data = null;
+      try { data = JSON.parse(event.data); } catch { return; }
+      if (data.event === "infoDelivery" && data.info && typeof data.info.currentTime === "number") {
+        syncCaptionsToTime(data.info.currentTime);
+      }
+    });
+
+    function syncCaptionsToTime(t) {
+      if (!CAPTIONS || CAPTIONS.length === 0) return;
+
+      // si todavía está dentro de la activa, no hacer nada
+      if (activeCaptionIndex >= 0 && activeCaptionIndex < CAPTIONS.length) {
+        const c = CAPTIONS[activeCaptionIndex];
+        if (t >= c.start && t <= c.end) return;
+      }
+
+      let idx = -1;
+      for (let i = 0; i < CAPTIONS.length; i++) {
+        const c = CAPTIONS[i];
+        if (t >= c.start && t <= c.end) { idx = i; break; }
+      }
+      if (idx === -1) return;
+      setActiveCaption(idx);
+    }
+
+    function setActiveCaption(idx) {
+      if (idx === activeCaptionIndex) return;
+
+      const capBody = $("#capBody");
+      const prev = capBody.querySelector(".capLine.active");
+      if (prev) prev.classList.remove("active");
+
+      const el = capBody.querySelector(`.capLine[data-index="${idx}"]`);
+      if (el) {
+        el.classList.add("active");
+        if (AUTO_SCROLL) {
+          // centrado suave (no se te escapa para abajo)
+          const top = el.offsetTop - capBody.clientHeight * 0.35;
+          capBody.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+        }
+      }
+      activeCaptionIndex = idx;
+    }
+
+    /*****************************************************************
+     * RENDER PLAYLISTS
+     *****************************************************************/
+    function cardHtml(item, playlistTitle) {
+      const title = escapeHtml(item.title);
+      const thumb = escapeHtml(item.thumb);
+      const date = formatDate(item.publishedAt);
+      const vid = escapeHtml(item.videoId);
+
+      return `
+        <div class="card" data-vid="${vid}" data-title="${escapeHtml(item.title)}" data-ptitle="${escapeHtml(playlistTitle)}">
+          <img class="thumb" src="${thumb}" alt="">
+          <div class="cardBody">
+            <div class="cardTitle">${title}</div>
+            <div class="cardMeta"><span class="miniTag">📺</span><span>${escapeHtml(playlistTitle)}</span></div>
+            <div class="cardMeta"><span class="miniTag">🗓️</span><span>${escapeHtml(date)}</span></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      const content = $("#content");
+      content.innerHTML = "";
+
+      const q = FILTER.trim().toLowerCase();
+      const filtered = ALL_PLAYLISTS
+        .map(pl => {
+          const items = (pl.items || []).filter(it => {
+            if (!q) return true;
+            return (pl.title || "").toLowerCase().includes(q) || (it.title || "").toLowerCase().includes(q);
+          });
+          return { ...pl, items };
+        })
+        .filter(pl => (pl.items || []).length > 0);
+
+      if (!filtered.length) {
+        content.innerHTML = `<div class="status">No encontré nada con ese filtro.</div>`;
+        return;
+      }
+
+      for (const pl of filtered) {
+        const section = document.createElement("div");
+        section.className = "section";
+        section.innerHTML = `
+          <div class="sectionHead">
+            <div class="title">
+              <div class="h">${escapeHtml(pl.title)}</div>
+              <div class="m">${escapeHtml(pl.desc || "").slice(0, 120)}${(pl.desc || "").length > 120 ? "…" : ""}</div>
+            </div>
+            <span class="pill">${(pl.items || []).length} videos</span>
+          </div>
+          <div class="row">
+            <div class="cards">
+              ${(pl.items || []).map(it => cardHtml(it, pl.title)).join("")}
+            </div>
+          </div>
+        `;
+        content.appendChild(section);
+      }
+
+      content.querySelectorAll(".card").forEach(card => {
+        card.addEventListener("click", () => {
+          const vid = card.dataset.vid;
+          const title = card.dataset.title || "Video";
+          const ptitle = card.dataset.ptitle || "";
+          openVideo(vid, title, ptitle);
+          $("#playerWrap").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+
+    /*****************************************************************
+     * INIT
+     *****************************************************************/
+    async function loadEverything() {
+      setApiBadge();
+      setCapStatus(null, "-");
+      setDictStatus("warn", "cargando…");
+
+      // cargar dict (si no existe, no rompe)
+      await loadViDictOnce();
+
+      if (!YT_API_KEY || YT_API_KEY === "PASTE_YOUR_API_KEY_HERE") {
+        $("#content").innerHTML = `<div class="status">Pegá tu API key en <b>YT_API_KEY</b> (arriba del código) y recargá.</div>`;
+        return;
+      }
+
+      $("#content").innerHTML = `<div class="status">Cargando playlists…</div>`;
+
+      try {
+        const playlists = await fetchAllPlaylists();
+        for (let i = 0; i < playlists.length; i++) {
+          const pl = playlists[i];
+          $("#content").innerHTML = `<div class="status">Cargando: <b>${escapeHtml(pl.title)}</b> (${i+1}/${playlists.length})…</div>`;
+          pl.items = await fetchPlaylistItems(pl.id);
+        }
+        ALL_PLAYLISTS = playlists;
+        renderAll();
+
+        const first = ALL_PLAYLISTS?.[0]?.items?.[0];
+        if (first) openVideo(first.videoId, first.title, ALL_PLAYLISTS[0].title);
+
+      } catch (e) {
+        console.error(e);
+        $("#content").innerHTML = `<div class="status">Error cargando YouTube API. Revisá API key + restricciones.<br><br><code style="opacity:.8">${escapeHtml(String(e.message || e))}</code></div>`;
+      }
+    }
+
+    $("#searchInput").addEventListener("input", (e) => {
+      FILTER = e.target.value || "";
+      renderAll();
+    });
+
+    $("#reloadBtn").addEventListener("click", () => {
+      FILTER = "";
+      $("#searchInput").value = "";
+      loadEverything();
+    });
+
+    $("#toggleAutoScroll").addEventListener("click", () => {
+      AUTO_SCROLL = !AUTO_SCROLL;
+      $("#toggleAutoScroll").textContent = AUTO_SCROLL ? "🧲 Auto-scroll: ON" : "🧲 Auto-scroll: OFF";
+    });
+
+    // ESC cierra popup
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const pop = document.getElementById("viDictPopup");
+        if (pop) pop.remove();
+      }
+    });
+
+    loadEverything();
+  </script>
 </body>
 </html>
