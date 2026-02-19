@@ -20,6 +20,8 @@
       --brandGrad: linear-gradient(135deg, #a7d8ff, #d8c6ff, #ffd1f3);
       --btnGrad: linear-gradient(135deg, #a7d8ff, #d8c6ff);
       --accent:#6a5cff;
+      --danger:#ff5078;
+      --ok:#32c36a;
     }
 
     *{box-sizing:border-box}
@@ -31,13 +33,12 @@
       background: radial-gradient(1200px 700px at 15% 0%, #e8f3ff 0%, transparent 60%),
                   radial-gradient(900px 600px at 90% 10%, #f7e6ff 0%, transparent 60%),
                   linear-gradient(180deg, var(--bg1), var(--bg2));
-      overflow-x:hidden; /* prevents sideways scroll bugs */
+      overflow-x:hidden;
     }
 
     a{color:inherit;text-decoration:none}
     .app-wrap{max-width:1200px;margin:24px auto;padding:0 16px 50px}
 
-    /* Header */
     .app-header{
       display:flex;align-items:center;justify-content:space-between;
       padding:14px 16px;
@@ -46,22 +47,15 @@
       background: var(--brandGrad);
       box-shadow: var(--shadow2);
     }
-    .brand{
-      display:flex;gap:12px;align-items:center;
-      min-width:260px;
-    }
+    .brand{display:flex;gap:12px;align-items:center;min-width:260px;}
     .logo{
       width:34px;height:34px;border-radius:12px;
       background: conic-gradient(from 220deg, #2cc7ff, #7d5cff, #ff57c8, #ffd66b, #2cc7ff);
       box-shadow: 0 10px 25px rgba(0,0,0,.10);
     }
-    .brand h1{
-      margin:0;font-size:15px;letter-spacing:.2px
-    }
+    .brand h1{margin:0;font-size:15px;letter-spacing:.2px}
     .brand small{display:block;color:rgba(29,27,43,.7);font-size:12px;margin-top:2px}
-    .header-actions{
-      display:flex;gap:10px;align-items:center;
-    }
+    .header-actions{display:flex;gap:10px;align-items:center;}
     .pill{
       display:inline-flex;align-items:center;gap:8px;
       padding:10px 12px;border-radius:999px;
@@ -76,11 +70,7 @@
     .pill:hover{transform: translateY(-1px)}
     .pill:active{transform: translateY(0px)}
 
-    /* Tabs */
-    .tabs{
-      margin-top:16px;
-      display:flex;gap:10px;justify-content:center;
-    }
+    .tabs{margin-top:16px;display:flex;gap:10px;justify-content:center;}
     .tab{
       display:inline-flex;align-items:center;gap:8px;
       padding:10px 14px;border-radius:999px;
@@ -91,12 +81,8 @@
       box-shadow: 0 10px 25px rgba(20,14,60,.08);
       cursor:pointer;
     }
-    .tab.active{
-      border-color: rgba(106,92,255,.25);
-      outline: 3px solid rgba(106,92,255,.10);
-    }
+    .tab.active{border-color: rgba(106,92,255,.25);outline: 3px solid rgba(106,92,255,.10);}
 
-    /* Main layout */
     .series-grid{
       margin-top:16px;
       display:grid;
@@ -121,11 +107,7 @@
       border:1px solid var(--stroke);
       background: rgba(255,255,255,.75);
     }
-    .search input{
-      border:0;outline:0;background:transparent;
-      width:100%;
-      font-size:14px;
-    }
+    .search input{border:0;outline:0;background:transparent;width:100%;font-size:14px;}
     .select{
       width:100%;
       margin-top:10px;
@@ -149,12 +131,9 @@
     .statusBad{border-color: rgba(255,80,120,.25); background: linear-gradient(180deg, rgba(255,80,120,.08), rgba(255,255,255,.55))}
     .statusOk{border-color: rgba(60,190,120,.25); background: linear-gradient(180deg, rgba(60,190,120,.08), rgba(255,255,255,.55))}
     .statusTitle{font-weight:800;margin-bottom:6px;display:flex;gap:8px;align-items:center}
-    .dot{
-      width:9px;height:9px;border-radius:50%;
-      background:#999;
-    }
-    .dot.ok{background:#32c36a}
-    .dot.bad{background:#ff5078}
+    .dot{width:9px;height:9px;border-radius:50%;background:#999;}
+    .dot.ok{background:var(--ok)}
+    .dot.bad{background:var(--danger)}
 
     .mainPanelHead{
       display:flex;justify-content:space-between;align-items:center;
@@ -170,7 +149,6 @@
       cursor:pointer;
     }
 
-    /* Cards */
     .series-cards{
       padding: 14px;
       display:grid;
@@ -207,12 +185,7 @@
       backdrop-filter: blur(10px);
     }
     .cardBody{padding:10px 12px}
-    .title{
-      margin:0;
-      font-weight:900;
-      font-size:14px;
-      line-height:1.25;
-    }
+    .title{margin:0;font-weight:900;font-size:14px;line-height:1.25;}
     .meta{
       margin-top:6px;
       font-size:12px;
@@ -257,9 +230,7 @@
       border-bottom: 1px solid var(--stroke);
       gap:10px;
     }
-    .modalTitle{
-      display:flex;flex-direction:column;gap:2px;min-width:0;
-    }
+    .modalTitle{display:flex;flex-direction:column;gap:2px;min-width:0;}
     .modalTitle b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .modalTitle small{font-size:12px;color:rgba(29,27,43,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .closeBtn{
@@ -270,10 +241,7 @@
       font-weight:900;
       cursor:pointer;
     }
-    .modalBody{
-      padding:14px;
-      overflow:auto; /* modal internal scroll only */
-    }
+    .modalBody{padding:14px;overflow:auto;}
 
     /* Player + Captions side-by-side */
     .playerGrid{
@@ -295,7 +263,7 @@
       aspect-ratio: 16 / 9;
       background:#000;
     }
-    .playerRatio iframe{
+    .playerRatio iframe, .playerRatio > div{
       position:absolute;inset:0;
       width:100%;height:100%;
       border:0;
@@ -321,7 +289,7 @@
     .capHead span{font-size:12px;color:rgba(29,27,43,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
     .capBody{
-      height: min(62vh, 520px); /* fixed scroll area so it won't push layout */
+      height: min(62vh, 520px);
       overflow:auto;
       padding:10px;
       line-height:1.5;
@@ -350,9 +318,49 @@
     }
     .capText{
       font-size:16px;
-      font-weight:700;
+      font-weight:750;
       color:rgba(29,27,43,.95);
       word-break: break-word;
+    }
+
+    /* Clickable words */
+    .w{
+      padding:1px 3px;
+      border-radius: 7px;
+      cursor:pointer;
+      display:inline-block;
+    }
+    .w:hover{
+      background: rgba(255,87,200,.10);
+      outline: 2px solid rgba(255,87,200,.12);
+    }
+
+    /* Dictionary popup */
+    .dictPop{
+      position: fixed;
+      z-index: 10000;
+      min-width: 240px;
+      max-width: 380px;
+      border-radius: 16px;
+      border: 1px solid rgba(106,92,255,.18);
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 18px 60px rgba(20,14,60,.18);
+      padding: 12px 12px 10px;
+      display:none;
+      backdrop-filter: blur(10px);
+    }
+    .dictPop.open{display:block}
+    .dictWord{font-weight:950;font-size:16px;margin:0 0 6px}
+    .dictDef{margin:0;color:rgba(29,27,43,.85);font-size:13px;line-height:1.35}
+    .dictMeta{margin-top:8px;font-size:11px;color:rgba(29,27,43,.55);display:flex;justify-content:space-between;gap:8px}
+    .dictClose{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.9);
+      border-radius: 999px;
+      padding:6px 10px;
+      font-weight:900;
+      cursor:pointer;
+      font-size:12px;
     }
 
     @media (max-width: 980px){
@@ -403,9 +411,10 @@
             </div>
 
             <div class="muted" style="margin-top:10px">
-              This loads playlists from your channel and shows every video (deduped).
-              Captions appear in the player if an <b>.srt</b> exists in your repo:
-              <b>/captions/VIDEO_ID.srt</b>
+              Loads playlists and shows every video (deduped).
+              Captions appear if an <b>.srt</b> exists:
+              <b>/captions/VIDEO_ID.srt</b>.
+              Word click uses dictionary if present (see status).
             </div>
 
             <select class="select" id="playlistFilter">
@@ -426,8 +435,9 @@
             </select>
 
             <div class="statusBox statusBad" id="statusBox">
-              <div class="statusTitle"><span class="dot bad" id="statusDot"></span> <span id="statusTitle">Could not load from YouTube API.</span></div>
-              <div><b>Error:</b> <span id="statusMsg">Not loaded yet.</span></div>
+              <div class="statusTitle"><span class="dot bad" id="statusDot"></span> <span id="statusTitle">Status</span></div>
+              <div><b>Info:</b> <span id="statusMsg">Not loaded yet.</span></div>
+              <div class="muted" style="margin-top:8px"><b>Dictionary:</b> <span id="dictStatus">Loading…</span></div>
             </div>
           </div>
         </aside>
@@ -450,7 +460,7 @@
       <div class="panel">
         <div class="inner">
           <h2>BOOK</h2>
-          <div class="muted">Placeholder. (Your book section stays here as-is.)</div>
+          <div class="muted">Placeholder. (Your book section stays here.)</div>
         </div>
       </div>
     </div>
@@ -489,19 +499,28 @@
     </div>
   </div>
 
-  <!-- YouTube IFrame API -->
+  <!-- Dictionary popup -->
+  <div class="dictPop" id="dictPop" role="dialog" aria-label="Dictionary">
+    <p class="dictWord" id="dictWord">word</p>
+    <p class="dictDef" id="dictDef">definition</p>
+    <div class="dictMeta">
+      <span id="dictHint">click outside to close</span>
+      <button class="dictClose" id="dictClose">Close</button>
+    </div>
+  </div>
+
   <script>
     // ========= CONFIG =========
-    // Put your restricted API key here (restricted to your GitHub Pages domain).
     const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
-
-    // Your YouTube channel ID (must be the one you used before that worked).
-    // If you already had it working, keep the same value you used earlier.
     const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
-
-    // SRT captions path in repo:
-    // /captions/VIDEO_ID.srt
     const CAPTIONS_DIR = "./captions";
+
+    // Dictionary: will try these paths (first that exists wins)
+    const DICT_CANDIDATES = [
+      "./dictionary.json",
+      "./dict.json",
+      "./dictionary/vi-en.json"
+    ];
 
     // ========= UI refs =========
     const tabSeries = document.getElementById("tabSeries");
@@ -520,6 +539,7 @@
     const statusDot = document.getElementById("statusDot");
     const statusTitle = document.getElementById("statusTitle");
     const statusMsg = document.getElementById("statusMsg");
+    const dictStatus = document.getElementById("dictStatus");
 
     const modalBack = document.getElementById("modalBack");
     const closeModalBtn = document.getElementById("closeModal");
@@ -529,18 +549,28 @@
     const capBody = document.getElementById("capBody");
     const capMeta = document.getElementById("capMeta");
 
+    const dictPop = document.getElementById("dictPop");
+    const dictWordEl = document.getElementById("dictWord");
+    const dictDefEl = document.getElementById("dictDef");
+    const dictClose = document.getElementById("dictClose");
+
     // ========= State =========
-    let playlists = [];          // {id,title}
-    let videosByPlaylist = new Map(); // playlistId -> videos[]
-    let allVideosDeduped = [];   // flattened unique
+    let playlists = [];
+    let videosByPlaylist = new Map();
+    let allVideosDeduped = [];
+
     let ytReady = false;
     let player = null;
     let currentVideoId = null;
 
-    // Captions state
-    let cues = []; // [{start,end,text}]
+    // Captions
+    let cues = []; // [{start,end,text, html}]
     let activeCueIndex = -1;
-    let rafId = null;
+    let syncTimer = null;
+
+    // Dictionary
+    let dict = null;          // object or Map-like
+    let dictLoadedFrom = "";  // which path succeeded
 
     // ========= Tabs =========
     function setTab(which){
@@ -559,7 +589,7 @@
     tabSeries.addEventListener("click", () => setTab("series"));
     tabBook.addEventListener("click", () => setTab("book"));
 
-    // ========= Status helpers =========
+    // ========= Status =========
     function setStatus(ok, title, msg){
       statusBox.classList.toggle("statusOk", !!ok);
       statusBox.classList.toggle("statusBad", !ok);
@@ -570,7 +600,31 @@
       document.getElementById("subTitle").textContent = ok ? "Loaded." : "Loading playlists…";
     }
 
-    // ========= YouTube API fetch =========
+    // ========= Helpers =========
+    function escapeHtml(s){
+      return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function inferLevel(title){
+      const t = (title||"").toUpperCase();
+      const m = t.match(/\b(A0|A1|A2|B1|B2|C1)\b/);
+      return m ? m[1] : "";
+    }
+    function inferTopic(title){
+      const t = (title||"").toLowerCase();
+      if(t.includes("sims") || t.includes("game") || t.includes("unpacking")) return "Games";
+      if(t.includes("story") || t.includes("cuento") || t.includes("historia")) return "Stories";
+      if(t.includes("chat") || t.includes("conversation") || t.includes("convers")) return "Conversation";
+      return "Daily";
+    }
+
+    function fmtTime(sec){
+      const s = Math.max(0, Math.floor(sec));
+      const m = Math.floor(s/60);
+      const r = s%60;
+      return `${m}:${String(r).padStart(2,"0")}`;
+    }
+
     async function ytFetch(url){
       const res = await fetch(url);
       if(!res.ok){
@@ -580,6 +634,422 @@
       return res.json();
     }
 
+    // ========= Dictionary =========
+    function normalizeWord(w){
+      return (w||"")
+        .toLowerCase()
+        .trim()
+        .replace(/^[^a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]+/iu,"")
+        .replace(/[^a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]+$/iu,"");
+    }
+
+    async function tryLoadJson(path){
+      const res = await fetch(path, {cache:"no-store"});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    async function loadDictionary(){
+      dictStatus.textContent = "Loading…";
+      dict = null;
+      dictLoadedFrom = "";
+
+      for(const p of DICT_CANDIDATES){
+        try{
+          const data = await tryLoadJson(p);
+          dict = data;
+          dictLoadedFrom = p;
+          break;
+        }catch(e){}
+      }
+
+      if(dict){
+        // count entries quickly (best-effort)
+        let n = 0;
+        try{ n = Object.keys(dict).length; }catch(e){ n = 0; }
+        dictStatus.textContent = `Loaded (${n ? n.toLocaleString() : "?"} entries) from ${dictLoadedFrom}`;
+      }else{
+        dictStatus.textContent = "Not loaded (add dictionary.json / dict.json / dictionary/vi-en.json)";
+      }
+    }
+
+    function lookupWord(w){
+      if(!dict) return null;
+      const key = normalizeWord(w);
+      if(!key) return null;
+
+      // Support multiple formats:
+      // 1) { "ăn": "to eat..." }
+      // 2) { "ăn": { "en": "...", "note": "..."} }
+      // 3) { "ăn": { "gloss": "..."} }
+      const v = dict[key] ?? dict[w] ?? dict[key.normalize?.("NFC") ?? key];
+      if(!v) return null;
+
+      if(typeof v === "string") return v;
+      if(typeof v === "object"){
+        return v.note || v.en || v.gloss || v.def || JSON.stringify(v);
+      }
+      return String(v);
+    }
+
+    function openDictPopup(word, definition, anchorRect){
+      dictWordEl.textContent = word;
+      dictDefEl.textContent = definition;
+
+      // position near clicked word, clamp to viewport
+      const pad = 10;
+      const popW = 360;
+      const popH = 160;
+
+      let left = anchorRect.left;
+      let top = anchorRect.bottom + 8;
+
+      // if too right, pull left
+      if(left + popW > window.innerWidth - pad) left = window.innerWidth - pad - popW;
+      if(left < pad) left = pad;
+
+      // if too low, show above
+      if(top + popH > window.innerHeight - pad) top = anchorRect.top - 8 - popH;
+      if(top < pad) top = pad;
+
+      dictPop.style.left = `${left}px`;
+      dictPop.style.top = `${top}px`;
+      dictPop.classList.add("open");
+    }
+
+    function closeDictPopup(){
+      dictPop.classList.remove("open");
+    }
+
+    dictClose.addEventListener("click", closeDictPopup);
+    window.addEventListener("click", (e) => {
+      if(dictPop.classList.contains("open")){
+        const inside = dictPop.contains(e.target);
+        const isWord = e.target && e.target.classList && e.target.classList.contains("w");
+        if(!inside && !isWord) closeDictPopup();
+      }
+    });
+
+    // ========= Captions (SRT) =========
+    function srtTimeToSeconds(t){
+      const m = (t||"").trim().match(/^(\d+):(\d+):(\d+),(\d+)$/);
+      if(!m) return 0;
+      const hh = parseInt(m[1],10);
+      const mm = parseInt(m[2],10);
+      const ss = parseInt(m[3],10);
+      const ms = parseInt(m[4],10);
+      return hh*3600 + mm*60 + ss + (ms/1000);
+    }
+
+    function parseSRT(srtText){
+      const blocks = srtText.replace(/\r/g,"").trim().split("\n\n");
+      const out = [];
+      for(const b of blocks){
+        const lines = b.split("\n").map(x => x.trim()).filter(Boolean);
+        if(lines.length < 2) continue;
+        const timeLine = lines.find(l => l.includes("-->"));
+        if(!timeLine) continue;
+
+        const [a,b2] = timeLine.split("-->").map(x => x.trim());
+        const start = srtTimeToSeconds(a);
+        const end = srtTimeToSeconds((b2||"").split(" ")[0].trim());
+        const textLines = lines.filter(l => l !== timeLine && !/^\d+$/.test(l));
+        const text = textLines.join(" ").replace(/\s+/g," ").trim();
+        if(!text) continue;
+
+        out.push({start,end,text});
+      }
+      out.sort((x,y)=>x.start-y.start);
+      return out;
+    }
+
+    function wordsToHtml(sentence){
+      // Split keeping punctuation/spaces, wrap word-ish tokens in spans
+      // Vietnamese letters included; keeps punctuation as normal text.
+      const parts = sentence.split(/(\s+|[,.!?;:"“”‘’()\[\]{}<>/\\…—–\-]+)/g);
+      return parts.map(p => {
+        const w = normalizeWord(p);
+        if(w && /[a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]/iu.test(w)){
+          return `<span class="w" data-w="${escapeHtml(w)}">${escapeHtml(p)}</span>`;
+        }
+        return escapeHtml(p);
+      }).join("");
+    }
+
+    function clearCaptionsUI(msg){
+      cues = [];
+      activeCueIndex = -1;
+      capMeta.textContent = "";
+      capBody.innerHTML = `<div class="capEmpty">${msg}</div>`;
+    }
+
+    async function loadCaptionsForVideo(videoId){
+      stopSync();
+      activeCueIndex = -1;
+      capMeta.textContent = "";
+      capBody.innerHTML = `<div class="capEmpty">Loading captions…</div>`;
+
+      const url = `${CAPTIONS_DIR}/${videoId}.srt`;
+      try{
+        const res = await fetch(url, {cache:"no-store"});
+        if(!res.ok) throw new Error(`No SRT (${res.status})`);
+        const txt = await res.text();
+        const parsed = parseSRT(txt);
+
+        cues = parsed.map(c => ({
+          ...c,
+          html: wordsToHtml(c.text)
+        }));
+
+        capMeta.textContent = `${cues.length} lines`;
+        if(!cues.length){
+          clearCaptionsUI("Captions file exists but is empty.");
+          return;
+        }
+
+        renderCaptions();
+        // Start sync if the player exists; if not yet ready, it will start on ready/play
+        startSync();
+      }catch(err){
+        clearCaptionsUI(`No captions found for this video.<br>Expected: <b>/captions/${videoId}.srt</b>`);
+      }
+    }
+
+    function renderCaptions(){
+      capBody.innerHTML = cues.map((c, i) => {
+        return `
+          <div class="capLine" data-i="${i}">
+            <span class="capTime">${fmtTime(c.start)}</span>
+            <span class="capText">${c.html}</span>
+          </div>
+        `;
+      }).join("");
+
+      // click line -> seek
+      capBody.querySelectorAll(".capLine").forEach(el => {
+        el.addEventListener("click", (ev) => {
+          // if user clicked a word, let that handler run, but still allow line click if not
+          const i = parseInt(el.getAttribute("data-i"),10);
+          const t = cues[i]?.start ?? 0;
+          if(player && typeof player.seekTo === "function"){
+            player.seekTo(t, true);
+            player.playVideo?.();
+          }
+          setActiveCue(i, true);
+        });
+      });
+
+      // word click -> dictionary popup
+      capBody.querySelectorAll(".w").forEach(wel => {
+        wel.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          const w = wel.getAttribute("data-w") || "";
+          const def = lookupWord(w);
+
+          const rect = wel.getBoundingClientRect();
+          if(def){
+            openDictPopup(w, def, rect);
+          }else{
+            openDictPopup(w, dict ? "Not found in dictionary." : "Dictionary not loaded.", rect);
+          }
+        });
+      });
+    }
+
+    // Binary search for cue at time t
+    function findCueIndexByTime(t){
+      if(!cues.length) return -1;
+      let lo = 0, hi = cues.length - 1;
+      while(lo <= hi){
+        const mid = (lo + hi) >> 1;
+        const c = cues[mid];
+        if(t < c.start) hi = mid - 1;
+        else if(t >= c.end) lo = mid + 1;
+        else return mid;
+      }
+      return -1;
+    }
+
+    function setActiveCue(i, userInitiated=false){
+      if(i === activeCueIndex) return;
+      activeCueIndex = i;
+
+      capBody.querySelectorAll(".capLine.active").forEach(el => el.classList.remove("active"));
+      if(i < 0) return;
+
+      const el = capBody.querySelector(`.capLine[data-i="${i}"]`);
+      if(!el) return;
+      el.classList.add("active");
+
+      // scroll INSIDE captions only (no page jump)
+      const top = el.offsetTop;
+      const h = el.offsetHeight;
+      const viewH = capBody.clientHeight;
+      const target = top - (viewH/2) + (h/2);
+
+      capBody.scrollTo({ top: Math.max(0, target), behavior: userInitiated ? "smooth" : "auto" });
+    }
+
+    // Stable sync loop (fixes "highlight stopped working")
+    function tickSync(){
+      if(!modalBack.classList.contains("open")) return;
+      if(!player || typeof player.getCurrentTime !== "function") return;
+      if(!cues.length) return;
+
+      // Only try syncing when actually playing
+      try{
+        const state = player.getPlayerState?.();
+        if(state !== 1) return; // 1 = playing
+      }catch(e){}
+
+      const t = player.getCurrentTime();
+      const idx = findCueIndexByTime(t);
+      setActiveCue(idx, false);
+    }
+
+    function startSync(){
+      if(syncTimer) return;
+      // Run 5 times per second: smooth enough, stable, cheap
+      syncTimer = setInterval(tickSync, 200);
+    }
+
+    function stopSync(){
+      if(syncTimer){
+        clearInterval(syncTimer);
+        syncTimer = null;
+      }
+    }
+
+    // ========= YouTube / Modal =========
+    function openModal(){
+      modalBack.classList.add("open");
+      modalBack.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeModal(){
+      modalBack.classList.remove("open");
+      modalBack.setAttribute("aria-hidden","true");
+      document.body.style.overflow = "";
+      stopSync();
+      closeDictPopup();
+
+      currentVideoId = null;
+      cues = [];
+      activeCueIndex = -1;
+      capBody.innerHTML = `<div class="capEmpty">No captions loaded.</div>`;
+      capMeta.textContent = "";
+
+      if(player && typeof player.stopVideo === "function") player.stopVideo();
+    }
+
+    closeModalBtn.addEventListener("click", closeModal);
+    modalBack.addEventListener("click", (e) => { if(e.target === modalBack) closeModal(); });
+    window.addEventListener("keydown", (e) => { if(e.key === "Escape" && modalBack.classList.contains("open")) closeModal(); });
+
+    function openVideo(v){
+      if(!v || !v.videoId) return;
+      currentVideoId = v.videoId;
+
+      modalVideoTitle.textContent = v.title || "Video";
+      modalVideoMeta.textContent = v.playlistTitle ? `Playlist: ${v.playlistTitle}` : "";
+
+      openModal();
+      loadCaptionsForVideo(currentVideoId);
+
+      // Ensure player is created/loaded correctly
+      if(ytReady){
+        if(!player){
+          player = new YT.Player("ytPlayer", {
+            videoId: currentVideoId,
+            playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
+            events: {
+              onReady: () => { startSync(); },
+              onStateChange: () => { startSync(); } // safe; tickSync checks state
+            }
+          });
+        }else{
+          player.loadVideoById(currentVideoId);
+          startSync();
+        }
+      }
+    }
+
+    // ========= Rendering =========
+    function pfTitle(){
+      const pf = playlistFilter.value;
+      if(!pf) return "All Series";
+      const p = playlists.find(x => x.id === pf);
+      return p ? p.title : "Playlist";
+    }
+
+    function getFiltered(){
+      const text = (q.value||"").trim().toLowerCase();
+      const pf = playlistFilter.value;
+      const lf = levelFilter.value;
+      const tf = topicFilter.value;
+
+      let base = allVideosDeduped;
+      if(pf){
+        base = (videosByPlaylist.get(pf) || []);
+        const seen = new Set();
+        base = base.filter(v => (seen.has(v.videoId) ? false : (seen.add(v.videoId), true)));
+      }
+
+      return base.filter(v => {
+        if(text && !(v.title||"").toLowerCase().includes(text)) return false;
+        const lvl = inferLevel(v.title);
+        const top = inferTopic(v.title);
+        if(lf && lvl !== lf) return false;
+        if(tf && top !== tf) return false;
+        return true;
+      }).map(v => ({...v, level: inferLevel(v.title), topic: inferTopic(v.title)}));
+    }
+
+    function render(){
+      const items = getFiltered();
+      document.getElementById("mainTitle").textContent = pfTitle();
+      document.getElementById("subTitle").textContent = `${items.length} video(s)`;
+
+      cards.innerHTML = items.map(v => {
+        const lvl = v.level ? `<span class="tag">${escapeHtml(v.level)}</span>` : "";
+        const top = v.topic ? `<span class="tag">${escapeHtml(v.topic)}</span>` : "";
+        return `
+          <div class="card" data-vid="${v.videoId}">
+            <div class="thumb">
+              ${v.thumb ? `<img src="${escapeHtml(v.thumb)}" alt="">` : ""}
+              <div class="chip">${escapeHtml(v.playlistTitle)}</div>
+            </div>
+            <div class="cardBody">
+              <p class="title">${escapeHtml(v.title)}</p>
+              <div class="meta">${lvl}${top}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      cards.querySelectorAll(".card").forEach(el => {
+        el.addEventListener("click", () => {
+          const vid = el.getAttribute("data-vid");
+          const v = items.find(x => x.videoId === vid) || allVideosDeduped.find(x => x.videoId === vid);
+          openVideo(v || {videoId: vid, title: "Video"});
+        });
+      });
+    }
+
+    q.addEventListener("input", render);
+    playlistFilter.addEventListener("change", render);
+    levelFilter.addEventListener("change", render);
+    topicFilter.addEventListener("change", render);
+
+    clearBtn.addEventListener("click", () => {
+      q.value = "";
+      playlistFilter.value = "";
+      levelFilter.value = "";
+      topicFilter.value = "";
+      render();
+    });
+
+    // ========= YouTube Data API loading =========
     async function loadPlaylists(){
       if(!YT_API_KEY || YT_API_KEY.includes("PASTE_")){
         setStatus(false, "API key not set.", "Paste your restricted API key in index.html");
@@ -592,7 +1062,6 @@
 
       setStatus(false, "Loading…", "Fetching playlists…");
 
-      // 1) Get playlists for channel
       let nextPageToken = "";
       const pls = [];
       do{
@@ -611,20 +1080,17 @@
       } while(nextPageToken);
 
       playlists = pls;
-      // Fill playlist filter
       playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
         playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
 
       setStatus(true, "Playlists loaded.", `${playlists.length} playlists`);
 
-      // 2) Load videos for each playlist (batched sequentially)
       videosByPlaylist.clear();
       for(const p of playlists){
         const vids = await loadPlaylistItems(p.id);
         videosByPlaylist.set(p.id, vids);
       }
 
-      // 3) Dedup videos across playlists
       const seen = new Set();
       const flat = [];
       for(const [pid, vids] of videosByPlaylist.entries()){
@@ -669,341 +1135,22 @@
       return out;
     }
 
-    // ========= Filtering + rendering =========
-    function escapeHtml(s){
-      return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-
-    function inferLevel(title){
-      const t = (title||"").toUpperCase();
-      const m = t.match(/\b(A0|A1|A2|B1|B2|C1)\b/);
-      return m ? m[1] : "";
-    }
-    function inferTopic(title){
-      const t = (title||"").toLowerCase();
-      if(t.includes("sims") || t.includes("game") || t.includes("unpacking")) return "Games";
-      if(t.includes("story") || t.includes("cuento") || t.includes("historia")) return "Stories";
-      if(t.includes("chat") || t.includes("conversation") || t.includes("convers")) return "Conversation";
-      return "Daily";
-    }
-
-    function getFiltered(){
-      const text = (q.value||"").trim().toLowerCase();
-      const pf = playlistFilter.value;
-      const lf = levelFilter.value;
-      const tf = topicFilter.value;
-
-      // If playlist filter set, show only videos that belong to it (but still dedup within playlist)
-      let base = allVideosDeduped;
-      if(pf){
-        base = (videosByPlaylist.get(pf) || []);
-        // dedup within that list
-        const seen = new Set();
-        base = base.filter(v => (seen.has(v.videoId) ? false : (seen.add(v.videoId), true)));
-      }
-
-      return base.filter(v => {
-        if(text && !(v.title||"").toLowerCase().includes(text)) return false;
-        const lvl = inferLevel(v.title);
-        const top = inferTopic(v.title);
-        if(lf && lvl !== lf) return false;
-        if(tf && top !== tf) return false;
-        return true;
-      }).map(v => ({
-        ...v,
-        level: inferLevel(v.title),
-        topic: inferTopic(v.title),
-      }));
-    }
-
-    function render(){
-      const items = getFiltered();
-      document.getElementById("mainTitle").textContent = pfTitle();
-      document.getElementById("subTitle").textContent = `${items.length} video(s)`;
-
-      cards.innerHTML = items.map(v => {
-        const lvl = v.level ? `<span class="tag">${escapeHtml(v.level)}</span>` : "";
-        const top = v.topic ? `<span class="tag">${escapeHtml(v.topic)}</span>` : "";
-        return `
-          <div class="card" data-vid="${v.videoId}">
-            <div class="thumb">
-              ${v.thumb ? `<img src="${escapeHtml(v.thumb)}" alt="">` : ""}
-              <div class="chip">${escapeHtml(v.playlistTitle)}</div>
-            </div>
-            <div class="cardBody">
-              <p class="title">${escapeHtml(v.title)}</p>
-              <div class="meta">
-                ${lvl}${top}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      // click handlers
-      cards.querySelectorAll(".card").forEach(el => {
-        el.addEventListener("click", () => {
-          const vid = el.getAttribute("data-vid");
-          const v = items.find(x => x.videoId === vid) || allVideosDeduped.find(x => x.videoId === vid);
-          openVideo(v || {videoId: vid, title: "Video"});
-        });
-      });
-    }
-
-    function pfTitle(){
-      const pf = playlistFilter.value;
-      if(!pf) return "All Series";
-      const p = playlists.find(x => x.id === pf);
-      return p ? p.title : "Playlist";
-    }
-
-    q.addEventListener("input", render);
-    playlistFilter.addEventListener("change", render);
-    levelFilter.addEventListener("change", render);
-    topicFilter.addEventListener("change", render);
-
-    clearBtn.addEventListener("click", () => {
-      q.value = "";
-      playlistFilter.value = "";
-      levelFilter.value = "";
-      topicFilter.value = "";
-      render();
-    });
-
-    // ========= Modal + Player =========
-    function openModal(){
-      modalBack.classList.add("open");
-      modalBack.setAttribute("aria-hidden","false");
-      document.body.style.overflow = "hidden";
-    }
-    function closeModal(){
-      modalBack.classList.remove("open");
-      modalBack.setAttribute("aria-hidden","true");
-      document.body.style.overflow = "";
-      stopCaptionLoop();
-      currentVideoId = null;
-      cues = [];
-      activeCueIndex = -1;
-      capBody.innerHTML = `<div class="capEmpty">No captions loaded.</div>`;
-      capMeta.textContent = "";
-      if(player && typeof player.stopVideo === "function") player.stopVideo();
-    }
-
-    closeModalBtn.addEventListener("click", closeModal);
-    modalBack.addEventListener("click", (e) => {
-      if(e.target === modalBack) closeModal();
-    });
-    window.addEventListener("keydown", (e) => {
-      if(e.key === "Escape" && modalBack.classList.contains("open")) closeModal();
-    });
-
-    function openVideo(v){
-      if(!v || !v.videoId) return;
-      currentVideoId = v.videoId;
-
-      modalVideoTitle.textContent = v.title || "Video";
-      modalVideoMeta.textContent = v.playlistTitle ? `Playlist: ${v.playlistTitle}` : "";
-
-      openModal();
-      loadCaptionsForVideo(currentVideoId);
-
-      // Create player if needed
-      if(ytReady){
-        if(!player){
-          player = new YT.Player("ytPlayer", {
-            videoId: currentVideoId,
-            playerVars: {
-              autoplay: 1,
-              rel: 0,
-              modestbranding: 1
-            },
-            events: {
-              onReady: () => { /* handled below */ },
-              onStateChange: onPlayerStateChange
-            }
-          });
-        }else{
-          player.loadVideoById(currentVideoId);
-        }
-      }else{
-        // If API not ready yet, it will auto-play on ready
-      }
-    }
-
-    function onPlayerStateChange(ev){
-      // Start caption loop when playing, pause when paused
-      if(!player) return;
-      const st = ev.data;
-      // 1 = playing, 2 = paused, 0 = ended
-      if(st === 1){
-        startCaptionLoop();
-      }else if(st === 2 || st === 0){
-        stopCaptionLoop();
-      }
-    }
-
-    // ========= Captions (SRT) =========
-    function srtTimeToSeconds(t){
-      // 00:00:01,500
-      const m = (t||"").trim().match(/^(\d+):(\d+):(\d+),(\d+)$/);
-      if(!m) return 0;
-      const hh = parseInt(m[1],10);
-      const mm = parseInt(m[2],10);
-      const ss = parseInt(m[3],10);
-      const ms = parseInt(m[4],10);
-      return hh*3600 + mm*60 + ss + (ms/1000);
-    }
-
-    function parseSRT(srtText){
-      const blocks = srtText.replace(/\r/g,"").trim().split("\n\n");
-      const out = [];
-      for(const b of blocks){
-        const lines = b.split("\n").map(x => x.trim()).filter(Boolean);
-        if(lines.length < 2) continue;
-        // lines[0] can be index
-        const timeLine = lines.find(l => l.includes("-->"));
-        if(!timeLine) continue;
-        const [a,b2] = timeLine.split("-->").map(x => x.trim());
-        const start = srtTimeToSeconds(a);
-        const end = srtTimeToSeconds((b2||"").split(" ")[0].trim());
-        const textLines = lines.filter(l => l !== timeLine && !/^\d+$/.test(l));
-        const text = textLines.join(" ").replace(/\s+/g," ").trim();
-        if(!text) continue;
-        out.push({start,end,text});
-      }
-      // sort by time
-      out.sort((x,y)=>x.start-y.start);
-      return out;
-    }
-
-    function fmtTime(sec){
-      const s = Math.max(0, sec|0);
-      const m = Math.floor(s/60);
-      const r = s%60;
-      return `${m}:${String(r).padStart(2,"0")}`;
-    }
-
-    async function loadCaptionsForVideo(videoId){
-      cues = [];
-      activeCueIndex = -1;
-      capMeta.textContent = "";
-      capBody.innerHTML = `<div class="capEmpty">Loading captions…</div>`;
-
-      const url = `${CAPTIONS_DIR}/${videoId}.srt`;
-      try{
-        const res = await fetch(url, {cache:"no-store"});
-        if(!res.ok) throw new Error(`No SRT (${res.status})`);
-        const txt = await res.text();
-        const parsed = parseSRT(txt);
-        cues = parsed;
-        capMeta.textContent = `${cues.length} lines`;
-        if(!cues.length){
-          capBody.innerHTML = `<div class="capEmpty">Captions file exists but is empty.</div>`;
-          return;
-        }
-        renderCaptions();
-        // if player is already playing, start loop
-        startCaptionLoop();
-      }catch(err){
-        capBody.innerHTML = `
-          <div class="capEmpty">
-            No captions found for this video.<br>
-            Expected: <b>/captions/${videoId}.srt</b>
-          </div>
-        `;
-      }
-    }
-
-    function renderCaptions(){
-      capBody.innerHTML = cues.map((c, i) => {
-        return `
-          <div class="capLine" data-i="${i}">
-            <span class="capTime">${fmtTime(c.start)}</span>
-            <span class="capText">${escapeHtml(c.text)}</span>
-          </div>
-        `;
-      }).join("");
-
-      capBody.querySelectorAll(".capLine").forEach(el => {
-        el.addEventListener("click", () => {
-          const i = parseInt(el.getAttribute("data-i"),10);
-          const t = cues[i]?.start ?? 0;
-          if(player && typeof player.seekTo === "function"){
-            player.seekTo(t, true);
-            player.playVideo?.();
-          }
-          setActiveCue(i, true);
-        });
-      });
-    }
-
-    function findCueIndexByTime(t){
-      // linear scan is fine for typical caption sizes, but we can do binary if you want
-      for(let i=0;i<cues.length;i++){
-        const c = cues[i];
-        if(t >= c.start && t < c.end) return i;
-      }
-      return -1;
-    }
-
-    function setActiveCue(i, userInitiated=false){
-      if(i === activeCueIndex) return;
-      activeCueIndex = i;
-
-      // Update classes
-      capBody.querySelectorAll(".capLine.active").forEach(el => el.classList.remove("active"));
-      if(i < 0) return;
-
-      const el = capBody.querySelector(`.capLine[data-i="${i}"]`);
-      if(!el) return;
-      el.classList.add("active");
-
-      // Scroll inside capBody ONLY (no pushing the whole page)
-      // Keep active line roughly centered in capBody.
-      const top = el.offsetTop;
-      const h = el.offsetHeight;
-      const viewTop = capBody.scrollTop;
-      const viewH = capBody.clientHeight;
-      const target = top - (viewH/2) + (h/2);
-
-      // Smooth but stable (no layout jump)
-      capBody.scrollTo({ top: Math.max(0, target), behavior: userInitiated ? "smooth" : "auto" });
-    }
-
-    function captionTick(){
-      if(!player || typeof player.getCurrentTime !== "function" || !cues.length) return;
-      const t = player.getCurrentTime();
-      const idx = findCueIndexByTime(t);
-      setActiveCue(idx, false);
-      rafId = requestAnimationFrame(captionTick);
-    }
-
-    function startCaptionLoop(){
-      if(!modalBack.classList.contains("open")) return;
-      if(rafId) return;
-      rafId = requestAnimationFrame(captionTick);
-    }
-    function stopCaptionLoop(){
-      if(rafId){
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-    }
-
-    // ========= YouTube iframe API init =========
+    // ========= YouTube IFrame API =========
     window.onYouTubeIframeAPIReady = function(){
       ytReady = true;
-      // If modal is open with a selected video but player wasn't created:
+      // If modal is open and video selected, build player now
       if(modalBack.classList.contains("open") && currentVideoId && !player){
         player = new YT.Player("ytPlayer", {
           videoId: currentVideoId,
           playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
-          events: { onStateChange: onPlayerStateChange }
+          events: {
+            onReady: () => { startSync(); },
+            onStateChange: () => { startSync(); }
+          }
         });
       }
     };
 
-    // Load the API script
     (function(){
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
@@ -1011,9 +1158,14 @@
     })();
 
     // ========= Boot =========
-    loadPlaylists().catch(err => {
-      setStatus(false, "Could not load from YouTube API.", err.message || String(err));
-    });
+    (async function init(){
+      await loadDictionary();
+      try{
+        await loadPlaylists();
+      }catch(err){
+        setStatus(false, "Could not load from YouTube API.", err.message || String(err));
+      }
+    })();
   </script>
 </body>
 </html>
