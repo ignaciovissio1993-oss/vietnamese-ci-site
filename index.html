@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Lazy Vietnamese | Playlists</title>
+  <title>Vietnamese CI Site</title>
 
   <style>
     :root{
@@ -46,6 +46,7 @@
     }
     .brand h1{margin:0; font-size:16px; letter-spacing:.2px; line-height:1.1;}
     .brand p{margin:0; color:var(--muted); font-size:12px;}
+
     .controls{
       display:flex; gap:10px; align-items:center; flex-wrap:wrap;
       justify-content:flex-end; width: 100%;
@@ -91,7 +92,7 @@
       gap: 14px;
     }
 
-    /* PLAYER (ahora tamaño normal, no gigante) */
+    /* PLAYER WRAP */
     .playerWrap{
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.08);
@@ -109,12 +110,12 @@
     .playerTitle .h{font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
     .playerTitle .sub{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
-    /* Grid: video + captions. Altura controlada. */
+    /* Grid */
     .playerGrid{
       display:grid;
-      grid-template-columns: 1.25fr .75fr;
+      grid-template-columns: 1.2fr .8fr;
       gap: 0;
-      min-height: 360px;
+      align-items: stretch;
     }
     @media (max-width: 980px){ .playerGrid{grid-template-columns: 1fr} }
 
@@ -124,30 +125,34 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding: 12px;
+      padding: 14px;
     }
 
-    /* Contenedor del iframe: limita tamaño */
+    /* ✅ limit real del tamaño para que no sea gigante */
     .videoBox{
       width: 100%;
-      max-width: 980px;     /* evita que se vuelva gigante en monitores grandes */
-      aspect-ratio: 16 / 9;
-      background:#000;
+      max-width: 920px;
       border-radius: 14px;
       overflow:hidden;
       border: 1px solid rgba(255,255,255,.08);
       box-shadow: 0 18px 40px rgba(0,0,0,.30);
-    }
-
-    .yt{
-      width:100%;
-      height:100%;
-      display:block;
-      border:0;
       background:#000;
     }
 
-    /* Estado inicial: no cargamos iframe enorme */
+    /* ratio estable */
+    .videoRatio{
+      width:100%;
+      aspect-ratio: 16 / 9;
+      background:#000;
+      position:relative;
+    }
+    #ytPlayer{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+    }
+
     .emptyState{
       position:absolute;
       inset: 0;
@@ -191,13 +196,13 @@
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
 
+    /* ✅ altura fija para que NO “se vaya para abajo” */
     .capBody{
       padding: 10px;
       overflow:auto;
-      height: 100%;
-      max-height: 460px; /* control para que no se vaya para abajo */
+      height: 460px;
     }
-    @media (max-width: 980px){ .capBody{max-height: 420px;} }
+    @media (max-width: 980px){ .capBody{height: 420px;} }
 
     .capLine{
       padding: 10px 10px;
@@ -213,7 +218,6 @@
     .capLine:hover{background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.10);}
     .capLine:active{transform: translateY(1px)}
 
-    /* 🔥 Resaltado fuerte sincronizado por oración */
     .capLine.active{
       border-color: rgba(125,211,252,.55);
       background: rgba(125,211,252,.16);
@@ -231,15 +235,12 @@
     .capLine .time{display:block; font-size:11px; color: var(--muted); margin-bottom:6px;}
     .capLine .text{font-size: 14px;}
 
-    /* Palabras clickeables pero sin “subrayado loco” */
     .capWord{
       cursor:pointer;
       padding: 1px 2px;
       border-radius: 6px;
     }
-    .capWord:hover{
-      background: rgba(167,139,250,.14);
-    }
+    .capWord:hover{ background: rgba(167,139,250,.14); }
 
     .capBadge{
       font-size: 12px;
@@ -362,7 +363,6 @@
 </header>
 
 <main>
-  <!-- PLAYER -->
   <div class="playerWrap" id="playerWrap">
     <div class="playerHeader">
       <div class="playerTitle">
@@ -381,13 +381,9 @@
     <div class="playerGrid">
       <div class="videoPane">
         <div class="videoBox">
-          <iframe
-            id="ytFrame"
-            class="yt"
-            src="about:blank"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
+          <div class="videoRatio">
+            <div id="ytPlayer"></div>
+          </div>
         </div>
 
         <div class="emptyState" id="emptyState">
@@ -414,7 +410,6 @@
     </div>
   </div>
 
-  <!-- PLAYLISTS -->
   <div id="content"></div>
 </main>
 
@@ -422,8 +417,11 @@
   /*****************************************************************
    * CONFIG
    *****************************************************************/
-  const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";   // <-- pegá tu API key
-  const YT_CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";            // <-- tu Channel ID
+  const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY"; // <-- pegá tu API key
+  const YT_CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";          // <-- tu Channel ID
+
+  // ✅ IMPORTANTÍSIMO para tu GitHub Pages:
+  const PLAYER_ORIGIN = "https://ignaciovissio1993-oss.github.io";
 
   const MAX_PLAYLISTS = 50;
   const MAX_ITEMS_PER_PLAYLIST = 50;
@@ -439,12 +437,15 @@
   let AUTO_SCROLL = true;
 
   let currentVideoId = null;
-  let ytTimePoll = null;
 
   let CAPTIONS = [];
   let activeCaptionIndex = -1;
 
   let VI_DICT = null; // null=not loaded, {}=loaded, false=missing
+
+  let ytPlayer = null;
+  let ytReady = false;
+  let timePoll = null;
 
   const $ = (sel) => document.querySelector(sel);
 
@@ -498,6 +499,93 @@
     el.textContent = `Dict: ${text}`;
     el.classList.remove("ok","warn","bad");
     if (kind) el.classList.add(kind);
+  }
+
+  function showPlayerEmptyState(show) {
+    $("#emptyState").style.display = show ? "flex" : "none";
+  }
+
+  /*****************************************************************
+   * YT IFRAME API
+   *****************************************************************/
+  function stopPolling() {
+    if (timePoll) clearInterval(timePoll);
+    timePoll = null;
+  }
+
+  function startPolling() {
+    stopPolling();
+    timePoll = setInterval(() => {
+      if (!ytPlayer || !CAPTIONS.length) return;
+      const t = ytPlayer.getCurrentTime?.();
+      if (typeof t === "number") syncCaptionsToTime(t);
+    }, 200);
+  }
+
+  // YouTube llama a esto cuando carga el API
+  window.onYouTubeIframeAPIReady = () => {
+    ytReady = true;
+
+    ytPlayer = new YT.Player("ytPlayer", {
+      width: "100%",
+      height: "100%",
+      videoId: "", // arranca vacío
+      playerVars: {
+        autoplay: 0,
+        rel: 0,
+        modestbranding: 1,
+        playsinline: 1,
+        origin: PLAYER_ORIGIN
+      },
+      events: {
+        onReady: () => {
+          showPlayerEmptyState(true);
+        },
+        onStateChange: (ev) => {
+          // 1 = playing, 2 = paused, 0 = ended
+          if (ev.data === 1) startPolling();
+          else if (ev.data === 2 || ev.data === 0) stopPolling();
+        }
+      }
+    });
+  };
+
+  function openVideo(videoId, title, subtitle) {
+    currentVideoId = videoId;
+    activeCaptionIndex = -1;
+
+    $("#playerTitle").textContent = title || "Video";
+    $("#playerSubtitle").textContent = subtitle || "";
+
+    showPlayerEmptyState(false);
+
+    // Cargar video en el player (si ya está listo)
+    if (ytPlayer && ytReady) {
+      ytPlayer.loadVideoById(videoId);
+    }
+
+    // Captions
+    CAPTIONS = [];
+    $("#capBody").innerHTML = `<div class="status">Cargando captions…</div>`;
+    setCapStatus("warn", "cargando…");
+
+    fetchCaptionsForVideo(videoId)
+      .then(caps => {
+        CAPTIONS = caps;
+        if (!CAPTIONS.length) throw new Error("empty captions");
+        renderCaptions();
+        setCapStatus("ok", "OK ✅");
+      })
+      .catch(() => {
+        CAPTIONS = [];
+        renderCaptions();
+        setCapStatus("bad", "no disponibles ❌");
+      });
+  }
+
+  function seekTo(seconds) {
+    if (!ytPlayer) return;
+    ytPlayer.seekTo(seconds, true);
   }
 
   /*****************************************************************
@@ -754,84 +842,6 @@
     activeCaptionIndex = -1;
   }
 
-  /*****************************************************************
-   * YT iframe postMessage API (sync)
-   *****************************************************************/
-  function showPlayerEmptyState(show) {
-    $("#emptyState").style.display = show ? "flex" : "none";
-  }
-
-  function openVideo(videoId, title, subtitle) {
-    currentVideoId = videoId;
-    activeCaptionIndex = -1;
-
-    $("#playerTitle").textContent = title || "Video";
-    $("#playerSubtitle").textContent = subtitle || "";
-
-    // 👇 origin importante en GitHub Pages para estabilidad del JS API
-    const origin = encodeURIComponent(location.origin);
-    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${origin}`;
-    $("#ytFrame").src = src;
-
-    showPlayerEmptyState(false);
-
-    CAPTIONS = [];
-    $("#capBody").innerHTML = `<div class="status">Cargando captions…</div>`;
-    setCapStatus("warn", "cargando…");
-
-    fetchCaptionsForVideo(videoId)
-      .then(caps => {
-        CAPTIONS = caps;
-        if (!CAPTIONS.length) throw new Error("empty captions");
-        renderCaptions();
-        setCapStatus("ok", "OK ✅");
-      })
-      .catch(() => {
-        CAPTIONS = [];
-        renderCaptions();
-        setCapStatus("bad", "no disponibles ❌");
-      });
-
-    // arrancamos polling un toque después para que el iframe “entre en ritmo”
-    startTimePolling(true);
-  }
-
-  function postToPlayer(messageObj) {
-    const frame = $("#ytFrame");
-    if (!frame || !frame.contentWindow) return;
-    frame.contentWindow.postMessage(JSON.stringify(messageObj), "*");
-  }
-
-  function seekTo(seconds) {
-    postToPlayer({ event: "command", func: "seekTo", args: [seconds, true] });
-  }
-
-  function startTimePolling(delayed) {
-    stopTimePolling();
-    const start = () => {
-      ytTimePoll = setInterval(() => {
-        if (!currentVideoId) return;
-        postToPlayer({ event: "command", func: "getCurrentTime", args: [] });
-      }, 250);
-    };
-    if (delayed) setTimeout(start, 900);
-    else start();
-  }
-
-  function stopTimePolling() {
-    if (ytTimePoll) clearInterval(ytTimePoll);
-    ytTimePoll = null;
-  }
-
-  window.addEventListener("message", (event) => {
-    if (!event.data) return;
-    let data = null;
-    try { data = JSON.parse(event.data); } catch { return; }
-    if (data.event === "infoDelivery" && data.info && typeof data.info.currentTime === "number") {
-      syncCaptionsToTime(data.info.currentTime);
-    }
-  });
-
   function syncCaptionsToTime(t) {
     if (!CAPTIONS || CAPTIONS.length === 0) return;
 
@@ -863,7 +873,6 @@
       el.classList.add("active");
 
       if (AUTO_SCROLL) {
-        // centrado estable: no “se va para abajo”
         const targetTop = el.offsetTop - capBody.clientHeight * 0.30;
         capBody.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
       }
@@ -955,7 +964,6 @@
     // arranque sin video
     currentVideoId = null;
     CAPTIONS = [];
-    $("#ytFrame").src = "about:blank";
     showPlayerEmptyState(true);
     $("#capBody").innerHTML = `<div class="status">Elegí un video para ver captions (si existen).</div>`;
 
@@ -999,7 +1007,6 @@
     $("#toggleAutoScroll").textContent = AUTO_SCROLL ? "🧲 Auto-scroll: ON" : "🧲 Auto-scroll: OFF";
   });
 
-  // ESC cierra popup
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       const pop = document.getElementById("viDictPopup");
@@ -1009,5 +1016,9 @@
 
   loadEverything();
 </script>
+
+<!-- ✅ CARGA REAL DEL IFRAME API (esto es lo que te faltaba para el highlight) -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
 </body>
 </html>
