@@ -9,17 +9,14 @@
 :root{
   --bg:#0b1020;
   --panel:#101a33;
-  --panel2:#0f1730;
   --muted:#9fb0d0;
   --text:#eaf0ff;
   --accent:#7aa7ff;
   --accent2:#4fe3c2;
   --danger:#ff6b8b;
   --border:rgba(255,255,255,.08);
-  --shadow:0 20px 60px rgba(0,0,0,.35);
   --radius:18px;
   --radius2:14px;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -38,6 +35,7 @@ header{
   backdrop-filter: blur(10px);
   background: rgba(11,16,32,.9);
   border-bottom:1px solid var(--border);
+  z-index:10;
 }
 
 .topbar{
@@ -153,17 +151,40 @@ header{
   max-height:520px;
   overflow:auto;
   padding:12px;
-  line-height:1.45;
+  line-height:1.5;
+  scroll-behavior:smooth;
+}
+
+.transcript .hint{
+  color: var(--muted);
+  font-size: 13px;
+  padding: 6px 4px;
 }
 
 .cue{
-  padding:6px;
-  border-radius:10px;
+  padding:7px 10px;
+  border-radius:12px;
   cursor:pointer;
+  margin: 4px 0;
+  border: 1px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.03);
+}
+
+.cue:hover{
+  background: rgba(122,167,255,.10);
 }
 
 .cue.active{
   background: rgba(79,227,194,.18);
+  border-color: rgba(79,227,194,.35);
+}
+
+.cue .t{
+  display:block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 2px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 </style>
 </head>
@@ -183,7 +204,7 @@ header{
 
     <section class="card">
       <div class="cardHeader">
-        <h3>Playlists</h3>
+        <h3 style="margin:0">Playlists</h3>
       </div>
       <div class="list" id="playlistList"></div>
     </section>
@@ -197,7 +218,7 @@ header{
         </div>
 
         <div class="transcript" id="transcript">
-          Select a video
+          <div class="hint">Select a video 👈</div>
         </div>
       </div>
 
@@ -207,21 +228,32 @@ header{
   </div>
 </div>
 
-
 <script>
+/** =========================
+ *  CONFIG
+ *  ========================= */
 const API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
 const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
 const CAPTIONS_DIR = "captions";
 
+/** =========================
+ *  STATE
+ *  ========================= */
 let playlists = [];
 let videos = [];
 let player;
-let cues = [];
+
+let cues = [];            // sentence-level cues (generated)
 let activeCue = -1;
 
-const $ = id => document.getElementById(id);
+let syncRunning = false;
+let rafId = null;
 
-// Load YT API
+const $ = (id) => document.getElementById(id);
+
+/** =========================
+ *  LOAD YT IFRAME API
+ *  ========================= */
 const tag = document.createElement("script");
 tag.src = "https://www.youtube.com/iframe_api";
 document.head.appendChild(tag);
@@ -231,19 +263,26 @@ window.onYouTubeIframeAPIReady = function(){
     height:"100%",
     width:"100%",
     videoId:"",
-    playerVars:{rel:0},
+    playerVars:{ rel:0 },
     events:{
       onStateChange: e=>{
-        if(e.data===1) startSync();
+        // 1 = playing, 2 = paused, 0 = ended
+        if(e.data===1){
+          startSync();
+        }else{
+          stopSync();
+        }
       }
     }
   });
 };
 
+/** =========================
+ *  YOUTUBE DATA API
+ *  ========================= */
 async function fetchPlaylists(){
-  const res = await fetch(
-    `https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${CHANNEL_ID}&maxResults=50&key=${API_KEY}`
-  );
+  const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${CHANNEL_ID}&maxResults=50&key=${API_KEY}`;
+  const res = await fetch(url);
   const data = await res.json();
   playlists = data.items || [];
   renderPlaylists();
@@ -255,21 +294,20 @@ function renderPlaylists(){
   playlists.forEach(p=>{
     const row=document.createElement("div");
     row.className="item";
-    row.innerHTML=`<div class="thumb">
-      <img src="${p.snippet.thumbnails.medium.url}">
-    </div>
-    <div class="title">${p.snippet.title}</div>`;
-    row.onclick=()=>loadVideos(p.id,p.snippet.title);
+    row.innerHTML=`
+      <div class="thumb"><img src="${p.snippet.thumbnails?.medium?.url || p.snippet.thumbnails?.default?.url || ""}"></div>
+      <div class="title">${escapeHtml(p.snippet.title)}</div>
+    `;
+    row.onclick=()=>loadVideos(p.id);
     list.appendChild(row);
   });
 }
 
-async function loadVideos(pid,title){
-  const res = await fetch(
-    `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${pid}&maxResults=50&key=${API_KEY}`
-  );
+async function loadVideos(pid){
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${pid}&maxResults=50&key=${API_KEY}`;
+  const res = await fetch(url);
   const data = await res.json();
-  videos=data.items||[];
+  videos = data.items || [];
   renderVideos();
 }
 
@@ -277,93 +315,308 @@ function renderVideos(){
   const list=$("videoList");
   list.innerHTML="";
   videos.forEach(v=>{
-    const id=v.snippet.resourceId.videoId;
+    const id=v.snippet?.resourceId?.videoId;
+    if(!id) return;
+
     const row=document.createElement("div");
     row.className="item";
-    row.innerHTML=`<div class="thumb">
-      <img src="${v.snippet.thumbnails.medium.url}">
-    </div>
-    <div class="title">${v.snippet.title}</div>`;
+    row.innerHTML=`
+      <div class="thumb"><img src="${v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || ""}"></div>
+      <div class="title">${escapeHtml(v.snippet.title || "Untitled")}</div>
+    `;
     row.onclick=()=>selectVideo(id);
     list.appendChild(row);
   });
 }
 
-
+/** =========================
+ *  VIDEO SELECT + CAPTIONS
+ *  ========================= */
 async function selectVideo(id){
-  player.loadVideoById(id);
-  loadCaptions(id);
+  activeCue = -1;
+  cues = [];
+  renderTranscriptMessage("Loading captions…");
+
+  if(player && player.loadVideoById){
+    player.loadVideoById(id);
+  }
+
+  await loadCaptions(id);
 }
 
 async function loadCaptions(id){
   try{
-    const res=await fetch(`${CAPTIONS_DIR}/${id}.srt`);
-    const text=await res.text();
-    cues=parseSRT(text);
+    const res = await fetch(`${CAPTIONS_DIR}/${id}.srt`, { cache: "no-store" });
+    if(!res.ok) throw new Error("No captions file");
+
+    const srt = await res.text();
+    const baseCues = parseSRT(srt);             // original SRT cues
+    cues = explodeCuesToSentences(baseCues);    // sentence-level cues
+
+    if(!cues.length){
+      renderTranscriptMessage("Captions file is empty.");
+      return;
+    }
+
     renderTranscript();
   }catch{
-    $("transcript").innerHTML="No captions found.";
+    cues = [];
+    renderTranscriptMessage("No captions found for this video.");
   }
 }
 
+function renderTranscriptMessage(msg){
+  $("transcript").innerHTML = `<div class="hint">${escapeHtml(msg)}</div>`;
+}
+
+/** =========================
+ *  SRT PARSER
+ *  ========================= */
 function parseSRT(data){
-  const blocks=data.split("\n\n");
-  return blocks.map(b=>{
-    const lines=b.split("\n");
-    if(lines.length>=3){
-      const times=lines[1].split(" --> ");
-      return{
-        start:toSec(times[0]),
-        end:toSec(times[1]),
-        text:lines.slice(2).join(" ")
-      };
+  const clean = data.replace(/\r/g, "").trim();
+  if(!clean) return [];
+
+  const blocks = clean.split("\n\n");
+  const out = [];
+
+  for(const b of blocks){
+    const lines = b.split("\n").filter(Boolean);
+    if(lines.length < 2) continue;
+
+    // Some SRTs include index line, some don't. We'll detect time line.
+    let timeLineIdx = 0;
+    if(lines[0].includes("-->")) timeLineIdx = 0;
+    else if(lines[1] && lines[1].includes("-->")) timeLineIdx = 1;
+    else continue;
+
+    const times = lines[timeLineIdx].split(" --> ");
+    if(times.length !== 2) continue;
+
+    const start = toSec(times[0]);
+    const end = toSec(times[1]);
+
+    const textLines = lines.slice(timeLineIdx + 1);
+    const text = textLines.join(" ").replace(/\s+/g, " ").trim();
+
+    if(Number.isFinite(start) && Number.isFinite(end) && end > start && text){
+      out.push({ start, end, text });
     }
-  }).filter(Boolean);
+  }
+  return out;
 }
 
 function toSec(t){
-  const p=t.replace(",",".").split(":");
-  return (+p[0])*3600+(+p[1])*60+parseFloat(p[2]);
+  // "00:01:02,500" or "00:01:02.500"
+  const s = (t || "").trim().replace(",", ".");
+  const parts = s.split(":");
+  if(parts.length !== 3) return NaN;
+  const hh = Number(parts[0]);
+  const mm = Number(parts[1]);
+  const ss = Number(parts[2]);
+  return hh*3600 + mm*60 + ss;
 }
 
+/** =========================
+ *  SENTENCE SPLIT (ORACIONES)
+ *  - Split cue text into sentences and distribute timing proportionally.
+ *  ========================= */
+function explodeCuesToSentences(baseCues){
+  const out = [];
+
+  for(const cue of baseCues){
+    const sentences = splitIntoSentences(cue.text);
+
+    // If no real split, keep as-is (still works and stays synced)
+    if(sentences.length <= 1){
+      out.push({ start: cue.start, end: cue.end, text: cue.text });
+      continue;
+    }
+
+    // Distribute time based on character weight (simple, surprisingly good)
+    const duration = cue.end - cue.start;
+    const weights = sentences.map(s => Math.max(1, s.replace(/\s+/g,"").length));
+    const total = weights.reduce((a,b)=>a+b,0);
+
+    let curStart = cue.start;
+
+    for(let i=0;i<sentences.length;i++){
+      const share = weights[i] / total;
+      let segDur = duration * share;
+
+      // guardrail: avoid microscopic segments
+      segDur = Math.max(0.18, segDur);
+
+      let segEnd = curStart + segDur;
+
+      // for last sentence, snap to cue.end
+      if(i === sentences.length - 1) segEnd = cue.end;
+
+      out.push({
+        start: curStart,
+        end: segEnd,
+        text: sentences[i]
+      });
+
+      curStart = segEnd;
+    }
+  }
+
+  // Ensure strictly increasing times (and avoid overlaps issues)
+  for(let i=1;i<out.length;i++){
+    if(out[i].start < out[i-1].end){
+      out[i].start = out[i-1].end;
+    }
+    if(out[i].end <= out[i].start){
+      out[i].end = out[i].start + 0.18;
+    }
+  }
+
+  return out;
+}
+
+function splitIntoSentences(text){
+  const t = (text || "").trim();
+  if(!t) return [];
+
+  // Split after . ! ? (including Spanish ¡¿ and ellipsis)
+  // Keeps punctuation with sentence.
+  const parts = t
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?…])\s+/g)
+    .map(s=>s.trim())
+    .filter(Boolean);
+
+  // If it didn't split but has separators like " - " we can do a fallback split
+  if(parts.length === 1){
+    const alt = t.split(/\s+\-\s+/g).map(s=>s.trim()).filter(Boolean);
+    return alt.length > 1 ? alt : parts;
+  }
+
+  return parts;
+}
+
+/** =========================
+ *  RENDER TRANSCRIPT
+ *  ========================= */
 function renderTranscript(){
-  const box=$("transcript");
-  box.innerHTML="";
+  const box = $("transcript");
+  box.innerHTML = "";
+
   cues.forEach((c,i)=>{
-    const div=document.createElement("div");
-    div.className="cue";
-    div.innerText=c.text;
-    div.onclick=()=>player.seekTo(c.start,true);
-    div.dataset.i=i;
+    const div = document.createElement("div");
+    div.className = "cue";
+    div.dataset.i = String(i);
+    div.innerHTML = `<span class="t">${fmtTime(c.start)} → ${fmtTime(c.end)}</span>${escapeHtml(c.text)}`;
+
+    div.onclick = ()=>{
+      if(player && player.seekTo){
+        player.seekTo(c.start, true);
+      }
+      setActive(i, true);
+    };
+
     box.appendChild(div);
   });
 }
 
-function startSync(){
-  setInterval(()=>{
-    if(!player||!cues.length)return;
-    const t=player.getCurrentTime();
-    for(let i=0;i<cues.length;i++){
-      if(t>=cues[i].start && t<=cues[i].end){
-        setActive(i);
-        break;
-      }
-    }
-  },200);
+function fmtTime(sec){
+  const s = Math.max(0, sec);
+  const m = Math.floor(s/60);
+  const r = s - m*60;
+  return `${String(m).padStart(2,"0")}:${String(Math.floor(r)).padStart(2,"0")}.${String(Math.floor((r%1)*10))}`;
 }
 
-function setActive(i){
-  if(i===activeCue)return;
-  const prev=document.querySelector(".cue.active");
-  if(prev)prev.classList.remove("active");
-  const cur=document.querySelector(`.cue[data-i="${i}"]`);
+/** =========================
+ *  SYNC LOOP (stable)
+ *  ========================= */
+function startSync(){
+  if(syncRunning) return;
+  syncRunning = true;
+
+  const tick = ()=>{
+    if(!syncRunning || !player || !cues.length){
+      rafId = requestAnimationFrame(tick);
+      return;
+    }
+
+    const t = player.getCurrentTime ? player.getCurrentTime() : 0;
+    const idx = findCueIndex(t);
+
+    if(idx !== -1){
+      setActive(idx, false);
+    }
+
+    rafId = requestAnimationFrame(tick);
+  };
+
+  rafId = requestAnimationFrame(tick);
+}
+
+function stopSync(){
+  syncRunning = false;
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+
+function findCueIndex(time){
+  // Binary search for performance and correctness
+  let lo = 0, hi = cues.length - 1;
+
+  while(lo <= hi){
+    const mid = (lo + hi) >> 1;
+    const c = cues[mid];
+
+    if(time < c.start) hi = mid - 1;
+    else if(time > c.end) lo = mid + 1;
+    else return mid;
+  }
+
+  // If between cues, keep last active (don’t flash)
+  return activeCue;
+}
+
+function setActive(i, userTriggered){
+  if(i === activeCue) return;
+
+  const prev = document.querySelector(".cue.active");
+  if(prev) prev.classList.remove("active");
+
+  const cur = document.querySelector(`.cue[data-i="${i}"]`);
   if(cur){
     cur.classList.add("active");
-    cur.scrollIntoView({block:"center",behavior:"smooth"});
+
+    // Only autoscroll when playing (not when user clicked fast)
+    // and keep it centered so it doesn't "slide way down"
+    if(!userTriggered){
+      const box = $("transcript");
+      const boxRect = box.getBoundingClientRect();
+      const curRect = cur.getBoundingClientRect();
+
+      const curTop = curRect.top - boxRect.top + box.scrollTop;
+      const target = curTop - (box.clientHeight / 2) + (cur.clientHeight / 2);
+
+      box.scrollTop = Math.max(0, target);
+    }
   }
-  activeCue=i;
+
+  activeCue = i;
 }
 
+/** =========================
+ *  UTIL
+ *  ========================= */
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/** =========================
+ *  INIT
+ *  ========================= */
 fetchPlaylists();
 </script>
 
