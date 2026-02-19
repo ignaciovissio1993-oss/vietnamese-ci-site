@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Lazy Vietnamese | Playlists</title>
+
   <style>
     :root{
       --bg:#0b0c10;
@@ -80,6 +81,7 @@
       background: rgba(255,255,255,.04);
       color: var(--muted);
     }
+
     main{
       max-width: 1400px;
       margin: 0 auto;
@@ -89,7 +91,7 @@
       gap: 14px;
     }
 
-    /* Player */
+    /* PLAYER (ahora tamaño normal, no gigante) */
     .playerWrap{
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.08);
@@ -107,22 +109,64 @@
     .playerTitle .h{font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
     .playerTitle .sub{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
+    /* Grid: video + captions. Altura controlada. */
     .playerGrid{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: 1.25fr .75fr;
       gap: 0;
-      min-height: 420px;
+      min-height: 360px;
     }
     @media (max-width: 980px){ .playerGrid{grid-template-columns: 1fr} }
 
-    .videoPane{background:#000; position:relative;}
+    .videoPane{
+      background:#000;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 12px;
+    }
+
+    /* Contenedor del iframe: limita tamaño */
+    .videoBox{
+      width: 100%;
+      max-width: 980px;     /* evita que se vuelva gigante en monitores grandes */
+      aspect-ratio: 16 / 9;
+      background:#000;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 18px 40px rgba(0,0,0,.30);
+    }
+
     .yt{
       width:100%;
-      aspect-ratio: 16 / 9;
+      height:100%;
       display:block;
       border:0;
       background:#000;
     }
+
+    /* Estado inicial: no cargamos iframe enorme */
+    .emptyState{
+      position:absolute;
+      inset: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      text-align:center;
+      color: var(--muted);
+      pointer-events:none;
+    }
+    .emptyCard{
+      max-width: 520px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 14px 14px;
+    }
+    .emptyCard b{color: var(--text)}
 
     .captionPane{
       background: rgba(10,12,18,.6);
@@ -148,10 +192,10 @@
     }
 
     .capBody{
-      padding: 8px;
+      padding: 10px;
       overflow:auto;
       height: 100%;
-      max-height: 520px;
+      max-height: 460px; /* control para que no se vaya para abajo */
     }
     @media (max-width: 980px){ .capBody{max-height: 420px;} }
 
@@ -164,16 +208,38 @@
       cursor:pointer;
       transition: background .12s ease, border-color .12s ease, transform .05s ease;
       line-height: 1.35;
+      position: relative;
     }
     .capLine:hover{background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.10);}
     .capLine:active{transform: translateY(1px)}
+
+    /* 🔥 Resaltado fuerte sincronizado por oración */
     .capLine.active{
-      border-color: rgba(125,211,252,.45);
-      background: rgba(125,211,252,.12);
-      box-shadow: inset 0 0 0 1px rgba(125,211,252,.15);
+      border-color: rgba(125,211,252,.55);
+      background: rgba(125,211,252,.16);
+      box-shadow: inset 0 0 0 1px rgba(125,211,252,.18);
     }
+    .capLine.active::before{
+      content:"";
+      position:absolute;
+      left:0; top:10px; bottom:10px;
+      width: 4px;
+      border-radius: 6px;
+      background: rgba(125,211,252,.85);
+    }
+
     .capLine .time{display:block; font-size:11px; color: var(--muted); margin-bottom:6px;}
     .capLine .text{font-size: 14px;}
+
+    /* Palabras clickeables pero sin “subrayado loco” */
+    .capWord{
+      cursor:pointer;
+      padding: 1px 2px;
+      border-radius: 6px;
+    }
+    .capWord:hover{
+      background: rgba(167,139,250,.14);
+    }
 
     .capBadge{
       font-size: 12px;
@@ -188,7 +254,7 @@
     .capBadge.warn{border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95); background: rgba(251,191,36,.10);}
     .capBadge.bad{border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95); background: rgba(251,113,133,.10);}
 
-    /* Playlists rows */
+    /* PLAYLISTS */
     .section{
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.08);
@@ -245,7 +311,7 @@
       font-size: 13px;
     }
 
-    /* Word popup dictionary */
+    /* Dictionary popup */
     #viDictPopup{
       position: fixed;
       z-index: 99999;
@@ -277,41 +343,44 @@
 </head>
 
 <body>
-  <header>
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <h1>Lazy Vietnamese</h1>
-          <p>Playlists + captions (.srt) desde GitHub + diccionario click</p>
-        </div>
-      </div>
-
-      <div class="controls">
-        <input id="searchInput" class="input" placeholder="Buscar video / playlist…" />
-        <button id="reloadBtn" class="btn" title="Recargar">🔄 <span>Reload</span></button>
-        <span id="apiBadge" class="pill">API: (no cargada)</span>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Lazy Vietnamese</h1>
+        <p>Playlists + captions (.srt) + diccionario click</p>
       </div>
     </div>
-  </header>
 
-  <main>
-    <!-- PLAYER -->
-    <div class="playerWrap" id="playerWrap">
-      <div class="playerHeader">
-        <div class="playerTitle">
-          <div class="h" id="playerTitle">Elegí un video 👇</div>
-          <div class="sub" id="playerSubtitle">Se abre acá con captions si existen</div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <span id="capStatus" class="capBadge">Captions: -</span>
-          <span id="dictStatus" class="capBadge">Dict: …</span>
-          <span class="capBadge">Click oración = saltar</span>
-        </div>
+    <div class="controls">
+      <input id="searchInput" class="input" placeholder="Buscar video / playlist…" />
+      <button id="reloadBtn" class="btn" title="Recargar">🔄 <span>Reload</span></button>
+      <span id="apiBadge" class="pill">API: …</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- PLAYER -->
+  <div class="playerWrap" id="playerWrap">
+    <div class="playerHeader">
+      <div class="playerTitle">
+        <div class="h" id="playerTitle">Elegí un video 👇</div>
+        <div class="sub" id="playerSubtitle">Las captions se cargan si existe captions/&lt;VIDEO_ID&gt;.srt</div>
       </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span id="capStatus" class="capBadge">Captions: -</span>
+        <span id="dictStatus" class="capBadge">Dict: …</span>
+        <button id="toggleAutoScroll" class="btn" style="padding:8px 10px;border-radius:12px;font-size:12px;">
+          🧲 Auto-scroll: ON
+        </button>
+      </div>
+    </div>
 
-      <div class="playerGrid">
-        <div class="videoPane">
+    <div class="playerGrid">
+      <div class="videoPane">
+        <div class="videoBox">
           <iframe
             id="ytFrame"
             class="yt"
@@ -321,620 +390,624 @@
           ></iframe>
         </div>
 
-        <div class="captionPane">
-          <div class="capHeader">
-            <div class="left">
-              <div class="t">Captions</div>
-              <div class="m" id="capMeta">Busca: captions/&lt;VIDEO_ID&gt;.srt</div>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <button id="toggleAutoScroll" class="btn" style="padding:8px 10px;border-radius:12px;font-size:12px;">
-                🧲 Auto-scroll: ON
-              </button>
-            </div>
-          </div>
-          <div class="capBody" id="capBody">
-            <div class="status">Abrí un video para cargar captions (si existen).</div>
+        <div class="emptyState" id="emptyState">
+          <div class="emptyCard">
+            <b>No hay video cargado</b><br>
+            Hacé click en cualquier video de abajo para abrir el reproductor y cargar captions.
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- PLAYLISTS -->
-    <div id="content"></div>
-  </main>
-
-  <script>
-    /*****************************************************************
-     * CONFIG
-     *****************************************************************/
-    // ✅ PONÉ TU API KEY ACÁ (pegala entre comillas):
-    const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
-
-    // ✅ Tu Channel ID:
-    const YT_CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
-
-    const MAX_PLAYLISTS = 50;
-    const MAX_ITEMS_PER_PLAYLIST = 50;
-
-    // captions/VIDEO_ID.srt
-    const CAPTIONS_DIR = "./captions";
-
-    // Diccionario local (opcional pero recomendado)
-    // assets/dict_vi_en.json  (formato: { "an": { "gloss": "..." }, ... })
-    const DICT_PATH = "./assets/dict_vi_en.json";
-
-    /*****************************************************************
-     * STATE
-     *****************************************************************/
-    let ALL_PLAYLISTS = [];
-    let FILTER = "";
-    let AUTO_SCROLL = true;
-
-    let currentVideoId = null;
-    let ytTimePoll = null;
-
-    let CAPTIONS = [];
-    let activeCaptionIndex = -1;
-
-    // Dict: null = no cargado aún, {} = cargado, false = no existe
-    let VI_DICT = null;
-
-    /*****************************************************************
-     * HELPERS
-     *****************************************************************/
-    const $ = (sel) => document.querySelector(sel);
-
-    function escapeHtml(s) {
-      return (s || "").replace(/[&<>"']/g, (c) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[c]));
-    }
-
-    function setApiBadge() {
-      const ok = (YT_API_KEY && YT_API_KEY !== "PASTE_YOUR_API_KEY_HERE" && YT_API_KEY.startsWith("AIza"));
-      const badge = $("#apiBadge");
-      badge.textContent = ok ? "API: OK ✅" : "API: falta ⚠️";
-      badge.style.color = ok ? "rgba(52,211,153,.95)" : "rgba(251,191,36,.95)";
-      badge.style.borderColor = ok ? "rgba(52,211,153,.25)" : "rgba(251,191,36,.25)";
-      badge.style.background = ok ? "rgba(52,211,153,.08)" : "rgba(251,191,36,.08)";
-    }
-
-    function formatDate(iso) {
-      try {
-        const d = new Date(iso);
-        return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"2-digit"});
-      } catch { return ""; }
-    }
-
-    function normalizeLookupToken(token) {
-      // Limpia puntuación pero deja diacríticos
-      return (token || "")
-        .toLowerCase()
-        .replace(/[\"'“”‘’\(\)\[\]\{\}<>\.,;:!?]+/g, "")
-        .trim();
-    }
-
-    function secondsToClock(s) {
-      const total = Math.max(0, s|0);
-      const hh = Math.floor(total / 3600);
-      const mm = Math.floor((total % 3600) / 60);
-      const ss = Math.floor(total % 60);
-      if (hh > 0) return `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
-      return `${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
-    }
-
-    function setCapStatus(kind, text) {
-      const el = $("#capStatus");
-      el.textContent = `Captions: ${text}`;
-      el.classList.remove("ok","warn","bad");
-      if (kind) el.classList.add(kind);
-    }
-
-    function setDictStatus(kind, text) {
-      const el = $("#dictStatus");
-      el.textContent = `Dict: ${text}`;
-      el.classList.remove("ok","warn","bad");
-      if (kind) el.classList.add(kind);
-    }
-
-    /*****************************************************************
-     * DICTIONARY (local JSON)
-     *****************************************************************/
-    async function loadViDictOnce() {
-      if (VI_DICT !== null) return VI_DICT;
-
-      try {
-        const res = await fetch(DICT_PATH, { cache: "no-cache" });
-        if (!res.ok) throw new Error("dict missing");
-        VI_DICT = await res.json();
-        setDictStatus("ok", "OK ✅");
-      } catch (e) {
-        VI_DICT = false; // no existe
-        setDictStatus("warn", "no encontrado (igual funciona)");
-      }
-      return VI_DICT;
-    }
-
-    function showWordPopup(anchorEl, wordKey, rawWord) {
-      const old = document.getElementById("viDictPopup");
-      if (old) old.remove();
-
-      const dict = (VI_DICT && VI_DICT !== false) ? VI_DICT : null;
-      const entry = dict ? dict[wordKey] : null;
-
-      const gloss = entry?.gloss || "No encontrada en el diccionario local.";
-      const gtUrl = `https://translate.google.com/?sl=vi&tl=en&text=${encodeURIComponent(wordKey || rawWord)}&op=translate`;
-
-      const div = document.createElement("div");
-      div.id = "viDictPopup";
-      div.innerHTML = `
-        <div class="w">${escapeHtml(wordKey || rawWord)}</div>
-        <div class="g">${escapeHtml(gloss)}</div>
-        <div class="actions">
-          <a class="a" href="${gtUrl}" target="_blank" rel="noopener">🌐 Abrir en Google Translate</a>
-          <a class="a" href="#" id="closePop">✖ Cerrar</a>
+      <div class="captionPane">
+        <div class="capHeader">
+          <div class="left">
+            <div class="t">Captions</div>
+            <div class="m" id="capMeta">Busca: captions/&lt;VIDEO_ID&gt;.srt</div>
+          </div>
+          <span class="capBadge">Click oración = saltar</span>
         </div>
-      `;
-      document.body.appendChild(div);
 
-      const r = anchorEl.getBoundingClientRect();
-      const pad = 10;
+        <div class="capBody" id="capBody">
+          <div class="status">Elegí un video para ver captions (si existen).</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      let top = r.bottom + 10;
-      let left = Math.min(window.innerWidth - div.offsetWidth - pad, Math.max(pad, r.left));
+  <!-- PLAYLISTS -->
+  <div id="content"></div>
+</main>
 
-      if (top + div.offsetHeight > window.innerHeight - pad) {
-        top = r.top - div.offsetHeight - 10;
-      }
-      div.style.top = `${Math.max(pad, top)}px`;
-      div.style.left = `${left}px`;
+<script>
+  /*****************************************************************
+   * CONFIG
+   *****************************************************************/
+  const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";   // <-- pegá tu API key
+  const YT_CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";            // <-- tu Channel ID
 
-      div.querySelector("#closePop").addEventListener("click", (e) => {
-        e.preventDefault();
-        div.remove();
+  const MAX_PLAYLISTS = 50;
+  const MAX_ITEMS_PER_PLAYLIST = 50;
+
+  const CAPTIONS_DIR = "./captions";
+  const DICT_PATH = "./assets/dict_vi_en.json";
+
+  /*****************************************************************
+   * STATE
+   *****************************************************************/
+  let ALL_PLAYLISTS = [];
+  let FILTER = "";
+  let AUTO_SCROLL = true;
+
+  let currentVideoId = null;
+  let ytTimePoll = null;
+
+  let CAPTIONS = [];
+  let activeCaptionIndex = -1;
+
+  let VI_DICT = null; // null=not loaded, {}=loaded, false=missing
+
+  const $ = (sel) => document.querySelector(sel);
+
+  function escapeHtml(s) {
+    return (s || "").replace(/[&<>"']/g, (c) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+  }
+
+  function setApiBadge() {
+    const ok = (YT_API_KEY && YT_API_KEY !== "PASTE_YOUR_API_KEY_HERE" && YT_API_KEY.startsWith("AIza"));
+    const badge = $("#apiBadge");
+    badge.textContent = ok ? "API: OK ✅" : "API: falta ⚠️";
+    badge.style.color = ok ? "rgba(52,211,153,.95)" : "rgba(251,191,36,.95)";
+    badge.style.borderColor = ok ? "rgba(52,211,153,.25)" : "rgba(251,191,36,.25)";
+    badge.style.background = ok ? "rgba(52,211,153,.08)" : "rgba(251,191,36,.08)";
+  }
+
+  function formatDate(iso) {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"2-digit"});
+    } catch { return ""; }
+  }
+
+  function normalizeLookupToken(token) {
+    return (token || "")
+      .toLowerCase()
+      .replace(/[\"'“”‘’\(\)\[\]\{\}<>\.,;:!?]+/g, "")
+      .trim();
+  }
+
+  function secondsToClock(s) {
+    const total = Math.max(0, s|0);
+    const hh = Math.floor(total / 3600);
+    const mm = Math.floor((total % 3600) / 60);
+    const ss = Math.floor(total % 60);
+    if (hh > 0) return `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+    return `${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+  }
+
+  function setCapStatus(kind, text) {
+    const el = $("#capStatus");
+    el.textContent = `Captions: ${text}`;
+    el.classList.remove("ok","warn","bad");
+    if (kind) el.classList.add(kind);
+  }
+
+  function setDictStatus(kind, text) {
+    const el = $("#dictStatus");
+    el.textContent = `Dict: ${text}`;
+    el.classList.remove("ok","warn","bad");
+    if (kind) el.classList.add(kind);
+  }
+
+  /*****************************************************************
+   * DICTIONARY
+   *****************************************************************/
+  async function loadViDictOnce() {
+    if (VI_DICT !== null) return VI_DICT;
+
+    try {
+      const res = await fetch(DICT_PATH, { cache: "no-cache" });
+      if (!res.ok) throw new Error("dict missing");
+      VI_DICT = await res.json();
+      setDictStatus("ok", "OK ✅");
+    } catch (e) {
+      VI_DICT = false;
+      setDictStatus("warn", "no encontrado (igual funciona)");
+    }
+    return VI_DICT;
+  }
+
+  function showWordPopup(anchorEl, wordKey, rawWord) {
+    const old = document.getElementById("viDictPopup");
+    if (old) old.remove();
+
+    const dict = (VI_DICT && VI_DICT !== false) ? VI_DICT : null;
+    const entry = dict ? dict[wordKey] : null;
+
+    const gloss = entry?.gloss || "No encontrada en el diccionario local.";
+    const gtUrl = `https://translate.google.com/?sl=vi&tl=en&text=${encodeURIComponent(wordKey || rawWord)}&op=translate`;
+
+    const div = document.createElement("div");
+    div.id = "viDictPopup";
+    div.innerHTML = `
+      <div class="w">${escapeHtml(wordKey || rawWord)}</div>
+      <div class="g">${escapeHtml(gloss)}</div>
+      <div class="actions">
+        <a class="a" href="${gtUrl}" target="_blank" rel="noopener">🌐 Google Translate</a>
+        <a class="a" href="#" id="closePop">✖ Cerrar</a>
+      </div>
+    `;
+    document.body.appendChild(div);
+
+    const r = anchorEl.getBoundingClientRect();
+    const pad = 10;
+
+    let top = r.bottom + 10;
+    let left = Math.min(window.innerWidth - div.offsetWidth - pad, Math.max(pad, r.left));
+
+    if (top + div.offsetHeight > window.innerHeight - pad) {
+      top = r.top - div.offsetHeight - 10;
+    }
+    div.style.top = `${Math.max(pad, top)}px`;
+    div.style.left = `${left}px`;
+
+    div.querySelector("#closePop").addEventListener("click", (e) => {
+      e.preventDefault();
+      div.remove();
+    });
+
+    setTimeout(() => {
+      const handler = (ev) => {
+        if (!div.contains(ev.target)) {
+          div.remove();
+          document.removeEventListener("click", handler, true);
+        }
+      };
+      document.addEventListener("click", handler, true);
+    }, 0);
+  }
+
+  function renderCaptionSentence(container, sentenceText) {
+    container.innerHTML = "";
+    const parts = sentenceText.split(/\s+/).filter(Boolean);
+
+    for (const raw of parts) {
+      const span = document.createElement("span");
+      span.className = "capWord";
+      span.textContent = raw + " ";
+      span.dataset.word = "1";
+
+      const key = normalizeLookupToken(raw);
+      span.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showWordPopup(span, key, raw);
       });
 
-      setTimeout(() => {
-        const handler = (ev) => {
-          if (!div.contains(ev.target)) {
-            div.remove();
-            document.removeEventListener("click", handler, true);
-          }
-        };
-        document.addEventListener("click", handler, true);
-      }, 0);
+      container.appendChild(span);
     }
+  }
 
-    function renderCaptionSentence(container, sentenceText) {
-      container.innerHTML = "";
+  /*****************************************************************
+   * YOUTUBE DATA API
+   *****************************************************************/
+  async function ytFetch(url) {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const txt = await res.text().catch(()=> "");
+      throw new Error(`YT API error ${res.status}: ${txt.slice(0,200)}`);
+    }
+    return res.json();
+  }
 
-      // Si no hay dict, igual hacemos palabras clickeables pero mostrando "no encontrada"
-      const parts = sentenceText.split(/\s+/).filter(Boolean);
+  async function fetchAllPlaylists() {
+    const base = "https://www.googleapis.com/youtube/v3/playlists";
+    let pageToken = "";
+    const playlists = [];
 
-      for (const raw of parts) {
-        const span = document.createElement("span");
-        span.textContent = raw + " ";
-        span.dataset.word = "1";
-        span.style.cursor = "pointer";
-        span.style.textDecoration = "underline";
-        span.style.textDecorationColor = "rgba(255,255,255,.22)";
-        span.style.textUnderlineOffset = "3px";
+    for (let i = 0; i < 20; i++) {
+      const url = new URL(base);
+      url.searchParams.set("part", "snippet,contentDetails");
+      url.searchParams.set("channelId", YT_CHANNEL_ID);
+      url.searchParams.set("maxResults", "50");
+      url.searchParams.set("key", YT_API_KEY);
+      if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-        const key = normalizeLookupToken(raw);
-        span.addEventListener("click", (e) => {
-          e.stopPropagation();
-          showWordPopup(span, key, raw);
+      const data = await ytFetch(url.toString());
+      for (const pl of (data.items || [])) {
+        playlists.push({
+          id: pl.id,
+          title: pl.snippet?.title || "Untitled",
+          desc: pl.snippet?.description || "",
+          count: pl.contentDetails?.itemCount ?? 0,
+          items: []
         });
-
-        container.appendChild(span);
       }
+      pageToken = data.nextPageToken || "";
+      if (!pageToken) break;
+      if (playlists.length >= MAX_PLAYLISTS) break;
     }
+    return playlists.slice(0, MAX_PLAYLISTS);
+  }
 
-    /*****************************************************************
-     * YOUTUBE DATA API
-     *****************************************************************/
-    async function ytFetch(url) {
-      const res = await fetch(url);
-      if (!res.ok) {
-        const txt = await res.text().catch(()=> "");
-        throw new Error(`YT API error ${res.status}: ${txt.slice(0,200)}`);
-      }
-      return res.json();
-    }
+  async function fetchPlaylistItems(playlistId) {
+    const base = "https://www.googleapis.com/youtube/v3/playlistItems";
+    let pageToken = "";
+    const items = [];
 
-    async function fetchAllPlaylists() {
-      const base = "https://www.googleapis.com/youtube/v3/playlists";
-      let pageToken = "";
-      const playlists = [];
+    for (let i = 0; i < 10; i++) {
+      const url = new URL(base);
+      url.searchParams.set("part", "snippet,contentDetails");
+      url.searchParams.set("playlistId", playlistId);
+      url.searchParams.set("maxResults", String(Math.min(50, MAX_ITEMS_PER_PLAYLIST)));
+      url.searchParams.set("key", YT_API_KEY);
+      if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-      for (let i = 0; i < 20; i++) {
-        const url = new URL(base);
-        url.searchParams.set("part", "snippet,contentDetails");
-        url.searchParams.set("channelId", YT_CHANNEL_ID);
-        url.searchParams.set("maxResults", "50");
-        url.searchParams.set("key", YT_API_KEY);
-        if (pageToken) url.searchParams.set("pageToken", pageToken);
+      const data = await ytFetch(url.toString());
+      for (const it of (data.items || [])) {
+        const vid = it.contentDetails?.videoId;
+        const sn = it.snippet || {};
+        if (!vid) continue;
 
-        const data = await ytFetch(url.toString());
-        for (const pl of (data.items || [])) {
-          playlists.push({
-            id: pl.id,
-            title: pl.snippet?.title || "Untitled",
-            desc: pl.snippet?.description || "",
-            count: pl.contentDetails?.itemCount ?? 0,
-            items: []
-          });
-        }
-        pageToken = data.nextPageToken || "";
-        if (!pageToken) break;
-        if (playlists.length >= MAX_PLAYLISTS) break;
-      }
-      return playlists.slice(0, MAX_PLAYLISTS);
-    }
-
-    async function fetchPlaylistItems(playlistId) {
-      const base = "https://www.googleapis.com/youtube/v3/playlistItems";
-      let pageToken = "";
-      const items = [];
-
-      for (let i = 0; i < 10; i++) {
-        const url = new URL(base);
-        url.searchParams.set("part", "snippet,contentDetails");
-        url.searchParams.set("playlistId", playlistId);
-        url.searchParams.set("maxResults", String(Math.min(50, MAX_ITEMS_PER_PLAYLIST)));
-        url.searchParams.set("key", YT_API_KEY);
-        if (pageToken) url.searchParams.set("pageToken", pageToken);
-
-        const data = await ytFetch(url.toString());
-        for (const it of (data.items || [])) {
-          const vid = it.contentDetails?.videoId;
-          const sn = it.snippet || {};
-          if (!vid) continue;
-
-          items.push({
-            videoId: vid,
-            title: sn.title || "Untitled video",
-            thumb: sn.thumbnails?.medium?.url || sn.thumbnails?.default?.url || "",
-            publishedAt: sn.publishedAt || "",
-          });
-        }
-
-        pageToken = data.nextPageToken || "";
-        if (!pageToken) break;
-      }
-      return items;
-    }
-
-    /*****************************************************************
-     * CAPTIONS (.srt from GitHub)
-     *****************************************************************/
-    function parseSrtTimeToSeconds(t) {
-      const m = (t || "").trim().match(/^(\d{2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
-      if (!m) return 0;
-      const hh = parseInt(m[1], 10);
-      const mm = parseInt(m[2], 10);
-      const ss = parseInt(m[3], 10);
-      const ms = parseInt(m[4].padEnd(3,"0"), 10);
-      return hh*3600 + mm*60 + ss + ms/1000;
-    }
-
-    function parseSrt(srtText) {
-      const blocks = srtText
-        .replace(/\r/g, "")
-        .split("\n\n")
-        .map(b => b.trim())
-        .filter(Boolean);
-
-      const out = [];
-      for (const b of blocks) {
-        const lines = b.split("\n").map(x => x.trim()).filter(Boolean);
-        if (lines.length < 2) continue;
-
-        let idxLine = 0;
-        if (/^\d+$/.test(lines[0])) idxLine = 1;
-
-        const timeLine = lines[idxLine] || "";
-        const tm = timeLine.match(/(.+?)\s*-->\s*(.+)/);
-        if (!tm) continue;
-
-        const start = parseSrtTimeToSeconds(tm[1]);
-        const end = parseSrtTimeToSeconds((tm[2] || "").split(" ")[0]);
-
-        const text = lines.slice(idxLine+1).join(" ").replace(/\s+/g, " ").trim();
-        if (!text) continue;
-
-        out.push({ start, end, text });
-      }
-      return out.sort((a,b)=> a.start - b.start);
-    }
-
-    async function fetchCaptionsForVideo(videoId) {
-      const url = `${CAPTIONS_DIR}/${videoId}.srt`;
-      const res = await fetch(url, { cache: "no-cache" });
-      if (!res.ok) throw new Error("No captions");
-      const txt = await res.text();
-      return parseSrt(txt);
-    }
-
-    function renderCaptions() {
-      const capBody = $("#capBody");
-      capBody.innerHTML = "";
-
-      if (!CAPTIONS || CAPTIONS.length === 0) {
-        capBody.innerHTML = `<div class="status">No se pudieron cargar captions para este video.</div>`;
-        return;
-      }
-
-      const frag = document.createDocumentFragment();
-
-      CAPTIONS.forEach((c, i) => {
-        const line = document.createElement("div");
-        line.className = "capLine";
-        line.dataset.index = String(i);
-        line.dataset.start = String(c.start);
-
-        const time = document.createElement("span");
-        time.className = "time";
-        time.textContent = `${secondsToClock(c.start)} → ${secondsToClock(c.end)}`;
-
-        const text = document.createElement("div");
-        text.className = "text";
-        // 👇 acá queda la magia: palabras clickeables
-        renderCaptionSentence(text, c.text);
-
-        line.appendChild(time);
-        line.appendChild(text);
-
-        line.addEventListener("click", (e) => {
-          // Si clickeaste una palabra (span), NO saltar
-          if (e.target && e.target.dataset && e.target.dataset.word === "1") return;
-          seekTo(c.start + 0.01);
+        items.push({
+          videoId: vid,
+          title: sn.title || "Untitled video",
+          thumb: sn.thumbnails?.medium?.url || sn.thumbnails?.default?.url || "",
+          publishedAt: sn.publishedAt || "",
         });
+      }
 
-        frag.appendChild(line);
+      pageToken = data.nextPageToken || "";
+      if (!pageToken) break;
+    }
+    return items;
+  }
+
+  /*****************************************************************
+   * CAPTIONS (.srt)
+   *****************************************************************/
+  function parseSrtTimeToSeconds(t) {
+    const m = (t || "").trim().match(/^(\d{2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
+    if (!m) return 0;
+    const hh = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10);
+    const ss = parseInt(m[3], 10);
+    const ms = parseInt(m[4].padEnd(3,"0"), 10);
+    return hh*3600 + mm*60 + ss + ms/1000;
+  }
+
+  function parseSrt(srtText) {
+    const blocks = srtText
+      .replace(/\r/g, "")
+      .split("\n\n")
+      .map(b => b.trim())
+      .filter(Boolean);
+
+    const out = [];
+    for (const b of blocks) {
+      const lines = b.split("\n").map(x => x.trim()).filter(Boolean);
+      if (lines.length < 2) continue;
+
+      let idxLine = 0;
+      if (/^\d+$/.test(lines[0])) idxLine = 1;
+
+      const timeLine = lines[idxLine] || "";
+      const tm = timeLine.match(/(.+?)\s*-->\s*(.+)/);
+      if (!tm) continue;
+
+      const start = parseSrtTimeToSeconds(tm[1]);
+      const end = parseSrtTimeToSeconds((tm[2] || "").split(" ")[0]);
+
+      const text = lines.slice(idxLine+1).join(" ").replace(/\s+/g, " ").trim();
+      if (!text) continue;
+
+      out.push({ start, end, text });
+    }
+    return out.sort((a,b)=> a.start - b.start);
+  }
+
+  async function fetchCaptionsForVideo(videoId) {
+    const url = `${CAPTIONS_DIR}/${videoId}.srt`;
+    const res = await fetch(url, { cache: "no-cache" });
+    if (!res.ok) throw new Error("No captions");
+    const txt = await res.text();
+    return parseSrt(txt);
+  }
+
+  function renderCaptions() {
+    const capBody = $("#capBody");
+    capBody.innerHTML = "";
+
+    if (!CAPTIONS || CAPTIONS.length === 0) {
+      capBody.innerHTML = `<div class="status">No se pudieron cargar captions para este video.</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+
+    CAPTIONS.forEach((c, i) => {
+      const line = document.createElement("div");
+      line.className = "capLine";
+      line.dataset.index = String(i);
+      line.dataset.start = String(c.start);
+
+      const time = document.createElement("span");
+      time.className = "time";
+      time.textContent = `${secondsToClock(c.start)} → ${secondsToClock(c.end)}`;
+
+      const text = document.createElement("div");
+      text.className = "text";
+      renderCaptionSentence(text, c.text);
+
+      line.appendChild(time);
+      line.appendChild(text);
+
+      line.addEventListener("click", (e) => {
+        if (e.target && e.target.dataset && e.target.dataset.word === "1") return;
+        seekTo(c.start + 0.01);
       });
 
-      capBody.appendChild(frag);
-      activeCaptionIndex = -1;
-    }
+      frag.appendChild(line);
+    });
 
-    /*****************************************************************
-     * YT iframe postMessage API
-     *****************************************************************/
-    function openVideo(videoId, title, subtitle) {
-      currentVideoId = videoId;
-      activeCaptionIndex = -1;
+    capBody.appendChild(frag);
+    activeCaptionIndex = -1;
+  }
 
-      $("#playerTitle").textContent = title || "Video";
-      $("#playerSubtitle").textContent = subtitle || "";
+  /*****************************************************************
+   * YT iframe postMessage API (sync)
+   *****************************************************************/
+  function showPlayerEmptyState(show) {
+    $("#emptyState").style.display = show ? "flex" : "none";
+  }
 
-      const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
-      $("#ytFrame").src = src;
+  function openVideo(videoId, title, subtitle) {
+    currentVideoId = videoId;
+    activeCaptionIndex = -1;
 
-      CAPTIONS = [];
-      $("#capBody").innerHTML = `<div class="status">Cargando captions…</div>`;
-      setCapStatus("warn", "cargando…");
+    $("#playerTitle").textContent = title || "Video";
+    $("#playerSubtitle").textContent = subtitle || "";
 
-      fetchCaptionsForVideo(videoId)
-        .then(caps => {
-          CAPTIONS = caps;
-          if (!CAPTIONS.length) throw new Error("empty captions");
-          renderCaptions();
-          setCapStatus("ok", "OK ✅");
-        })
-        .catch(() => {
-          CAPTIONS = [];
-          renderCaptions();
-          setCapStatus("bad", "no disponibles ❌");
-        });
+    // 👇 origin importante en GitHub Pages para estabilidad del JS API
+    const origin = encodeURIComponent(location.origin);
+    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${origin}`;
+    $("#ytFrame").src = src;
 
-      startTimePolling();
-    }
+    showPlayerEmptyState(false);
 
-    function postToPlayer(messageObj) {
-      const frame = $("#ytFrame");
-      if (!frame || !frame.contentWindow) return;
-      frame.contentWindow.postMessage(JSON.stringify(messageObj), "*");
-    }
+    CAPTIONS = [];
+    $("#capBody").innerHTML = `<div class="status">Cargando captions…</div>`;
+    setCapStatus("warn", "cargando…");
 
-    function seekTo(seconds) {
-      postToPlayer({ event: "command", func: "seekTo", args: [seconds, true] });
-    }
+    fetchCaptionsForVideo(videoId)
+      .then(caps => {
+        CAPTIONS = caps;
+        if (!CAPTIONS.length) throw new Error("empty captions");
+        renderCaptions();
+        setCapStatus("ok", "OK ✅");
+      })
+      .catch(() => {
+        CAPTIONS = [];
+        renderCaptions();
+        setCapStatus("bad", "no disponibles ❌");
+      });
 
-    function startTimePolling() {
-      stopTimePolling();
+    // arrancamos polling un toque después para que el iframe “entre en ritmo”
+    startTimePolling(true);
+  }
+
+  function postToPlayer(messageObj) {
+    const frame = $("#ytFrame");
+    if (!frame || !frame.contentWindow) return;
+    frame.contentWindow.postMessage(JSON.stringify(messageObj), "*");
+  }
+
+  function seekTo(seconds) {
+    postToPlayer({ event: "command", func: "seekTo", args: [seconds, true] });
+  }
+
+  function startTimePolling(delayed) {
+    stopTimePolling();
+    const start = () => {
       ytTimePoll = setInterval(() => {
         if (!currentVideoId) return;
         postToPlayer({ event: "command", func: "getCurrentTime", args: [] });
       }, 250);
+    };
+    if (delayed) setTimeout(start, 900);
+    else start();
+  }
+
+  function stopTimePolling() {
+    if (ytTimePoll) clearInterval(ytTimePoll);
+    ytTimePoll = null;
+  }
+
+  window.addEventListener("message", (event) => {
+    if (!event.data) return;
+    let data = null;
+    try { data = JSON.parse(event.data); } catch { return; }
+    if (data.event === "infoDelivery" && data.info && typeof data.info.currentTime === "number") {
+      syncCaptionsToTime(data.info.currentTime);
+    }
+  });
+
+  function syncCaptionsToTime(t) {
+    if (!CAPTIONS || CAPTIONS.length === 0) return;
+
+    // si seguimos dentro de la activa, no recalcular
+    if (activeCaptionIndex >= 0 && activeCaptionIndex < CAPTIONS.length) {
+      const c = CAPTIONS[activeCaptionIndex];
+      if (t >= c.start && t <= c.end) return;
     }
 
-    function stopTimePolling() {
-      if (ytTimePoll) clearInterval(ytTimePoll);
-      ytTimePoll = null;
+    let idx = -1;
+    for (let i = 0; i < CAPTIONS.length; i++) {
+      const c = CAPTIONS[i];
+      if (t >= c.start && t <= c.end) { idx = i; break; }
+    }
+    if (idx === -1) return;
+    setActiveCaption(idx);
+  }
+
+  function setActiveCaption(idx) {
+    if (idx === activeCaptionIndex) return;
+
+    const capBody = $("#capBody");
+
+    const prev = capBody.querySelector(".capLine.active");
+    if (prev) prev.classList.remove("active");
+
+    const el = capBody.querySelector(`.capLine[data-index="${idx}"]`);
+    if (el) {
+      el.classList.add("active");
+
+      if (AUTO_SCROLL) {
+        // centrado estable: no “se va para abajo”
+        const targetTop = el.offsetTop - capBody.clientHeight * 0.30;
+        capBody.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+      }
     }
 
-    window.addEventListener("message", (event) => {
-      if (!event.data) return;
-      let data = null;
-      try { data = JSON.parse(event.data); } catch { return; }
-      if (data.event === "infoDelivery" && data.info && typeof data.info.currentTime === "number") {
-        syncCaptionsToTime(data.info.currentTime);
-      }
-    });
+    activeCaptionIndex = idx;
+  }
 
-    function syncCaptionsToTime(t) {
-      if (!CAPTIONS || CAPTIONS.length === 0) return;
+  /*****************************************************************
+   * RENDER PLAYLISTS
+   *****************************************************************/
+  function cardHtml(item, playlistTitle) {
+    const title = escapeHtml(item.title);
+    const thumb = escapeHtml(item.thumb);
+    const date = formatDate(item.publishedAt);
+    const vid = escapeHtml(item.videoId);
 
-      // si todavía está dentro de la activa, no hacer nada
-      if (activeCaptionIndex >= 0 && activeCaptionIndex < CAPTIONS.length) {
-        const c = CAPTIONS[activeCaptionIndex];
-        if (t >= c.start && t <= c.end) return;
-      }
+    return `
+      <div class="card" data-vid="${vid}" data-title="${escapeHtml(item.title)}" data-ptitle="${escapeHtml(playlistTitle)}">
+        <img class="thumb" src="${thumb}" alt="">
+        <div class="cardBody">
+          <div class="cardTitle">${title}</div>
+          <div class="cardMeta"><span class="miniTag">📺</span><span>${escapeHtml(playlistTitle)}</span></div>
+          <div class="cardMeta"><span class="miniTag">🗓️</span><span>${escapeHtml(date)}</span></div>
+        </div>
+      </div>
+    `;
+  }
 
-      let idx = -1;
-      for (let i = 0; i < CAPTIONS.length; i++) {
-        const c = CAPTIONS[i];
-        if (t >= c.start && t <= c.end) { idx = i; break; }
-      }
-      if (idx === -1) return;
-      setActiveCaption(idx);
+  function renderAll() {
+    const content = $("#content");
+    content.innerHTML = "";
+
+    const q = FILTER.trim().toLowerCase();
+    const filtered = ALL_PLAYLISTS
+      .map(pl => {
+        const items = (pl.items || []).filter(it => {
+          if (!q) return true;
+          return (pl.title || "").toLowerCase().includes(q) || (it.title || "").toLowerCase().includes(q);
+        });
+        return { ...pl, items };
+      })
+      .filter(pl => (pl.items || []).length > 0);
+
+    if (!filtered.length) {
+      content.innerHTML = `<div class="status">No encontré nada con ese filtro.</div>`;
+      return;
     }
 
-    function setActiveCaption(idx) {
-      if (idx === activeCaptionIndex) return;
-
-      const capBody = $("#capBody");
-      const prev = capBody.querySelector(".capLine.active");
-      if (prev) prev.classList.remove("active");
-
-      const el = capBody.querySelector(`.capLine[data-index="${idx}"]`);
-      if (el) {
-        el.classList.add("active");
-        if (AUTO_SCROLL) {
-          // centrado suave (no se te escapa para abajo)
-          const top = el.offsetTop - capBody.clientHeight * 0.35;
-          capBody.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-        }
-      }
-      activeCaptionIndex = idx;
-    }
-
-    /*****************************************************************
-     * RENDER PLAYLISTS
-     *****************************************************************/
-    function cardHtml(item, playlistTitle) {
-      const title = escapeHtml(item.title);
-      const thumb = escapeHtml(item.thumb);
-      const date = formatDate(item.publishedAt);
-      const vid = escapeHtml(item.videoId);
-
-      return `
-        <div class="card" data-vid="${vid}" data-title="${escapeHtml(item.title)}" data-ptitle="${escapeHtml(playlistTitle)}">
-          <img class="thumb" src="${thumb}" alt="">
-          <div class="cardBody">
-            <div class="cardTitle">${title}</div>
-            <div class="cardMeta"><span class="miniTag">📺</span><span>${escapeHtml(playlistTitle)}</span></div>
-            <div class="cardMeta"><span class="miniTag">🗓️</span><span>${escapeHtml(date)}</span></div>
+    for (const pl of filtered) {
+      const section = document.createElement("div");
+      section.className = "section";
+      section.innerHTML = `
+        <div class="sectionHead">
+          <div class="title">
+            <div class="h">${escapeHtml(pl.title)}</div>
+            <div class="m">${escapeHtml(pl.desc || "").slice(0, 120)}${(pl.desc || "").length > 120 ? "…" : ""}</div>
+          </div>
+          <span class="pill">${(pl.items || []).length} videos</span>
+        </div>
+        <div class="row">
+          <div class="cards">
+            ${(pl.items || []).map(it => cardHtml(it, pl.title)).join("")}
           </div>
         </div>
       `;
+      content.appendChild(section);
     }
 
-    function renderAll() {
-      const content = $("#content");
-      content.innerHTML = "";
-
-      const q = FILTER.trim().toLowerCase();
-      const filtered = ALL_PLAYLISTS
-        .map(pl => {
-          const items = (pl.items || []).filter(it => {
-            if (!q) return true;
-            return (pl.title || "").toLowerCase().includes(q) || (it.title || "").toLowerCase().includes(q);
-          });
-          return { ...pl, items };
-        })
-        .filter(pl => (pl.items || []).length > 0);
-
-      if (!filtered.length) {
-        content.innerHTML = `<div class="status">No encontré nada con ese filtro.</div>`;
-        return;
-      }
-
-      for (const pl of filtered) {
-        const section = document.createElement("div");
-        section.className = "section";
-        section.innerHTML = `
-          <div class="sectionHead">
-            <div class="title">
-              <div class="h">${escapeHtml(pl.title)}</div>
-              <div class="m">${escapeHtml(pl.desc || "").slice(0, 120)}${(pl.desc || "").length > 120 ? "…" : ""}</div>
-            </div>
-            <span class="pill">${(pl.items || []).length} videos</span>
-          </div>
-          <div class="row">
-            <div class="cards">
-              ${(pl.items || []).map(it => cardHtml(it, pl.title)).join("")}
-            </div>
-          </div>
-        `;
-        content.appendChild(section);
-      }
-
-      content.querySelectorAll(".card").forEach(card => {
-        card.addEventListener("click", () => {
-          const vid = card.dataset.vid;
-          const title = card.dataset.title || "Video";
-          const ptitle = card.dataset.ptitle || "";
-          openVideo(vid, title, ptitle);
-          $("#playerWrap").scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+    content.querySelectorAll(".card").forEach(card => {
+      card.addEventListener("click", () => {
+        const vid = card.dataset.vid;
+        const title = card.dataset.title || "Video";
+        const ptitle = card.dataset.ptitle || "";
+        openVideo(vid, title, ptitle);
+        $("#playerWrap").scrollIntoView({ behavior: "smooth", block: "start" });
       });
+    });
+  }
+
+  /*****************************************************************
+   * INIT
+   *****************************************************************/
+  async function loadEverything() {
+    setApiBadge();
+    setCapStatus(null, "-");
+    setDictStatus("warn", "cargando…");
+
+    // arranque sin video
+    currentVideoId = null;
+    CAPTIONS = [];
+    $("#ytFrame").src = "about:blank";
+    showPlayerEmptyState(true);
+    $("#capBody").innerHTML = `<div class="status">Elegí un video para ver captions (si existen).</div>`;
+
+    await loadViDictOnce();
+
+    if (!YT_API_KEY || YT_API_KEY === "PASTE_YOUR_API_KEY_HERE") {
+      $("#content").innerHTML = `<div class="status">Pegá tu API key en <b>YT_API_KEY</b> (arriba del código) y recargá.</div>`;
+      return;
     }
 
-    /*****************************************************************
-     * INIT
-     *****************************************************************/
-    async function loadEverything() {
-      setApiBadge();
-      setCapStatus(null, "-");
-      setDictStatus("warn", "cargando…");
+    $("#content").innerHTML = `<div class="status">Cargando playlists…</div>`;
 
-      // cargar dict (si no existe, no rompe)
-      await loadViDictOnce();
-
-      if (!YT_API_KEY || YT_API_KEY === "PASTE_YOUR_API_KEY_HERE") {
-        $("#content").innerHTML = `<div class="status">Pegá tu API key en <b>YT_API_KEY</b> (arriba del código) y recargá.</div>`;
-        return;
+    try {
+      const playlists = await fetchAllPlaylists();
+      for (let i = 0; i < playlists.length; i++) {
+        const pl = playlists[i];
+        $("#content").innerHTML = `<div class="status">Cargando: <b>${escapeHtml(pl.title)}</b> (${i+1}/${playlists.length})…</div>`;
+        pl.items = await fetchPlaylistItems(pl.id);
       }
-
-      $("#content").innerHTML = `<div class="status">Cargando playlists…</div>`;
-
-      try {
-        const playlists = await fetchAllPlaylists();
-        for (let i = 0; i < playlists.length; i++) {
-          const pl = playlists[i];
-          $("#content").innerHTML = `<div class="status">Cargando: <b>${escapeHtml(pl.title)}</b> (${i+1}/${playlists.length})…</div>`;
-          pl.items = await fetchPlaylistItems(pl.id);
-        }
-        ALL_PLAYLISTS = playlists;
-        renderAll();
-
-        const first = ALL_PLAYLISTS?.[0]?.items?.[0];
-        if (first) openVideo(first.videoId, first.title, ALL_PLAYLISTS[0].title);
-
-      } catch (e) {
-        console.error(e);
-        $("#content").innerHTML = `<div class="status">Error cargando YouTube API. Revisá API key + restricciones.<br><br><code style="opacity:.8">${escapeHtml(String(e.message || e))}</code></div>`;
-      }
-    }
-
-    $("#searchInput").addEventListener("input", (e) => {
-      FILTER = e.target.value || "";
+      ALL_PLAYLISTS = playlists;
       renderAll();
-    });
+    } catch (e) {
+      console.error(e);
+      $("#content").innerHTML = `<div class="status">Error cargando YouTube API. Revisá API key + restricciones.<br><br><code style="opacity:.8">${escapeHtml(String(e.message || e))}</code></div>`;
+    }
+  }
 
-    $("#reloadBtn").addEventListener("click", () => {
-      FILTER = "";
-      $("#searchInput").value = "";
-      loadEverything();
-    });
+  $("#searchInput").addEventListener("input", (e) => {
+    FILTER = e.target.value || "";
+    renderAll();
+  });
 
-    $("#toggleAutoScroll").addEventListener("click", () => {
-      AUTO_SCROLL = !AUTO_SCROLL;
-      $("#toggleAutoScroll").textContent = AUTO_SCROLL ? "🧲 Auto-scroll: ON" : "🧲 Auto-scroll: OFF";
-    });
-
-    // ESC cierra popup
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        const pop = document.getElementById("viDictPopup");
-        if (pop) pop.remove();
-      }
-    });
-
+  $("#reloadBtn").addEventListener("click", () => {
+    FILTER = "";
+    $("#searchInput").value = "";
     loadEverything();
-  </script>
+  });
+
+  $("#toggleAutoScroll").addEventListener("click", () => {
+    AUTO_SCROLL = !AUTO_SCROLL;
+    $("#toggleAutoScroll").textContent = AUTO_SCROLL ? "🧲 Auto-scroll: ON" : "🧲 Auto-scroll: OFF";
+  });
+
+  // ESC cierra popup
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const pop = document.getElementById("viDictPopup");
+      if (pop) pop.remove();
+    }
+  });
+
+  loadEverything();
+</script>
 </body>
 </html>
