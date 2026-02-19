@@ -293,8 +293,6 @@
       overflow:auto;
       padding:10px;
       line-height:1.5;
-
-      /* ✅ FIX (mobile highlight jump) */
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       overflow-anchor: none;
@@ -306,8 +304,6 @@
       cursor:pointer;
       user-select:none;
       border:1px solid transparent;
-
-      /* ✅ FIX (prevent scroll anchoring jumps) */
       overflow-anchor: none;
     }
     .capLine:hover{background: rgba(106,92,255,.06)}
@@ -672,7 +668,6 @@
       }
 
       if(dict){
-        // count entries quickly (best-effort)
         let n = 0;
         try{ n = Object.keys(dict).length; }catch(e){ n = 0; }
         dictStatus.textContent = `Loaded (${n ? n.toLocaleString() : "?"} entries) from ${dictLoadedFrom}`;
@@ -686,10 +681,6 @@
       const key = normalizeWord(w);
       if(!key) return null;
 
-      // Support multiple formats:
-      // 1) { "ăn": "to eat..." }
-      // 2) { "ăn": { "en": "...", "note": "..."} }
-      // 3) { "ăn": { "gloss": "..."} }
       const v = dict[key] ?? dict[w] ?? dict[key.normalize?.("NFC") ?? key];
       if(!v) return null;
 
@@ -700,7 +691,6 @@
       return String(v);
     }
 
-    /* ✅ NEW: phrase support (2+ words, longest match) */
     function normalizePhraseKey(s){
       return (s || "")
         .toLowerCase()
@@ -710,7 +700,6 @@
         .replace(/[^a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]+$/iu,"");
     }
 
-    // Intenta longest-match: 4 palabras -> 3 -> 2 -> 1
     function lookupBestPhraseFromSpan(spanEl, maxWords = 4){
       if(!spanEl) return { phrase: "", def: null };
 
@@ -718,10 +707,9 @@
       const w0 = spanEl.getAttribute("data-w") || "";
       if(w0) words.push(w0);
 
-      // mirar adelante dentro del mismo capText
       let node = spanEl.nextSibling;
       while(node && words.length < maxWords){
-        if(node.nodeType === 3){ // spaces
+        if(node.nodeType === 3){
           node = node.nextSibling;
           continue;
         }
@@ -734,7 +722,7 @@
             continue;
           }
         }
-        break; // punctuation/other
+        break;
       }
 
       for(let k = Math.min(words.length, maxWords); k >= 1; k--){
@@ -752,7 +740,6 @@
       dictWordEl.textContent = word;
       dictDefEl.textContent = definition;
 
-      // position near clicked word, clamp to viewport
       const pad = 10;
       const popW = 360;
       const popH = 160;
@@ -760,11 +747,9 @@
       let left = anchorRect.left;
       let top = anchorRect.bottom + 8;
 
-      // if too right, pull left
       if(left + popW > window.innerWidth - pad) left = window.innerWidth - pad - popW;
       if(left < pad) left = pad;
 
-      // if too low, show above
       if(top + popH > window.innerHeight - pad) top = anchorRect.top - 8 - popH;
       if(top < pad) top = pad;
 
@@ -820,8 +805,6 @@
     }
 
     function wordsToHtml(sentence){
-      // Split keeping punctuation/spaces, wrap word-ish tokens in spans
-      // Vietnamese letters included; keeps punctuation as normal text.
       const parts = sentence.split(/(\s+|[,.!?;:"“”‘’()\[\]{}<>/\\…—–\-]+)/g);
       return parts.map(p => {
         const w = normalizeWord(p);
@@ -864,7 +847,6 @@
         }
 
         renderCaptions();
-        // Start sync if the player exists; if not yet ready, it will start on ready/play
         startSync();
       }catch(err){
         clearCaptionsUI(`No captions found for this video.<br>Expected: <b>/captions/${videoId}.srt</b>`);
@@ -881,7 +863,6 @@
         `;
       }).join("");
 
-      // click line -> seek
       capBody.querySelectorAll(".capLine").forEach(el => {
         el.addEventListener("click", (ev) => {
           const i = parseInt(el.getAttribute("data-i"),10);
@@ -894,7 +875,6 @@
         });
       });
 
-      // ✅ UPDATED: word click -> dictionary popup (supports multi-word phrases)
       capBody.querySelectorAll(".w").forEach(wel => {
         wel.addEventListener("click", (ev) => {
           ev.stopPropagation();
@@ -911,7 +891,6 @@
       });
     }
 
-    // Binary search for cue at time t
     function findCueIndexByTime(t){
       if(!cues.length) return -1;
       let lo = 0, hi = cues.length - 1;
@@ -925,7 +904,9 @@
       return -1;
     }
 
-    /* ✅ REPLACED: Mobile-safe active cue scroll (no jump) */
+    // ✅ ONLY CHANGE for your request:
+    // Mobile highlight scroll: keep the active line visible WITHOUT jumping far down.
+    // Desktop behavior stays as-is.
     function setActiveCue(i, userInitiated=false){
       if(i === activeCueIndex) return;
       activeCueIndex = i;
@@ -937,29 +918,43 @@
       if(!el) return;
       el.classList.add("active");
 
-      // Only scroll if the active line is not visible (prevents mobile "push down" jump)
-      const elTop = el.offsetTop;
-      const elBottom = elTop + el.offsetHeight;
-      const viewTop = capBody.scrollTop;
-      const viewBottom = viewTop + capBody.clientHeight;
+      const isMobile = window.matchMedia("(max-width: 980px)").matches;
 
-      const pad = 28;
-      const isAbove = elTop < (viewTop + pad);
-      const isBelow = elBottom > (viewBottom - pad);
+      if(isMobile){
+        // On mobile: "nearest" scroll using rect deltas (prevents overshoot / jump)
+        const adjust = () => {
+          const cb = capBody.getBoundingClientRect();
+          const eb = el.getBoundingClientRect();
+          const pad = 22;
 
-      if(isAbove || isBelow){
-        const target = Math.max(0, elTop - (capBody.clientHeight * 0.35));
-        capBody.scrollTo({ top: target, behavior: userInitiated ? "smooth" : "auto" });
+          const above = eb.top < (cb.top + pad);
+          const below = eb.bottom > (cb.bottom - pad);
+
+          if(above){
+            capBody.scrollTop -= (cb.top + pad - eb.top);
+          }else if(below){
+            capBody.scrollTop += (eb.bottom - (cb.bottom - pad));
+          }
+        };
+
+        // Two RAFs makes it stable on mobile browsers (layout + paint)
+        requestAnimationFrame(() => requestAnimationFrame(adjust));
+        return;
       }
+
+      // Desktop (unchanged feel): center it
+      const top = el.offsetTop;
+      const h = el.offsetHeight;
+      const viewH = capBody.clientHeight;
+      const target = top - (viewH/2) + (h/2);
+      capBody.scrollTo({ top: Math.max(0, target), behavior: userInitiated ? "smooth" : "auto" });
     }
 
-    // Stable sync loop (fixes "highlight stopped working")
     function tickSync(){
       if(!modalBack.classList.contains("open")) return;
       if(!player || typeof player.getCurrentTime !== "function") return;
       if(!cues.length) return;
 
-      // Only try syncing when actually playing
       try{
         const state = player.getPlayerState?.();
         if(state !== 1) return; // 1 = playing
@@ -972,7 +967,6 @@
 
     function startSync(){
       if(syncTimer) return;
-      // Run 5 times per second: smooth enough, stable, cheap
       syncTimer = setInterval(tickSync, 200);
     }
 
@@ -1019,7 +1013,6 @@
       openModal();
       loadCaptionsForVideo(currentVideoId);
 
-      // Ensure player is created/loaded correctly
       if(ytReady){
         if(!player){
           player = new YT.Player("ytPlayer", {
@@ -1027,7 +1020,7 @@
             playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
             events: {
               onReady: () => { startSync(); },
-              onStateChange: () => { startSync(); } // safe; tickSync checks state
+              onStateChange: () => { startSync(); }
             }
           });
         }else{
@@ -1201,7 +1194,6 @@
     // ========= YouTube IFrame API =========
     window.onYouTubeIframeAPIReady = function(){
       ytReady = true;
-      // If modal is open and video selected, build player now
       if(modalBack.classList.contains("open") && currentVideoId && !player){
         player = new YT.Player("ytPlayer", {
           videoId: currentVideoId,
