@@ -384,25 +384,8 @@
 
 <body>
   <div class="app-wrap">
-    <div class="app-header">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <h1>Vietnamese CI</h1>
-          <small>Series + Book</small>
-        </div>
-      </div>
 
-      <div class="header-actions">
-        <a class="pill" href="https://www.youtube.com" target="_blank" rel="noreferrer">YouTube</a>
-        <a class="pill" href="https://www.patreon.com" target="_blank" rel="noreferrer">Patreon</a>
-      </div>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" id="tabSeries">🎬 Series</div>
-      <div class="tab" id="tabBook">📘 Book</div>
-    </div>
+    <!-- ✅ Removed: top header + tabs (as requested). Videos show directly. -->
 
     <div id="seriesView">
       <div class="series-grid">
@@ -460,14 +443,6 @@
       </div>
     </div>
 
-    <div id="bookView" style="display:none;margin-top:16px">
-      <div class="panel">
-        <div class="inner">
-          <h2>BOOK</h2>
-          <div class="muted">Placeholder. (Your book section stays here.)</div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Modal Player -->
@@ -527,11 +502,6 @@
     ];
 
     // ========= UI refs =========
-    const tabSeries = document.getElementById("tabSeries");
-    const tabBook = document.getElementById("tabBook");
-    const seriesView = document.getElementById("seriesView");
-    const bookView = document.getElementById("bookView");
-
     const q = document.getElementById("q");
     const playlistFilter = document.getElementById("playlistFilter");
     const levelFilter = document.getElementById("levelFilter");
@@ -575,23 +545,6 @@
     // Dictionary
     let dict = null;          // object or Map-like
     let dictLoadedFrom = "";  // which path succeeded
-
-    // ========= Tabs =========
-    function setTab(which){
-      if(which === "series"){
-        tabSeries.classList.add("active");
-        tabBook.classList.remove("active");
-        seriesView.style.display = "";
-        bookView.style.display = "none";
-      }else{
-        tabBook.classList.add("active");
-        tabSeries.classList.remove("active");
-        bookView.style.display = "";
-        seriesView.style.display = "none";
-      }
-    }
-    tabSeries.addEventListener("click", () => setTab("series"));
-    tabBook.addEventListener("click", () => setTab("book"));
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -904,9 +857,7 @@
       return -1;
     }
 
-    // ✅ ONLY CHANGE for your request:
     // Mobile highlight scroll: keep the active line visible WITHOUT jumping far down.
-    // Desktop behavior stays as-is.
     function setActiveCue(i, userInitiated=false){
       if(i === activeCueIndex) return;
       activeCueIndex = i;
@@ -921,7 +872,6 @@
       const isMobile = window.matchMedia("(max-width: 980px)").matches;
 
       if(isMobile){
-        // On mobile: "nearest" scroll using rect deltas (prevents overshoot / jump)
         const adjust = () => {
           const cb = capBody.getBoundingClientRect();
           const eb = el.getBoundingClientRect();
@@ -936,13 +886,11 @@
             capBody.scrollTop += (eb.bottom - (cb.bottom - pad));
           }
         };
-
-        // Two RAFs makes it stable on mobile browsers (layout + paint)
         requestAnimationFrame(() => requestAnimationFrame(adjust));
         return;
       }
 
-      // Desktop (unchanged feel): center it
+      // Desktop: center it
       const top = el.offsetTop;
       const h = el.offsetHeight;
       const viewH = capBody.clientHeight;
