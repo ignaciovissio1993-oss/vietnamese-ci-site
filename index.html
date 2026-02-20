@@ -39,37 +39,6 @@
     a{color:inherit;text-decoration:none}
     .app-wrap{max-width:1200px;margin:24px auto;padding:0 16px 50px}
 
-    .app-header{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:14px 16px;
-      border:1px solid var(--stroke);
-      border-radius: 999px;
-      background: var(--brandGrad);
-      box-shadow: var(--shadow2);
-    }
-    .brand{display:flex;gap:12px;align-items:center;min-width:260px;}
-    .logo{
-      width:34px;height:34px;border-radius:12px;
-      background: conic-gradient(from 220deg, #2cc7ff, #7d5cff, #ff57c8, #ffd66b, #2cc7ff);
-      box-shadow: 0 10px 25px rgba(0,0,0,.10);
-    }
-    .brand h1{margin:0;font-size:15px;letter-spacing:.2px}
-    .brand small{display:block;color:rgba(29,27,43,.7);font-size:12px;margin-top:2px}
-    .header-actions{display:flex;gap:10px;align-items:center;}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:10px 12px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.55);
-      background: rgba(255,255,255,.6);
-      backdrop-filter: blur(10px);
-      font-weight:600;
-      box-shadow: 0 8px 20px rgba(0,0,0,.08);
-      cursor:pointer;
-      user-select:none;
-    }
-    .pill:hover{transform: translateY(-1px)}
-    .pill:active{transform: translateY(0px)}
-
     .tabs{margin-top:16px;display:flex;gap:10px;justify-content:center;}
     .tab{
       display:inline-flex;align-items:center;gap:8px;
@@ -83,13 +52,15 @@
     }
     .tab.active{border-color: rgba(106,92,255,.25);outline: 3px solid rgba(106,92,255,.10);}
 
+    /* ✅ ONLY CHANGE YOU ASKED: make filters panel sit ABOVE videos (no left column) */
     .series-grid{
       margin-top:16px;
       display:grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 1fr;
       gap:16px;
       align-items:start;
     }
+
     .panel{
       border:1px solid var(--stroke);
       border-radius: var(--radius2);
@@ -243,7 +214,6 @@
     }
     .modalBody{padding:14px;overflow:auto;}
 
-    /* Player + Captions side-by-side */
     .playerGrid{
       display:grid;
       grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr);
@@ -327,7 +297,6 @@
       word-break: break-word;
     }
 
-    /* Clickable words */
     .w{
       padding:1px 3px;
       border-radius: 7px;
@@ -339,7 +308,6 @@
       outline: 2px solid rgba(255,87,200,.12);
     }
 
-    /* Dictionary popup */
     .dictPop{
       position: fixed;
       z-index: 10000;
@@ -368,10 +336,7 @@
     }
 
     @media (max-width: 980px){
-      .series-grid{grid-template-columns: 1fr}
       .series-cards{grid-template-columns: repeat(2, minmax(0,1fr));}
-      .header-actions{display:none}
-      .brand{min-width: unset}
       .playerGrid{grid-template-columns: 1fr}
       .capBody{height: min(44vh, 420px)}
     }
@@ -384,11 +349,10 @@
 
 <body>
   <div class="app-wrap">
-
-    <!-- ✅ Removed: top header + tabs (as requested). Videos show directly. -->
-
     <div id="seriesView">
       <div class="series-grid">
+
+        <!-- Filters panel (now ABOVE videos) -->
         <aside class="panel">
           <div class="inner">
             <h2>BROWSE</h2>
@@ -429,6 +393,7 @@
           </div>
         </aside>
 
+        <!-- Videos panel -->
         <main class="panel">
           <div class="mainPanelHead">
             <div>
@@ -440,9 +405,9 @@
 
           <section class="series-cards" id="cards"></section>
         </main>
+
       </div>
     </div>
-
   </div>
 
   <!-- Modal Player -->
@@ -543,8 +508,8 @@
     let syncTimer = null;
 
     // Dictionary
-    let dict = null;          // object or Map-like
-    let dictLoadedFrom = "";  // which path succeeded
+    let dict = null;
+    let dictLoadedFrom = "";
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -662,10 +627,7 @@
 
       let node = spanEl.nextSibling;
       while(node && words.length < maxWords){
-        if(node.nodeType === 3){
-          node = node.nextSibling;
-          continue;
-        }
+        if(node.nodeType === 3){ node = node.nextSibling; continue; }
         if(node.nodeType === 1){
           const el = node;
           if(el.classList && el.classList.contains("w")){
@@ -711,9 +673,7 @@
       dictPop.classList.add("open");
     }
 
-    function closeDictPopup(){
-      dictPop.classList.remove("open");
-    }
+    function closeDictPopup(){ dictPop.classList.remove("open"); }
 
     dictClose.addEventListener("click", closeDictPopup);
     window.addEventListener("click", (e) => {
@@ -788,12 +748,9 @@
         const txt = await res.text();
         const parsed = parseSRT(txt);
 
-        cues = parsed.map(c => ({
-          ...c,
-          html: wordsToHtml(c.text)
-        }));
-
+        cues = parsed.map(c => ({...c, html: wordsToHtml(c.text)}));
         capMeta.textContent = `${cues.length} lines`;
+
         if(!cues.length){
           clearCaptionsUI("Captions file exists but is empty.");
           return;
@@ -817,7 +774,7 @@
       }).join("");
 
       capBody.querySelectorAll(".capLine").forEach(el => {
-        el.addEventListener("click", (ev) => {
+        el.addEventListener("click", () => {
           const i = parseInt(el.getAttribute("data-i"),10);
           const t = cues[i]?.start ?? 0;
           if(player && typeof player.seekTo === "function"){
@@ -831,15 +788,10 @@
       capBody.querySelectorAll(".w").forEach(wel => {
         wel.addEventListener("click", (ev) => {
           ev.stopPropagation();
-
           const rect = wel.getBoundingClientRect();
           const { phrase, def } = lookupBestPhraseFromSpan(wel, 4);
-
-          if(def){
-            openDictPopup(phrase, def, rect);
-          }else{
-            openDictPopup(phrase || (wel.getAttribute("data-w")||""), dict ? "Not found in dictionary." : "Dictionary not loaded.", rect);
-          }
+          if(def) openDictPopup(phrase, def, rect);
+          else openDictPopup(phrase || (wel.getAttribute("data-w")||""), dict ? "Not found in dictionary." : "Dictionary not loaded.", rect);
         });
       });
     }
@@ -857,7 +809,6 @@
       return -1;
     }
 
-    // Mobile highlight scroll: keep the active line visible WITHOUT jumping far down.
     function setActiveCue(i, userInitiated=false){
       if(i === activeCueIndex) return;
       activeCueIndex = i;
@@ -880,17 +831,13 @@
           const above = eb.top < (cb.top + pad);
           const below = eb.bottom > (cb.bottom - pad);
 
-          if(above){
-            capBody.scrollTop -= (cb.top + pad - eb.top);
-          }else if(below){
-            capBody.scrollTop += (eb.bottom - (cb.bottom - pad));
-          }
+          if(above) capBody.scrollTop -= (cb.top + pad - eb.top);
+          else if(below) capBody.scrollTop += (eb.bottom - (cb.bottom - pad));
         };
         requestAnimationFrame(() => requestAnimationFrame(adjust));
         return;
       }
 
-      // Desktop: center it
       const top = el.offsetTop;
       const h = el.offsetHeight;
       const viewH = capBody.clientHeight;
@@ -905,7 +852,7 @@
 
       try{
         const state = player.getPlayerState?.();
-        if(state !== 1) return; // 1 = playing
+        if(state !== 1) return;
       }catch(e){}
 
       const t = player.getCurrentTime();
@@ -966,10 +913,7 @@
           player = new YT.Player("ytPlayer", {
             videoId: currentVideoId,
             playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
-            events: {
-              onReady: () => { startSync(); },
-              onStateChange: () => { startSync(); }
-            }
+            events: { onReady: () => { startSync(); }, onStateChange: () => { startSync(); } }
           });
         }else{
           player.loadVideoById(currentVideoId);
@@ -1097,7 +1041,7 @@
 
       const seen = new Set();
       const flat = [];
-      for(const [pid, vids] of videosByPlaylist.entries()){
+      for(const vids of videosByPlaylist.values()){
         vids.forEach(v => {
           if(seen.has(v.videoId)) return;
           seen.add(v.videoId);
@@ -1146,10 +1090,7 @@
         player = new YT.Player("ytPlayer", {
           videoId: currentVideoId,
           playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
-          events: {
-            onReady: () => { startSync(); },
-            onStateChange: () => { startSync(); }
-          }
+          events: { onReady: () => { startSync(); }, onStateChange: () => { startSync(); } }
         });
       }
     };
@@ -1163,11 +1104,8 @@
     // ========= Boot =========
     (async function init(){
       await loadDictionary();
-      try{
-        await loadPlaylists();
-      }catch(err){
-        setStatus(false, "Could not load from YouTube API.", err.message || String(err));
-      }
+      try{ await loadPlaylists(); }
+      catch(err){ setStatus(false, "Could not load from YouTube API.", err.message || String(err)); }
     })();
   </script>
 </body>
