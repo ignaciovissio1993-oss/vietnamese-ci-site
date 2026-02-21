@@ -119,3 +119,7 @@ async function checkMembership(session, env) {
   }
   return false;
 }
+
+export async function onRequest(context) {
+  return guard(context);
+}
