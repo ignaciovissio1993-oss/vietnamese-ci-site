@@ -1,5 +1,3 @@
 ﻿/auth/*        /auth/:splat        200
 /assets/*      /assets/:splat      200
 /scripts/*     /scripts/:splat     200
-
-/*             /functions/_middleware.js  200
