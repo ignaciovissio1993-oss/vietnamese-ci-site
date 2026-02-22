@@ -7,6 +7,7 @@
 } from "../_auth/utils";
 
 const STATE_COOKIE = "patreon_oauth";
+const PATREON_AUTHORIZE_URL = "https://www.patreon.com/oauth2/authorize";
 
 export async function onRequest({ request, env }) {
   if (!env.PATREON_CLIENT_ID || !env.PATREON_REDIRECT_URI || !env.SESSION_SECRET) {
@@ -26,7 +27,7 @@ export async function onRequest({ request, env }) {
 
   const signed = await signValue(env.SESSION_SECRET, payload);
 
-  const authUrl = new URL("https://www.patreon.com/oauth2/authorize");
+  const authUrl = new URL(PATREON_AUTHORIZE_URL);
   authUrl.searchParams.set("response_type", "code");
   authUrl.searchParams.set("client_id", env.PATREON_CLIENT_ID);
   authUrl.searchParams.set("redirect_uri", env.PATREON_REDIRECT_URI);

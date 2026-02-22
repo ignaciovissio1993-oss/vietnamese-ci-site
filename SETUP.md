@@ -26,11 +26,13 @@ PATREON_CLIENT_SECRET=
 PATREON_REDIRECT_URI=https://YOUR_SITE_DOMAIN/auth/callback
 PATREON_CAMPAIGN_ID=
 SESSION_SECRET=
+MEMBER_CACHE_SECONDS=300
 ```
 
 Notes:
 - `PATREON_CAMPAIGN_ID` is your Patreon campaign ID. You can find it in the Patreon API tools or by checking your campaign in the developer portal.
 - `SESSION_SECRET` should be a long random string (32+ characters). This is used to sign the session cookie.
+- `MEMBER_CACHE_SECONDS` controls how long membership status is cached in the session cookie before another Patreon membership API check (default `300`).
 
 ## 4) Deploy
 1. Commit the new files.

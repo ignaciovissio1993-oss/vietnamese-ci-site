@@ -8,12 +8,15 @@
 } from "./utils";
 
 const SESSION_COOKIE = "patreon_session";
-const MEMBER_CACHE_SECONDS = 300;
+const DEFAULT_MEMBER_CACHE_SECONDS = 300;
+const PATREON_TOKEN_URL = "https://api.patreon.com/oauth2/token";
+const PATREON_IDENTITY_URL = "https://api.patreon.com/api/oauth2/v2/identity";
 
 export async function guard(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const cookies = parseCookies(request.headers.get("Cookie"));
+  const memberCacheSeconds = getMemberCacheSeconds(env);
 
   if (!env.SESSION_SECRET) {
     return new Response("Missing SESSION_SECRET", { status: 500 });
@@ -28,7 +31,10 @@ export async function guard(context) {
 
   const now = Math.floor(Date.now() / 1000);
 
-  if (session.member_valid_until && now < session.member_valid_until) {
+  if (isMembershipCacheValid(session, now, memberCacheSeconds)) {
+    if (session.member_is_active === false) {
+      return buildRedirectResponse("/not-a-member.html");
+    }
     return context.next();
   }
 
@@ -38,23 +44,22 @@ export async function guard(context) {
   }
 
   const memberOk = await checkMembership(refreshed, env);
+  refreshed.member_checked_at = now;
+  refreshed.member_is_active = memberOk;
+  const newSessionCookie = await signValue(env.SESSION_SECRET, refreshed);
+  const sessionCookie = setCookie(SESSION_COOKIE, newSessionCookie, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Lax",
+    path: "/"
+  });
+
   if (!memberOk) {
-    return buildRedirectResponse("/not-a-member.html", [clearCookie(SESSION_COOKIE)]);
+    return buildRedirectResponse("/not-a-member.html", [sessionCookie]);
   }
 
-  refreshed.member_valid_until = now + MEMBER_CACHE_SECONDS;
-  const newSessionCookie = await signValue(env.SESSION_SECRET, refreshed);
-
   const response = await context.next();
-  response.headers.append(
-    "Set-Cookie",
-    setCookie(SESSION_COOKIE, newSessionCookie, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-      path: "/"
-    })
-  );
+  response.headers.append("Set-Cookie", sessionCookie);
   return response;
 }
 
@@ -77,7 +82,7 @@ async function ensureAccessToken(session, env) {
     client_secret: env.PATREON_CLIENT_SECRET || ""
   });
 
-  const resp = await fetch("https://api.patreon.com/oauth2/token", {
+  const resp = await fetch(PATREON_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body
@@ -97,9 +102,7 @@ async function ensureAccessToken(session, env) {
 async function checkMembership(session, env) {
   if (!env.PATREON_CAMPAIGN_ID) return false;
 
-  const url =
-    "https://api.patreon.com/api/oauth2/v2/identity" +
-    "?include=memberships&fields%5Bmember%5D=patron_status";
+  const url = `${PATREON_IDENTITY_URL}?include=memberships&fields%5Bmember%5D=patron_status`;
 
   const resp = await fetch(url, {
     headers: { Authorization: `Bearer ${session.access_token}` }
@@ -122,4 +125,24 @@ async function checkMembership(session, env) {
 
 export async function onRequest(context) {
   return guard(context);
+}
+
+function getMemberCacheSeconds(env) {
+  const configured = Number.parseInt(env.MEMBER_CACHE_SECONDS || "", 10);
+  if (Number.isFinite(configured) && configured > 0) {
+    return configured;
+  }
+  return DEFAULT_MEMBER_CACHE_SECONDS;
+}
+
+function isMembershipCacheValid(session, now, memberCacheSeconds) {
+  if (session.member_checked_at && now < session.member_checked_at + memberCacheSeconds) {
+    return true;
+  }
+
+  if (session.member_valid_until && now < session.member_valid_until) {
+    return true;
+  }
+
+  return false;
 }

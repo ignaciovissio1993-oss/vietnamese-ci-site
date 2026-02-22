@@ -9,6 +9,7 @@
 
 const STATE_COOKIE = "patreon_oauth";
 const SESSION_COOKIE = "patreon_session";
+const PATREON_TOKEN_URL = "https://api.patreon.com/oauth2/token";
 
 export async function onRequest({ request, env }) {
   if (!env.PATREON_CLIENT_ID || !env.PATREON_CLIENT_SECRET || !env.PATREON_REDIRECT_URI || !env.SESSION_SECRET) {
@@ -39,7 +40,7 @@ export async function onRequest({ request, env }) {
     redirect_uri: env.PATREON_REDIRECT_URI
   });
 
-  const tokenResp = await fetch("https://api.patreon.com/oauth2/token", {
+  const tokenResp = await fetch(PATREON_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: tokenBody
