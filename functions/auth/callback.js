@@ -39,7 +39,7 @@ export async function onRequest({ request, env }) {
     redirect_uri: env.PATREON_REDIRECT_URI
   });
 
-  const tokenResp = await fetch("https://www.patreon.com/api/oauth2/token", {
+  const tokenResp = await fetch("https://api.patreon.com/oauth2/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: tokenBody

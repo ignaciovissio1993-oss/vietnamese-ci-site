@@ -77,7 +77,7 @@ async function ensureAccessToken(session, env) {
     client_secret: env.PATREON_CLIENT_SECRET || ""
   });
 
-  const resp = await fetch("https://www.patreon.com/api/oauth2/token", {
+  const resp = await fetch("https://api.patreon.com/oauth2/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body
@@ -98,7 +98,7 @@ async function checkMembership(session, env) {
   if (!env.PATREON_CAMPAIGN_ID) return false;
 
   const url =
-    "https://www.patreon.com/api/oauth2/v2/identity" +
+    "https://api.patreon.com/api/oauth2/v2/identity" +
     "?include=memberships&fields%5Bmember%5D=patron_status";
 
   const resp = await fetch(url, {
