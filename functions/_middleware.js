@@ -10,6 +10,7 @@
 
   // Allow static assets (adjust if your folders differ)
   if (
+    path === "/login.html" ||
     path.startsWith("/assets/") ||
     path.startsWith("/scripts/") ||
     path.startsWith("/images/") ||
@@ -30,5 +31,33 @@
     headers: request.headers,
   });
 
-  return fetch(forwarded);
+  const guardResponse = await fetch(forwarded);
+  const location = guardResponse.headers.get("Location");
+
+  if (location) {
+    const redirectUrl = new URL(location, url.origin);
+    if (redirectUrl.pathname === "/auth/login") {
+      const accept = request.headers.get("accept") || "";
+      const isHtmlNav = accept.includes("text/html");
+
+      const passthroughHeaders = new Headers();
+      for (const [key, value] of guardResponse.headers) {
+        if (key.toLowerCase() === "location") continue;
+        passthroughHeaders.append(key, value);
+      }
+
+      if (isHtmlNav) {
+        const loginUrl = new URL("/login.html", url.origin).toString();
+        passthroughHeaders.set("Location", loginUrl);
+        return new Response(null, { status: 302, headers: passthroughHeaders });
+      }
+
+      if (!passthroughHeaders.has("Content-Type")) {
+        passthroughHeaders.set("Content-Type", "text/plain; charset=utf-8");
+      }
+      return new Response("Unauthorized", { status: 401, headers: passthroughHeaders });
+    }
+  }
+
+  return guardResponse;
 }
