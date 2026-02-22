@@ -7,6 +7,7 @@
 } from "../_auth/utils";
 
 const STATE_COOKIE = "patreon_oauth";
+// OAuth browser redirect must use Patreon authorize endpoint.
 const PATREON_AUTHORIZE_URL = "https://www.patreon.com/oauth2/authorize";
 
 export async function onRequest({ request, env }) {

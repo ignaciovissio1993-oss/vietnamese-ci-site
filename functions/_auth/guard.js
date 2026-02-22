@@ -1,16 +1,18 @@
-﻿import {
+import {
   parseCookies,
   setCookie,
   clearCookie,
   signValue,
   verifyValue,
-  buildRedirectResponse
+  buildRedirectResponse,
+  fetchPatreonJson
 } from "./utils";
 
 const SESSION_COOKIE = "patreon_session";
 const DEFAULT_MEMBER_CACHE_SECONDS = 300;
-const PATREON_TOKEN_URL = "https://api.patreon.com/oauth2/token";
-const PATREON_IDENTITY_URL = "https://api.patreon.com/api/oauth2/v2/identity";
+// Use Patreon API endpoints on www.patreon.com/api for token and v2 identity requests.
+const PATREON_TOKEN_URL = "https://www.patreon.com/api/oauth2/token";
+const PATREON_IDENTITY_URL = "https://www.patreon.com/api/oauth2/v2/identity";
 
 export async function guard(context) {
   const { request, env } = context;
@@ -82,44 +84,54 @@ async function ensureAccessToken(session, env) {
     client_secret: env.PATREON_CLIENT_SECRET || ""
   });
 
-  const resp = await fetch(PATREON_TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body
-  });
+  try {
+    const data = await fetchPatreonJson(PATREON_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body
+    });
 
-  if (!resp.ok) return null;
-  const data = await resp.json();
+    if (!data?.access_token || typeof data.access_token !== "string") {
+      return null;
+    }
 
-  return {
-    access_token: data.access_token,
-    refresh_token: data.refresh_token || session.refresh_token,
-    expires_at: now + (data.expires_in || 0),
-    scope: data.scope || session.scope
-  };
+    return {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || session.refresh_token,
+      expires_at: now + (data.expires_in || 0),
+      scope: data.scope || session.scope,
+      member_checked_at: session.member_checked_at,
+      member_is_active: session.member_is_active
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function checkMembership(session, env) {
   if (!env.PATREON_CAMPAIGN_ID) return false;
+  if (!session.access_token) return false;
 
   const url = `${PATREON_IDENTITY_URL}?include=memberships&fields%5Bmember%5D=patron_status`;
 
-  const resp = await fetch(url, {
-    headers: { Authorization: `Bearer ${session.access_token}` }
-  });
+  try {
+    const data = await fetchPatreonJson(url, {
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    });
+    const included = data.included || [];
 
-  if (!resp.ok) return false;
-  const data = await resp.json();
-  const included = data.included || [];
-
-  for (const item of included) {
-    if (item.type !== "member") continue;
-    const status = item.attributes?.patron_status;
-    const campaignId = item.relationships?.campaign?.data?.id;
-    if (campaignId === env.PATREON_CAMPAIGN_ID && status === "active_patron") {
-      return true;
+    for (const item of included) {
+      if (item.type !== "member") continue;
+      const status = item.attributes?.patron_status;
+      const campaignId = item.relationships?.campaign?.data?.id;
+      if (campaignId === env.PATREON_CAMPAIGN_ID && status === "active_patron") {
+        return true;
+      }
     }
+  } catch {
+    return false;
   }
+
   return false;
 }
 

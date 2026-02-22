@@ -1,15 +1,17 @@
-﻿import {
+import {
   parseCookies,
   setCookie,
   clearCookie,
   verifyValue,
   signValue,
-  buildRedirectResponse
+  buildRedirectResponse,
+  fetchPatreonJson
 } from "../_auth/utils";
 
 const STATE_COOKIE = "patreon_oauth";
 const SESSION_COOKIE = "patreon_session";
-const PATREON_TOKEN_URL = "https://api.patreon.com/oauth2/token";
+// Token exchange must target Patreon OAuth token endpoint on www.patreon.com/api.
+const PATREON_TOKEN_URL = "https://www.patreon.com/api/oauth2/token";
 
 export async function onRequest({ request, env }) {
   if (!env.PATREON_CLIENT_ID || !env.PATREON_CLIENT_SECRET || !env.PATREON_REDIRECT_URI || !env.SESSION_SECRET) {
@@ -40,17 +42,21 @@ export async function onRequest({ request, env }) {
     redirect_uri: env.PATREON_REDIRECT_URI
   });
 
-  const tokenResp = await fetch(PATREON_TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: tokenBody
-  });
-
-  if (!tokenResp.ok) {
+  let tokenData;
+  try {
+    tokenData = await fetchPatreonJson(PATREON_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: tokenBody
+    });
+  } catch {
     return new Response("Token exchange failed", { status: 400 });
   }
 
-  const tokenData = await tokenResp.json();
+  if (!tokenData?.access_token || typeof tokenData.access_token !== "string") {
+    return new Response("Token exchange failed", { status: 400 });
+  }
+
   const now = Math.floor(Date.now() / 1000);
 
   const session = {
