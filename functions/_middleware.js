@@ -8,6 +8,8 @@ export async function onRequest(context) {
 
   if (
     path === "/login" ||
+    path === "/login/" ||
+    path === "/login.html" ||
     path === "/auth" ||
     path.startsWith("/auth/") ||
     path.startsWith("/_auth/") ||
