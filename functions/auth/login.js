@@ -4,7 +4,7 @@
   signValue,
   buildRedirectResponse,
   isSafeReturnTo
-} from "../_auth/utils";
+} from "/lib/_auth/utils";
 
 const STATE_COOKIE = "patreon_oauth";
 // OAuth browser redirect must use Patreon authorize endpoint.

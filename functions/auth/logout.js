@@ -1,4 +1,4 @@
-﻿import { clearCookie, buildRedirectResponse } from "../_auth/utils";
+import { clearCookie, buildRedirectResponse } from "/lib/_auth/utils";
 
 const SESSION_COOKIE = "patreon_session";
 

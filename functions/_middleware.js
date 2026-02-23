@@ -1,3 +1,5 @@
+import { guard } from "/lib/_auth/guard";
+
 export async function onRequest(context) {
   const { request, next } = context;
   const url = new URL(request.url);
@@ -19,19 +21,7 @@ export async function onRequest(context) {
     return next();
   }
 
-  const to = encodeURIComponent(path + url.search);
-  const guardUrl = new URL(`/_auth/guard?to=${to}`, url.origin);
-
-  const requestInit = {
-    method: request.method,
-    headers: request.headers
-  };
-
-  if (request.method !== "GET" && request.method !== "HEAD") {
-    requestInit.body = request.body;
-  }
-
-  const guardResponse = await fetch(new Request(guardUrl.toString(), requestInit));
+  const guardResponse = await guard(context);
   const location = guardResponse.headers.get("Location");
 
   if (location) {
