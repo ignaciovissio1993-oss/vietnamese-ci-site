@@ -16,8 +16,8 @@ export async function onRequest({ request, env }) {
   }
 
   const url = new URL(request.url);
-  const to = url.searchParams.get("to") || "/members/";
-  const returnTo = isSafeReturnTo(to) ? to : "/members/";
+  const to = url.searchParams.get("to") || "/";
+  const returnTo = isSafeReturnTo(to) ? to : "/";
 
   const state = cryptoRandomString();
   const payload = {

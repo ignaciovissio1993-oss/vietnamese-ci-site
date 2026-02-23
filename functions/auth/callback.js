@@ -5,7 +5,8 @@ import {
   verifyValue,
   signValue,
   buildRedirectResponse,
-  fetchPatreonJson
+  fetchPatreonJson,
+  isSafeReturnTo
 } from "../../lib/_auth/utils";
 
 const STATE_COOKIE = "patreon_oauth";
@@ -76,7 +77,8 @@ export async function onRequest({ request, env }) {
   });
 
   const clearStateCookie = clearCookie(STATE_COOKIE);
-  const returnTo = statePayload.return_to || "/members/";
+  const requestedTo = url.searchParams.get("to");
+  const returnTo = requestedTo && isSafeReturnTo(requestedTo) ? requestedTo : "/";
 
   return buildRedirectResponse(returnTo, [sessionCookie, clearStateCookie]);
 }
