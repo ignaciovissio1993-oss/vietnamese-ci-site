@@ -4,19 +4,25 @@ export async function onRequest(context) {
   const { request, next } = context;
   const url = new URL(request.url);
   const path = url.pathname;
-
-  if (path.startsWith("/auth/") || path.startsWith("/_auth/")) {
-    return next();
-  }
+  const lowerPath = path.toLowerCase();
 
   if (
-    path === "/login.html" ||
+    path === "/login" ||
+    path === "/auth" ||
+    path.startsWith("/auth/") ||
+    path.startsWith("/_auth/") ||
+    path === "/not-a-member.html" ||
     path.startsWith("/assets/") ||
-    path.startsWith("/scripts/") ||
-    path.startsWith("/images/") ||
+    path.startsWith("/captions/") ||
     path === "/favicon.ico" ||
-    path === "/robots.txt" ||
-    path === "/sitemap.xml"
+    lowerPath.endsWith(".css") ||
+    lowerPath.endsWith(".js") ||
+    lowerPath.endsWith(".png") ||
+    lowerPath.endsWith(".jpg") ||
+    lowerPath.endsWith(".svg") ||
+    lowerPath.endsWith(".webp") ||
+    lowerPath.endsWith(".json") ||
+    lowerPath.endsWith(".srt")
   ) {
     return next();
   }
