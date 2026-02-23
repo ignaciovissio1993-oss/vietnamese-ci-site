@@ -6,7 +6,7 @@ import {
   signValue,
   buildRedirectResponse,
   fetchPatreonJson
-} from "/lib/_auth/utils";
+} from "../../lib/_auth/utils";
 
 const STATE_COOKIE = "patreon_oauth";
 const SESSION_COOKIE = "patreon_session";

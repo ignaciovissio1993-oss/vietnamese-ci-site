@@ -1,4 +1,4 @@
-import { guard } from "/lib/_auth/guard";
+import { guard } from "../lib/_auth/guard";
 
 export async function onRequest(context) {
   const { request, next } = context;
