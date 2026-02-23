@@ -14,6 +14,8 @@ export async function onRequest(context) {
     path.startsWith("/auth/") ||
     path.startsWith("/_auth/") ||
     path === "/not-a-member.html" ||
+    path === "/not-a-member" ||
+    path === "/not-a-member/" ||
     path.startsWith("/assets/") ||
     path.startsWith("/captions/") ||
     path === "/favicon.ico" ||
@@ -42,7 +44,7 @@ export async function onRequest(context) {
       }
 
       if (isHtmlNavigation(request)) {
-        const loginUrl = new URL("/login.html", url.origin).toString();
+        const loginUrl = new URL("/login", url.origin).toString();
         passthroughHeaders.set("Location", loginUrl);
         return new Response(null, { status: 302, headers: passthroughHeaders });
       }
