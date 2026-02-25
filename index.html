@@ -742,11 +742,20 @@
       capBody.innerHTML = `<div class="capEmpty">Loading captions…</div>`;
 
       const url = `${CAPTIONS_DIR}/${videoId}.srt`;
+      // FALLBACK ADDITION
+      const showCaptionsFallback = () => {
+        cues = [];
+        capMeta.textContent = "";
+        capBody.textContent = "No captions available.";
+      };
       try{
         const res = await fetch(url, {cache:"no-store"});
-        if(!res.ok) throw new Error(`No SRT (${res.status})`);
+        if(!res.ok){ showCaptionsFallback(); return; }
+        const contentType = res.headers.get("content-type") || "";
+        if(contentType.includes("text/html")){ showCaptionsFallback(); return; }
         const txt = await res.text();
         const parsed = parseSRT(txt);
+        if(!parsed.length){ showCaptionsFallback(); return; }
 
         cues = parsed.map(c => ({...c, html: wordsToHtml(c.text)}));
         capMeta.textContent = `${cues.length} lines`;
@@ -759,7 +768,7 @@
         renderCaptions();
         startSync();
       }catch(err){
-        clearCaptionsUI(`No captions found for this video.<br>Expected: <b>/captions/${videoId}.srt</b>`);
+        showCaptionsFallback();
       }
     }
 
