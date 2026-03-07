@@ -1,928 +1,1556 @@
 1
-00:00:00,933 --> 00:00:03,666
-chào các bạn các bạn có khỏe không
+00:00:00,000 --> 00:00:02,066
+  chào em em có khỏe không
 
 2
-00:00:04,233 --> 00:00:07,966
-hôm nay mình sẽ chơi một game tên là Florence
+00:00:03,700 --> 00:00:05,000
+chào chị em khỏe
 
 3
-00:00:10,933 --> 00:00:11,866
-trò chơi mới
+00:00:05,533 --> 00:00:07,466
+chị có khỏe không?
 
 4
-00:00:19,033 --> 00:00:22,066
-chương một cuộc sống trưởng thành
+00:00:07,466 --> 00:00:09,733
+ chị khỏe cảm ơn em 
 
 5
-00:00:27,666 --> 00:00:36,066
-Florence Yeoh 25 tuổi, cô ấy đang ngủ cô ấy đang ngủ
+00:00:11,500 --> 00:00:15,500
+chị tên là Diệp em tên là gì?
 
 6
-00:00:36,966 --> 00:00:40,100
-bây giờ là 7 giờ rồi bây giờ là 7 giờ rồi
+00:00:17,566 --> 00:00:23,266
+em tên là Linh em 24 tuổi, chị bao nhiêu tuổi?
 
 7
-00:00:40,900 --> 00:00:45,266
-đây là đồng hồ báo thức đồng hồ báo thức
+00:00:24,766 --> 00:00:27,666
+chị năm nay 33 tuổi
 
 8
-00:00:46,100 --> 00:00:50,100
-đồng hồ báo thức đang rung rung rung và đang kêu
+00:00:29,766 --> 00:00:34,666
+ thế là chị lớn hơn em chín tuổi đúng không?
 
 9
-00:00:51,033 --> 00:00:53,466
-bây giờ mình cần tắt đồng hồ báo thức
+00:00:34,966 --> 00:00:37,333
+đúng đúng chị lớn hơn em chín tuổi
 
 10
-00:00:54,133 --> 00:00:55,366
-tắt đồng hồ báo thức
+00:00:38,133 --> 00:00:40,066
+vậy là em sinh năm bao nhiêu
 
 11
-00:00:59,133 --> 00:01:01,866
-Florence không ngủ dậy không ngủ dậy
+00:00:42,166 --> 00:00:45,300
+em sinh 2001 
 
 12
-00:01:02,133 --> 00:01:03,533
-Florence tiếp tục ngủ
+00:00:47,100 --> 00:00:54,000
+vậy là em lớn hơn ờ em gái của chị 2 tuổi 
 
 13
-00:01:04,133 --> 00:01:07,833
-và đồng hồ báo thức bây giờ là 07:15 phút
+00:00:54,000 --> 00:00:58,133
+ em gái của chị sinh năm hai nghìn không trăm lẻ ba
 
 14
-00:01:08,433 --> 00:01:12,166
-đồng hồ báo thức tiếp tục kêu mình sẽ tắt
+00:00:59,500 --> 00:01:03,500
+hay  hai nghìn không trăm linh ba
 
 15
-00:01:16,533 --> 00:01:19,066
-bây giờ là 07:30 phút
+00:01:03,500 --> 00:01:06,200
+chị sinh năm một nghìn chín trăm chín mươi hai
 
 16
-00:01:20,433 --> 00:01:24,966
-ờ Florence đang ở trong nhà tắm mình nghĩ là thế
+00:01:07,700 --> 00:01:12,900
+à ừm vậy thì chị lớn hơn anh của em một tuổi
 
 17
-00:01:25,700 --> 00:01:28,300
-Florence đang chuẩn bị đánh răng
+00:01:13,366 --> 00:01:19,866
+a thế hả? thế là anh của em sinh 1993 đúng không?
 
 18
-00:01:28,666 --> 00:01:31,033
-đánh răng mình sẽ đánh răng đánh răng đánh răng
+00:01:20,133 --> 00:01:21,200
+đúng rồi
 
 19
-00:01:32,333 --> 00:01:33,433
-đánh răng đánh răng
+00:01:21,366 --> 00:01:26,533
+à chồng của chị sinh 1993
 
 20
-00:01:38,266 --> 00:01:41,066
-bây giờ là 08:15 phút 
+00:01:27,266 --> 00:01:29,800
+chị lớn hơn chồng chị một tuổi
 
 21
-00:01:41,066 --> 00:01:46,433
-bây giờ Florence đang ở trên tàu điện ngầm
+00:01:32,133 --> 00:01:35,066
+ à, em hiểu rồi
 
 22
-00:01:47,066 --> 00:01:49,366
-Florence đang ở trên tàu điện ngầm
+00:01:37,366 --> 00:01:40,100
+bạn trai của em sinh năm bao nhiêu?
 
 23
-00:01:49,766 --> 00:01:51,300
-cô ấy đang nghe nhạc
+00:01:42,300 --> 00:01:45,366
+ bạn trai của em sinh 2000 ( hai ngàn/ hai nghìn)
 
 24
-00:01:52,333 --> 00:01:54,300
-và đang lướt điện thoại
+00:01:46,066 --> 00:01:47,966
+lớn hơn em một tuổi
 
 25
-00:01:54,733 --> 00:01:57,766
-mình nghĩ đây giống như là Instagram mình nghĩ là thế
+00:01:47,966 --> 00:01:50,100
+ à rồi ô kê ô kê ô kê
 
 26
-00:01:58,266 --> 00:02:01,666
-cô ấy vừa nghe nhạc vừa xem Instagram
+00:01:51,133 --> 00:01:55,533
+công việc của chị là giáo viên tiếng Việt
 
 27
-00:02:03,633 --> 00:02:04,933
-mình sẽ thích cái này
+00:01:56,366 --> 00:01:59,733
+chị dạy tiếng Việt ở trên Preply
 
 28
-00:02:05,900 --> 00:02:09,966
-mình sẽ thích cái này mình cũng sẽ thích cái này
+00:02:00,900 --> 00:02:06,100
+em thì sao? Công việc của em là gì? Em làm việc gì?
 
 29
-00:02:11,100 --> 00:02:14,966
-ảnh con chó rất dễ thương mình sẽ chia sẻ cái này
+00:02:08,333 --> 00:02:12,833
+em vừa làm giáo viên tiếng Việt trên Preply 
 
 30
-00:02:17,233 --> 00:02:18,300
-mình sẽ thích cái này
+00:02:12,833 --> 00:02:15,733
+vừa làm ở trung tâm tiếng Anh
 
 31
-00:02:19,666 --> 00:02:20,633
-mình sẽ thích cái này
+00:02:16,200 --> 00:02:18,166
+ừm rồi rất tốt rất tốt
 
 32
-00:02:25,166 --> 00:02:27,666
-bây giờ là 9 giờ bây giờ là 9 giờ
+00:02:18,800 --> 00:02:25,833
+chị nghĩ là chị dạy tiếng Việt ở Preply khoảng 4 năm rồi 
 
 33
-00:02:28,166 --> 00:02:31,133
-và Florence đang ở công ty
+00:02:25,833 --> 00:02:29,333
+chị nghĩ là khoảng 4 năm rồi
 
 34
-00:02:31,733 --> 00:02:32,866
-đang ở chỗ làm
+00:02:29,966 --> 00:02:36,333
+ còn em thì sao? em dạy ở Preply bao lâu rồi
 
 35
-00:02:33,900 --> 00:02:37,100
-cô ấy đang làm việc cô ấy đang làm việc
+00:02:37,100 --> 00:02:40,466
+và em làm việc ở trung tâm bao lâu rồi?
 
 36
-00:02:38,866 --> 00:02:42,033
-bây giờ mình sẽ làm việc
+00:02:42,800 --> 00:02:48,133
+em tạo tài khoản trên Preply vào tháng 2
 
 37
-00:02:42,033 --> 00:02:45,633
- 77 đô 77 đô ô kê 100 
+00:02:48,600 --> 00:02:53,466
+và có học sinh đầu tiên vào tháng 6
 
 38
-00:02:45,633 --> 00:02:47,900
-7 đô và 7 đô này
+00:02:54,533 --> 00:02:58,033
+tháng 6 năm nay đúng không? năm nay đúng không?
 
 39
-00:02:47,900 --> 00:02:50,466
- 3 đô và 3 đô nè 
+00:02:58,033 --> 00:02:59,466
+ dạ dạ đúng rồi chị
 
 40
-00:02:50,466 --> 00:02:52,600
-31 đô và 31 đô
+00:02:59,600 --> 00:03:00,400
+đúng rồi
 
 41
-00:02:53,666 --> 00:02:55,533
-đã xong đã làm việc xong
+00:03:00,766 --> 00:03:05,000
+và em cũng bắt đầu làm việc ở trung tâm tiếng Anh 
 
 42
-00:02:56,933 --> 00:02:59,500
-02:30 ừm
+00:03:05,000 --> 00:03:06,566
+từ tháng 6 năm nay
 
 43
-00:03:01,100 --> 00:03:04,333
-mẹ của Florence đang gọi điện cho cô ấy 
+00:03:07,100 --> 00:03:10,266
+a rồi rồi ô kê rất tốt rất tốt thế
 
 44
-00:03:05,300 --> 00:03:08,066
-nghe hay không nghe ừm mình sẽ nghe
+00:03:11,133 --> 00:03:13,933
+ trước khi em đi làm
 
 45
-00:03:08,333 --> 00:03:10,000
-mình sẽ nhấc máy mình sẽ nghe
+00:03:14,700 --> 00:03:16,533
+trước khi em đi làm ở Preply
 
 46
-00:03:17,033 --> 00:03:21,866
-vâng con biết, con bận, mình sẽ chọn vâng con biết
+00:03:17,400 --> 00:03:19,200
+trước khi em đi làm ở trung tâm
 
 47
-00:03:25,600 --> 00:03:29,100
-vâng con biết hay là vâng,  vâng con biết
+00:03:19,966 --> 00:03:23,166
+thì em học hay em làm cái gì khác? 
 
 48
-00:03:31,266 --> 00:03:35,000
-à nói chuyện với mẹ sau, không muốn nói chuyện nữa
+00:03:25,733 --> 00:03:31,166
+trước đó khi em ra trường là tốt nghiệp đại học
 
 49
-00:03:35,400 --> 00:03:37,966
-nói chuyện với mẹ sau hay là vâng 
+00:03:32,000 --> 00:03:36,966
+thì em đi làm ở công ty một thời gian
 
 50
-00:03:37,966 --> 00:03:39,600
-mình sẽ vâng
+00:03:37,966 --> 00:03:38,766
+là 3 tháng
 
 51
-00:03:39,600 --> 00:03:43,200
- vâng con biết hay con ổn 
+00:03:41,466 --> 00:03:48,333
+sau đó em dành một năm để học IELTS 
 
 52
-00:03:43,200 --> 00:03:45,033
-vâng con biết
+00:03:48,733 --> 00:03:51,066
+thế là em đi học đại học đúng không 
 
 53
-00:03:51,066 --> 00:03:54,700
-08:30 Florence đang làm gì
+00:03:51,333 --> 00:03:53,100
+thế em học ngành gì?
 
 54
-00:03:55,433 --> 00:03:59,000
-Florence đang xem phim và đang ăn tối
+00:03:53,933 --> 00:03:54,900
+em học ngành gì?
 
 55
-00:04:00,133 --> 00:04:03,933
-ờ cô ấy vừa xem phim vừa ăn tối
+00:03:56,866 --> 00:03:59,066
+em học ngành kiểm toán
 
 56
-00:04:04,800 --> 00:04:08,200
-ờ cô ấy đang ngồi ở trên ghế sô pha
+00:03:59,666 --> 00:04:03,500
+à rồi, chị biết kiểm toán ô kê ô kê
 
 57
-00:04:09,100 --> 00:04:12,333
-cô ấy ngồi ở trên ghế sô pha và ăn tối
+00:04:03,933 --> 00:04:06,533
+thế khi em học xong ngành kiểm toán
 
 58
-00:04:13,266 --> 00:04:17,900
-cô ấy vừa xem phim và vừa ăn tối cô ấy đang ăn sushi
+00:04:07,466 --> 00:04:11,066
+em đi làm ở công ty kiểm toán đúng không
 
 59
-00:04:18,300 --> 00:04:20,633
-mình nghĩ là cô ấy đang ăn sushi hay là sushi
+00:04:12,166 --> 00:04:13,133
+đúng rồi chị 
 
 60
-00:04:21,900 --> 00:04:24,633
-ăn 1 miếng sushi ăn 2 miếng
+00:04:13,133 --> 00:04:17,566
+ừm rồi vậy em đi làm ở công ty kiểm toán 3 tháng 
 
 61
-00:04:25,466 --> 00:04:28,733
-3 miếng 4 miếng 5 miếng
+00:04:17,566 --> 00:04:18,233
+3 tháng
 
 62
-00:04:29,633 --> 00:04:32,833
-6 miếng 7 miếng 8 miếng
+00:04:18,233 --> 00:04:19,966
+ ồ rất tốt rất tốt
 
 63
-00:04:32,833 --> 00:04:35,900
- ừm no quá! ăn xong rồi
+00:04:20,333 --> 00:04:24,700
+thế tại sao em chỉ làm ở công ty kiểm toán 3 tháng
 
 64
-00:04:37,666 --> 00:04:40,666
-bây giờ là 11:50
+00:04:27,533 --> 00:04:31,300
+tại vì em không thích công việc kiểm toán
 
 65
-00:04:41,266 --> 00:04:42,733
-Florence đang ở đâu
+00:04:32,933 --> 00:04:33,866
+ô kê ô kê
 
 66
-00:04:43,600 --> 00:04:48,533
-bây giờ Florence đang ở nhà tắm hay nhà vệ sinh
+00:04:35,300 --> 00:04:39,633
+thế em làm ở đó 3 tháng và em học đại học trong 4 năm
 
 67
-00:04:49,466 --> 00:04:52,000
-và bây giờ cô ấy sẽ làm gì
+00:04:39,633 --> 00:04:40,466
+đúng không?
 
 68
-00:04:53,666 --> 00:04:56,133
-bây giờ cô ấy sẽ đánh răng
+00:04:43,300 --> 00:04:48,300
+thế tại sao em lại quyết định học ngành kiểm toán?
 
 69
-00:04:56,533 --> 00:04:58,466
-đánh răng đánh răng đánh răng đánh răng đánh răng
+00:04:52,133 --> 00:04:55,066
+tại vì lúc thi đại học
 
 70
-00:05:06,033 --> 00:05:11,200
-là 12:20 mình nghĩ là thế 12:20
+00:04:55,933 --> 00:04:58,100
+em chưa biết mình thích gì
 
 71
-00:05:15,033 --> 00:05:19,700
-bây giờ là 12:20 cô ấy đang ngủ
+00:04:58,800 --> 00:05:01,366
+à giống giống chị giống chị giống chị
 
 72
-00:05:20,500 --> 00:05:23,500
-cô ấy đang ngủ ô kê đã xong
+00:05:03,200 --> 00:05:06,866
+gia đình em tư vấn cho em ngành kiểm toán à
 
 73
-00:05:27,933 --> 00:05:33,066
-chương 2 ký ức ừm ký ức,  mình sẽ kéo lên
+00:05:06,866 --> 00:05:09,200
+ nên em quyết định theo học
 
 74
-00:05:33,733 --> 00:05:38,433
-cô ấy đang làm gì, cô ấy đang dùng máy hút bụi
+00:05:09,900 --> 00:05:10,700
+à rồi
 
 75
-00:05:39,300 --> 00:05:42,600
-để hút bụi, cô ấy đang dọn nhà
+00:05:11,133 --> 00:05:12,733
+lúc em thi đại học đúng không
 
 76
-00:05:43,100 --> 00:05:46,300
-cô ấy đang hút bụi. Đây là máy hút bụi hút bụi
+00:05:12,766 --> 00:05:14,366
+là khi đó em 18 tuổi
 
 77
-00:05:50,033 --> 00:05:53,633
-sau khi dùng máy hút bụi xong, sau khi dùng xong
+00:05:15,133 --> 00:05:16,533
+thì em không biết em thích cái gì
 
 78
-00:05:54,433 --> 00:05:57,700
-cô ấy  mang máy hút bụi cất đi
+00:05:17,100 --> 00:05:21,700
+và gia đình thì nói em là em nên học kiểm toán ô kê
 
 79
-00:05:57,866 --> 00:06:00,933
-mang cất máy hút bụi đi cất vào trong cái phòng này
+00:05:22,300 --> 00:05:23,633
+tại sao lại là kiểm toán?
 
 80
-00:06:01,133 --> 00:06:02,633
-cô ấy cất máy hút bụi đi
+00:05:24,033 --> 00:05:27,900
+trong gia đình của em có ai làm kiểm toán không?
 
 81
-00:06:03,233 --> 00:06:06,466
-và trong phòng này có rất nhiều thứ
+00:05:30,666 --> 00:05:31,466
+không có luôn
 
 82
-00:06:07,333 --> 00:06:11,300
-trong phòng này có rất nhiều thứ và có một cái hộp 
+00:05:32,733 --> 00:05:38,733
+nhưng mà lúc đó bạn gái của anh em làm kiểm toán 
 
 83
-00:06:12,766 --> 00:06:17,366
-đổ lên trên người Florence, đổ lên trên người Florence
+00:05:38,966 --> 00:05:43,466
+rồi rồi rồi chị hiểu chị hiểu ô kê rất tốt rất tốt ờ ờm
 
 84
-00:06:19,800 --> 00:06:24,433
-có rất nhiều hộp ở trên sàn có rất nhiều hộp ở trên sàn
+00:05:44,266 --> 00:05:45,833
+khi chị đi học đại học
 
 85
-00:06:28,233 --> 00:06:30,633
-đây là một cái hộp màu hồng
+00:05:46,433 --> 00:05:50,066
+chị học ngành tài chính kế toán 
 
 86
-00:06:31,600 --> 00:06:35,100
-màu hồng và trong hộp có rất nhiều thứ
+00:05:51,466 --> 00:05:56,333
+nhưng mà chị chưa bao giờ đi làm tài chính kế toán
 
 87
-00:06:36,266 --> 00:06:38,933
-mình sẽ xem trong hộp có cái gì
+00:05:57,066 --> 00:06:01,066
+tại vì chị đi học đại học 4 năm đúng không 
 
 88
-00:06:41,633 --> 00:06:45,000
-cô ấy đang xem một tờ giấy
+00:06:01,300 --> 00:06:02,933
+thế thì đến năm thứ 3
 
 89
-00:06:45,933 --> 00:06:50,266
-đây là một tờ giấy cô ấy đang nhìn vào một tờ giấy
+00:06:03,466 --> 00:06:05,533
+chị biết là chị không thích cái ngành này rồi
 
 90
-00:06:52,333 --> 00:06:53,700
-trong tờ giấy có cái gì
+00:06:06,066 --> 00:06:07,733
+chị biết là chị không thích cái ngành này rồi
 
 91
-00:06:59,433 --> 00:07:02,800
-đây là Florence 7 tuổi khi cô ấy 7 tuổi
+00:06:08,100 --> 00:06:11,666
+nên chị chưa bao giờ đi làm ngành tài chính kế toán
 
 92
-00:07:03,266 --> 00:07:04,200
-cô ấy đang làm gì
+00:06:12,266 --> 00:06:16,133
+ô kê em có nói là bạn gái của anh trai em
 
 93
-00:07:05,600 --> 00:07:07,266
-cô ấy đang cắt giấy
+00:06:16,933 --> 00:06:18,700
+làm kiểm toán đúng không
 
 94
-00:07:08,233 --> 00:07:10,900
-giấy này không phải là giấy bình thường
+00:06:20,300 --> 00:06:24,033
+thế gia đình của em có bao nhiêu người?
 
 95
-00:07:11,733 --> 00:07:15,933
-giấy này là giấy màu đây giấy này có màu vàng
+00:06:24,700 --> 00:06:25,966
+em có mấy anh trai?
 
 96
-00:07:17,100 --> 00:07:21,300
-giấy này có màu vàng giấy này có màu xanh da trời
+00:06:26,333 --> 00:06:30,133
+em có em trai chị gái hay em gái không?
 
 97
-00:07:22,333 --> 00:07:23,666
-giấy này có màu hồng
+00:06:31,900 --> 00:06:35,833
+gia đình của em có 4 người 
 
 98
-00:07:24,600 --> 00:07:29,533
-và giấy này có màu xanh lá cây cô ấy đang cắt giấy màu
+00:06:35,833 --> 00:06:39,333
+ ba mẹ anh trai và em
 
 99
-00:07:30,666 --> 00:07:35,833
-và đây là đây là một cái lọ keo dán keo dán
+00:06:39,666 --> 00:06:40,666
+à rồi rồi rồi
 
 100
-00:07:36,666 --> 00:07:38,833
-sau khi Florence cắt giấy xong
+00:06:40,833 --> 00:06:44,333
+ngoài anh trai thì em không có anh chị em nào khác
 
 101
-00:07:39,333 --> 00:07:42,300
-thì em ấy sẽ dùng cái này
+00:06:44,900 --> 00:06:47,533
+à rồi rồi rồi rồi rồi chị hiểu chị hiểu
 
 102
-00:07:42,466 --> 00:07:46,600
-dùng cái keo này để dán vào tờ giấy này ừm
+00:06:48,100 --> 00:06:49,300
+em có thể hỏi chị
 
 103
-00:07:46,900 --> 00:07:49,466
-sau khi em ấy cắt giấy màu xong
+00:06:50,466 --> 00:06:55,966
+à nhà nhà chị thì sao? chị có mấy anh chị em?
 
 104
-00:07:50,100 --> 00:07:54,400
-em ấy sẽ dùng keo dán để dán giấy vào đây
+00:06:56,566 --> 00:07:00,700
+gia đình của chị thì lớn hơn gia đình của em một chút
 
 105
-00:07:54,733 --> 00:07:55,533
-dán giấy vào đây
+00:07:01,366 --> 00:07:03,500
+gia đình của chị có năm người
 
 106
-00:08:01,500 --> 00:08:04,600
-a đây là một cái thuyền đây là một cái thuyền
+00:07:04,266 --> 00:07:11,700
+có bố mẹ chị, chị có 2 em một em trai và một em gái
 
 107
-00:08:05,266 --> 00:08:07,700
-ô kê mình cần dán giấy vào cái thuyền
+00:07:12,866 --> 00:07:22,233
+em gái của chị sinh 2003 em trai của chị sinh 2007
 
 108
-00:08:07,933 --> 00:08:10,200
-mình cần dán giấy màu vào cái thuyền
+00:07:25,633 --> 00:07:30,233
+vậy là em trai của chị ít hơn chị rất nhiều tuổi
 
 109
-00:08:20,600 --> 00:08:22,133
-mình sẽ dán giấy vào đây
+00:07:30,866 --> 00:07:36,033
+đúng đúng đúng em trai của chị ít hơn chị 15 tuổi
 
 110
-00:08:24,633 --> 00:08:25,800
-ôi rất dễ thương
+00:07:36,933 --> 00:07:39,033
+đúng 15 tuổi rất nhiều
 
 111
-00:08:32,466 --> 00:08:34,533
-xong mình dán xong rồi mình dán xong rồi
+00:07:39,500 --> 00:07:42,100
+thế là em trai của chị có thể là con chị
 
 112
-00:08:34,833 --> 00:08:36,900
-thuyền của mình có rất nhiều màu
+00:07:46,033 --> 00:07:48,200
+vậy lúc chị ra nước ngoài
 
 113
-00:08:37,600 --> 00:08:38,400
-màu hồng
+00:07:48,766 --> 00:07:50,766
+thì em trai chị bao nhiêu tuổi
 
 114
-00:08:39,300 --> 00:08:40,600
-màu xanh lá cây
+00:07:51,400 --> 00:07:53,566
+trời ơi lúc mà chị đi Argentina
 
 115
-00:08:41,466 --> 00:08:47,033
-màu xanh da trời màu vàng màu xanh lá cây màu hồng
+00:07:54,000 --> 00:07:58,033
+chị nghĩ là chị khoảng 24 hay 25 tuổi gì đó
 
 116
-00:08:47,900 --> 00:08:51,333
-màu này mình nghĩ là màu xanh lam mình nghĩ là thế
+00:07:58,933 --> 00:07:59,733
+ờ
 
 117
-00:08:51,900 --> 00:08:55,866
-còn màu này thì là màu tím mình nghĩ là màu tím đã xong
+00:08:00,166 --> 00:08:01,033
+chị nghĩ là thế
 
 118
-00:09:00,300 --> 00:09:01,300
-đây là con gì
+00:08:01,733 --> 00:08:04,533
+có thể là 25 tuổi đi có thể là 25 tuổi
 
 119
-00:09:02,000 --> 00:09:03,433
-đây là con bướm
+00:08:05,200 --> 00:08:08,300
+thì khi đó em trai chị rất nhỏ vẫn là trẻ con thôi
 
 120
-00:09:03,866 --> 00:09:07,333
-bây giờ mình cần dán giấy màu vào con bướm
+00:08:08,700 --> 00:08:10,166
+nó chắc là khoảng 10 tuổi
 
 121
-00:09:08,000 --> 00:09:11,900
-mình sẽ dán giấy màu vào con bướm
+00:08:10,366 --> 00:08:12,233
+rất nhỏ rất nhỏ trông giống trẻ con
 
 122
-00:09:15,466 --> 00:09:19,833
-dán giấy màu vào con bướm
+00:08:12,533 --> 00:08:14,733
+bây giờ nó lớn hơn rồi bây giờ nó lớn hơn rồi
 
 123
-00:09:25,066 --> 00:09:28,900
-rất dễ thương a ôi rất đẹp rất đẹp rất đẹp
+00:08:15,033 --> 00:08:16,400
+bây giờ nó 17 tuổi rồi
 
 124
-00:09:29,900 --> 00:09:33,000
-cũng có rất nhiều màu ở đây màu hồng
+00:08:16,966 --> 00:08:18,933
+thì là người lớn rồi 
 
 125
-00:09:34,300 --> 00:09:38,633
-màu xanh lá cây màu xanh da trời màu vàng
+00:08:21,033 --> 00:08:27,600
+vậy chị có thường xuyên gọi điện cho em chị không ?
 
 126
-00:09:41,300 --> 00:09:43,066
-đã xong đã dán giấy xong
+00:08:28,100 --> 00:08:30,800
+chị thường nhắn tin cho em gái của chị
 
 127
-00:09:44,533 --> 00:09:46,866
-Florence đang cắt giấy màu 
+00:08:31,433 --> 00:08:33,833
+còn em trai của chị thì thường
 
 128
-00:09:47,333 --> 00:09:49,900
-đây là mẹ đây là mẹ của Florence
+00:08:33,933 --> 00:08:35,933
+chị gọi điện cho nó một tuần một lần
 
 129
-00:09:50,666 --> 00:09:56,533
-mẹ không muốn em ấy cắt giấy và dán giấy màu
+00:08:36,500 --> 00:08:39,500
+tại vì chị dạy nó tiếng Anh
 
 130
-00:09:56,900 --> 00:09:59,700
-mẹ muốn em ấy học bài học bài học bài
+00:08:39,933 --> 00:08:43,500
+tại vì em trai của chị cần học tiếng Anh
 
 131
-00:10:00,466 --> 00:10:01,933
-không muốn chơi muốn học bài
+00:08:44,133 --> 00:08:47,000
+thế nên là chị muốn giúp em trai của chị học tiếng Anh
 
 132
-00:10:11,500 --> 00:10:17,866
-4 cộng mấy bằng 18 4 cộng với 14
+00:08:47,833 --> 00:08:49,733
+sau sau lớp này với em 
 
 133
-00:10:19,533 --> 00:10:22,033
-4+14=18 
+00:08:49,733 --> 00:08:52,300
+là chị sẽ gọi điện cho em trai của chị
 
 134
-00:10:22,033 --> 00:10:28,533
-17 cộng mấy bằng 23 
+00:08:53,766 --> 00:08:55,733
+vậy là sau lớp này 
 
 135
-00:10:28,533 --> 00:10:35,366
-17 cộng với 6, 17+6=23 
+00:08:55,733 --> 00:08:59,966
+chị sẽ dạy tiếng Anh cho em trai của chị
 
 136
-00:10:35,366 --> 00:10:39,433
-15 cộng với số mấy thì bằng 21
+00:09:00,333 --> 00:09:02,233
+đúng đúng đúng chính xác chính xác chính xác
 
 137
-00:10:40,300 --> 00:10:44,700
-mình nghĩ là cộng với 6, 15+6=21
+00:09:02,566 --> 00:09:05,500
+thế sau lớp này thì em sẽ làm gì?
 
 138
-00:10:46,200 --> 00:10:47,133
-làm bài rất nhiều
+00:09:05,500 --> 00:09:05,766
+ em có lớp khác không?
 
 139
-00:10:50,233 --> 00:10:54,066
-không vui nữa mặt của Florence không vui nữa
+00:09:09,133 --> 00:09:13,200
+sau lớp này thì em không có lớp khác ừm
 
 140
-00:10:59,500 --> 00:11:00,300
-số tuổi
+00:09:13,200 --> 00:09:16,633
+ và em sẽ coi phim với bạn trai của em
 
 141
-00:11:00,666 --> 00:11:03,200
-ô không biết bao nhiêu tuổi đây là bao nhiêu tuổi
+00:09:16,633 --> 00:09:18,633
+ ờ rồi rất tốt rất tốt
 
 142
-00:11:03,933 --> 00:11:05,000
-mình không biết bao nhiêu tuổi
+00:09:19,100 --> 00:09:22,300
+thế em sẽ coi phim với bạn trai của em ở nhà
 
 143
-00:11:05,866 --> 00:11:08,833
-đây là Florence và bạn của em ấy
+00:09:23,133 --> 00:09:25,833
+hay là ở rạp chiếu phim
 
 144
-00:11:09,466 --> 00:11:13,400
-có lẽ khi này em ừm năm tuổi mình nghĩ là năm tuổi
+00:09:27,500 --> 00:09:30,633
+em sẽ mở Netflix và coi phim ở nhà
 
 145
-00:11:14,200 --> 00:11:16,700
-còn đây là cái đồng hồ đây là cái đồng hồ
+00:09:31,033 --> 00:09:32,300
+à rồi rất tốt
 
 146
-00:11:17,666 --> 00:11:19,266
-thời gian trôi qua
+00:09:32,633 --> 00:09:36,166
+ở nhà của em hay ở nhà của bạn trai của em
 
 147
-00:11:20,333 --> 00:11:21,600
-thời gian trôi qua
+00:09:37,700 --> 00:09:40,066
+em coi phim ở nhà của em
 
 148
-00:11:24,133 --> 00:11:25,933
-thời gian trôi qua
+00:09:40,066 --> 00:09:41,733
+ à rồi rồi rất tốt
 
 149
-00:11:29,066 --> 00:11:30,800
-bạn của em ấy lớn lên
+00:09:42,200 --> 00:09:43,733
+chị cũng có Netflix
 
 150
-00:11:31,733 --> 00:11:36,066
-Florence đã lớn lên bạn của em ấy cũng lớn lên và
+00:09:44,433 --> 00:09:50,200
+chị nghĩ là một tháng chị trả 11 đô cho Netflix
 
 151
-00:11:38,233 --> 00:11:40,433
-họ xa nhau xa nhau
+00:09:50,966 --> 00:09:53,633
+một tháng em trả bao nhiêu tiền cho Netflix
 
 152
-00:11:41,833 --> 00:11:43,933
-bạn bận hơn rồi bạn bận hơn
+00:09:55,766 --> 00:10:00,333
+ờ một tháng em trả khoảng 80.000 thôi chị 
 
 153
-00:11:44,100 --> 00:11:46,266
-bạn không chơi cùng Florence nữa
+00:10:00,333 --> 00:10:02,966
+Ui! Sao ít vậy?! Sao ít vậy?!
 
 154
-00:11:47,066 --> 00:11:48,833
-xa nhau họ xa nhau hơn
+00:10:03,600 --> 00:10:06,433
+ơ thế là em trả Netflix gì?
 
 155
-00:11:52,866 --> 00:11:55,300
-bây giờ, bây giờ thì em ấy một mình 
+00:10:06,433 --> 00:10:11,566
+ Netflix có 1 màn hình, 2 màn hình hay là 4 màn hình
 
 156
-00:11:55,300 --> 00:11:56,733
-em ấy dùng điện thoại
+00:10:13,500 --> 00:10:18,200
+ờ em chỉ sử dụng gói cá nhân là một màn hình
 
 157
-00:11:57,200 --> 00:11:58,266
-em ấy uống cà phê
+00:10:18,633 --> 00:10:20,600
+nên chắc là rẻ hơn
 
 158
-00:11:58,700 --> 00:11:59,600
-em ấy nghe nhạc
+00:10:21,600 --> 00:10:23,733
+trời ơi! Sao Netflix của chị đắt vậy!?
 
 159
-00:12:00,333 --> 00:12:02,033
-và em ấy không có bạn nữa
+00:10:26,400 --> 00:10:31,733
+chị nghĩ là có lẽ là vì ờ chị sống ở Argentina
 
 160
-00:12:02,700 --> 00:12:03,800
-em ấy không có bạn nữa
+00:10:32,233 --> 00:10:34,000
+thế nên chị cần phải trả nhiều tiền hơn
 
 161
-00:12:04,133 --> 00:12:05,500
-bây giờ không biết em ấy bao nhiêu tuổi
+00:10:34,766 --> 00:10:36,000
+nếu chị sống ở Việt Nam
 
 162
-00:12:05,733 --> 00:12:08,100
-có khi 20 tuổi mình nghĩ là 20 tuổi
+00:10:36,166 --> 00:10:38,100
+thì có lẽ chị cần trả ít tiền hơn
 
 163
-00:12:20,233 --> 00:12:22,933
-đây là cái giấy màu mà Florence dán
+00:10:38,766 --> 00:10:39,733
+ô kê ô kê ô kê
 
 164
-00:12:24,066 --> 00:12:27,100
-em ấy đang nhìn vào cái giấy màu mà em ấy dán
+00:10:41,033 --> 00:10:42,833
+chị trả nhiều tiền cho Netflix quá
 
 165
-00:12:27,433 --> 00:12:28,500
-khi em ấy còn nhỏ
+00:10:46,833 --> 00:10:52,100
+ngoài Netflix thì chị có trả trả những cái khoản phí 
 
 166
-00:12:30,000 --> 00:12:30,900
-đây là cái hộp
+00:10:52,100 --> 00:10:54,700
+xho nền tảng nào khác không?
 
 167
-00:12:34,500 --> 00:12:35,666
-và em ấy đang nghĩ
+00:10:55,500 --> 00:10:57,000
+ví dụ như là như là nghe nhạc
 
 168
-00:12:36,600 --> 00:12:39,100
-có lẽ em ấy đang uống trà và đang nghĩ
+00:10:57,733 --> 00:11:02,166
+nghe nhạc ở trên  Spotify ấy đúng không?
 
 169
-00:12:44,133 --> 00:12:46,900
-Chương 3: âm nhạc
+00:11:02,766 --> 00:11:05,900
+không không, chị thường nghe nhạc ở YouTube music
 
 170
-00:12:48,233 --> 00:12:49,033
-chơi nhạc
+00:11:06,400 --> 00:11:08,600
+và chị có trả YouTube premium
 
 171
-00:12:55,333 --> 00:12:59,400
-em ấy vừa nghe nhạc vừa xem điện thoại
+00:11:08,966 --> 00:11:11,300
+chị nghĩ là cái YouTube của chị là YouTube family
 
 172
-00:13:00,100 --> 00:13:01,033
-vừa xem điện thoại 
+00:11:11,700 --> 00:11:13,800
+hình như là 6 đô một tháng
 
 173
-00:13:01,033 --> 00:13:03,133
-ôi con chó rất dễ thương, mình sẽ chia sẻ
+00:11:15,233 --> 00:11:16,800
+ à, 6 đô thì rẻ
 
 174
-00:13:05,400 --> 00:13:06,700
-mình thích cái này
+00:11:17,300 --> 00:11:20,333
+ rẻ rẻ hả rẻ hả?
 
 175
-00:13:08,100 --> 00:13:08,900
-thích cái này
+00:11:21,133 --> 00:11:24,766
+thế em có có mua YouTube premium không?
 
 176
-00:13:10,533 --> 00:13:14,466
-người này cũng vừa nghe nhạc vừa xem điện thoại
+00:11:26,766 --> 00:11:27,566
+dạ không
 
 177
-00:13:16,833 --> 00:13:21,266
-Ui rất ngon! trông giống một salad mình sẽ chia sẻ
+00:11:28,000 --> 00:11:32,300
+thường thì em thích bài hát nào em sẽ mua trên
 
 178
-00:13:23,233 --> 00:13:23,833
-UI
+00:11:33,033 --> 00:11:35,200
+iTunes của iPhone
 
 179
-00:13:23,833 --> 00:13:27,100
-điện thoại của mình hết pin rồi mình không có pin nữa
+00:11:36,366 --> 00:11:40,300
+em sẽ mua và tải về nghe trên máy 
 
 180
-00:13:27,466 --> 00:13:28,466
-điện thoại hết pin rồi
+00:11:40,500 --> 00:11:42,866
+thế là em mua, mua nhạc ở iTunes 
 
 181
-00:13:29,300 --> 00:13:30,400
-không có pin nữa
+00:11:42,866 --> 00:11:45,033
+thế là em có iPhone đúng không
 
 182
-00:13:30,533 --> 00:13:33,000
-mình không thể tiếp tục xem điện thoại
+00:11:46,000 --> 00:11:47,466
+dạ, đúng rồi chị
 
 183
-00:13:33,400 --> 00:13:36,266
-mình không thể tiếp tục lướt Instagram
+00:11:48,166 --> 00:11:49,300
+chị không có iPhone
 
 184
-00:13:42,733 --> 00:13:44,433
-có một nốt nhạc ở đây
+00:11:50,100 --> 00:11:53,766
+chị dùng Android, điện thoại của chị là Motorola
 
 185
-00:13:49,533 --> 00:13:51,500
-mình nghe thấy tiếng nhạc
+00:11:56,100 --> 00:11:58,833
+em thấy hãng này 
 
 186
-00:14:04,233 --> 00:14:06,600
-Florence nghe thấy tiếng nhạc
+00:11:59,400 --> 00:12:02,166
+em nghe tên hãng này cũng lâu rồi 
 
 187
-00:14:08,133 --> 00:14:09,866
-em ấy rất thích cái nhạc này
+00:12:02,433 --> 00:12:05,733
+nhưng mà em chưa chưa gặp ai dùng hãng này bao giờ
 
 188
-00:14:12,633 --> 00:14:15,100
-em ấy cảm thấy như là em ấy đang bay
+00:12:06,433 --> 00:12:08,133
+ờ tại vì chị nghĩ là
 
 189
-00:14:15,600 --> 00:14:17,800
-đang bay em ấy cảm thấy như là em ấy đang bay
+00:12:08,966 --> 00:12:12,566
+ trước Kia là ở Việt Nam có Motorola
 
 190
-00:14:18,700 --> 00:14:22,600
-em ấy vừa nghe nhạc và cảm thấy như là em ấy đang bay 
+00:12:12,933 --> 00:12:14,166
+nhưng mà không hiểu tại sao
 
 191
-00:14:39,766 --> 00:14:43,266
-có một người đàn ông đang chơi đàn
+00:12:14,566 --> 00:12:17,766
+sau đó là Motorola không có bán ở Việt Nam nữa
 
 192
-00:14:44,466 --> 00:14:48,333
-đàn này là đàn gì mình không biết đàn này là đàn gì
+00:12:18,300 --> 00:12:19,566
+ở Việt Nam chỉ có Samsung
 
 193
-00:14:50,300 --> 00:14:54,300
-mình biết là đàn này không phải là đàn violong
+00:12:19,966 --> 00:12:23,200
+Huawei Xiaomi iPhone đúng không
 
 194
-00:14:54,833 --> 00:14:56,866
-nhưng mình không biết đàn này là đàn gì
+00:12:23,200 --> 00:12:26,733
+thế nhưng mà ở Argentina thì Motorola rất phổ biến
 
 195
-00:14:57,633 --> 00:14:59,900
-có một người đàn ông đang chơi đàn
+00:12:27,400 --> 00:12:32,566
+ở đây thì là Motorola rẻ hơn Samsung Samsung đắt hơn
 
 196
-00:15:02,266 --> 00:15:06,400
-và em ấy rất thích nghe cái nhạc của người đàn ông này
+00:12:33,366 --> 00:12:36,233
+iPhone là đắt nhất sau đó là Samsung
 
 197
-00:15:09,400 --> 00:15:11,200
-em ấy rất thích nhạc
+00:12:36,766 --> 00:12:39,000
+sau đó là Motorola 
 
 198
-00:15:12,033 --> 00:15:14,033
-âm nhạc âm nhạc em ấy rất thích nhạc
+00:12:40,966 --> 00:12:43,533
+vậy là chị qua bên Argentina
 
 199
-00:15:18,933 --> 00:15:20,600
-đây là các chương ừm 
+00:12:43,533 --> 00:12:46,133
+ và chị mua Motorola để dùng
 
 200
-00:15:20,600 --> 00:15:23,800
-màn một thì có chương 1 chương 2 chương 3
+00:12:46,733 --> 00:12:48,133
+đúng chính xác chính xác
 
 201
-00:15:24,633 --> 00:15:28,133
-chương một là cuộc sống trưởng thành của Florence
+00:12:48,633 --> 00:12:52,566
+trước kia khi chị ở Việt Nam thì chị thích dùng Sony
 
 202
-00:15:28,666 --> 00:15:31,066
-hơi chán một chút đúng không hơi chán hơi chán
+00:12:53,033 --> 00:12:57,900
+nhưng mà chị mua Sony và chị thấy là Sony hơi hơi
 
 203
-00:15:31,600 --> 00:15:33,300
-em ấy đánh răng
+00:12:58,133 --> 00:12:59,500
+hơi hơi đắt một chút xíu
 
 204
-00:15:34,233 --> 00:15:36,333
-em ấy đi tàu điện
+00:13:00,200 --> 00:13:03,533
+và chị bị, bị mất điện thoại này
 
 205
-00:15:37,033 --> 00:15:41,000
-ờm và vừa nghe nhạc vừa xem điện thoại
+00:13:03,566 --> 00:13:05,033
+thế sau đó là chị buồn quá
 
 206
-00:15:41,800 --> 00:15:45,233
-và sau đó em ấy đi làm em, em ấy nói chuyện với mẹ
+00:13:05,033 --> 00:13:07,033
+thế là chị không mua Sony nữa 
 
 207
-00:15:45,833 --> 00:15:46,800
-sau đó em về nhà
+00:13:07,566 --> 00:13:08,800
+chị à chị mua
 
 208
-00:15:47,466 --> 00:15:49,833
-và em đánh răng em đi ngủ
+00:13:09,433 --> 00:13:10,333
+à không, chị không mua
 
 209
-00:15:50,300 --> 00:15:53,233
-trước đó em ăn tối và xem ti vi ừm
+00:13:10,333 --> 00:13:13,300
+ mà chị dùng một cái điện thoại Samsung 
 
 210
-00:15:53,633 --> 00:15:56,266
-cuộc sống trưởng thành của Florence rất chán
+00:13:13,300 --> 00:13:15,100
+mà cậu của chị tặng chị 
 
 211
-00:15:56,400 --> 00:15:57,666
-mình nghĩ rất chán ừm
+00:13:15,233 --> 00:13:18,366
+còn sau đó là khi chị sang đây thì chị mua Motorola
 
 212
-00:15:58,600 --> 00:15:59,733
-sau đó là ký ức
+00:13:18,800 --> 00:13:22,300
+tại vì Motorola thì rẻ hơn Samsung rất nhiều 
 
 213
-00:16:00,133 --> 00:16:03,133
-ký ức là em ấy tìm thấy một cái hộp
+00:13:25,033 --> 00:13:28,800
+vậy chị thấy điện thoại Motorola xài có tốt không
 
 214
-00:16:03,533 --> 00:16:04,866
-sau đó em mở hộp ra
+00:13:29,200 --> 00:13:30,533
+chị nghĩ là rất tốt
 
 215
-00:16:05,466 --> 00:16:08,833
-và em nhìn thấy một cái tranh dán màu
+00:13:30,766 --> 00:13:32,833
+chị nghĩ là tùy người dùng
 
 216
-00:16:09,100 --> 00:16:10,900
-em ấy nhìn thấy một cái tranh dán màu
+00:13:33,566 --> 00:13:36,300
+tùy người xài tùy người dùng 
 
 217
-00:16:11,500 --> 00:16:14,733
-mà em ấy dán khi em ấy còn rất nhỏ ừm
+00:13:37,433 --> 00:13:41,933
+chị dùng một cái Motorola rất bình thường giá rất rẻ
 
 218
-00:16:15,233 --> 00:16:17,733
-sau đó là âm nhạc ừm 
+00:13:42,166 --> 00:13:44,800
+chị nghĩ là khoảng 200 đô gì đó 200 đô
 
 219
-00:16:17,733 --> 00:16:23,466
-khi em ấy vừa đi bộ vừa nghe nhạc vừa xem điện thoại
+00:13:45,333 --> 00:13:49,200
+chị dùng 3 năm rồi, nó rất tốt, không có vấn đề gì cả
 
 220
-00:16:24,100 --> 00:16:26,100
-nhưng mà em ấy bị hết pin
+00:13:49,833 --> 00:13:52,800
+nhưng mà em họ của chồng chị
 
 221
-00:16:26,666 --> 00:16:29,233
-thế nên là Florence không thể nghe nhạc
+00:13:53,966 --> 00:13:56,433
+cũng có cái Motorola giống như chị
 
 222
-00:16:29,833 --> 00:16:30,933
-không thể xem điện thoại nữa
+00:13:56,766 --> 00:13:58,600
+nhưng mà nó luôn luôn bị hỏng
 
 223
-00:16:31,800 --> 00:16:35,000
-và em ấy bắt đầu nghe thấy nhạc ừm
+00:13:59,133 --> 00:14:01,600
+thế nên chị nghĩ là tùy người dùng tùy người dùng
 
 224
-00:16:35,200 --> 00:16:36,666
-ai đó đang chơi nhạc
+00:14:01,900 --> 00:14:03,966
+nhưng mà chị nghĩ là Motorola cũng khá tốt
 
 225
-00:16:37,266 --> 00:16:39,600
-và em ấy đi bộ và em ấy nhìn thấy
+00:14:04,566 --> 00:14:05,966
+ít nhất là ở Argentina
 
 226
-00:16:40,000 --> 00:16:42,566
-một người đàn ông đang chơi nhạc 
+00:14:07,333 --> 00:14:08,800
+à em hiểu rồi 
 
 227
-00:16:42,566 --> 00:16:44,533
-và em ấy rất thích anh ấy
+00:14:08,800 --> 00:14:09,733
+à ô kê ờ 
 
 228
-00:16:44,666 --> 00:16:46,266
-mình nghĩ là em ấy rất thích anh ấy
+00:14:09,733 --> 00:14:14,333
+Ở Việt Nam thì người ta thường xài những hãng khác 
 
 229
-00:16:47,066 --> 00:16:50,800
-và em ấy rất thích âm nhạc anh ấy đang chơi ô kê
+00:14:14,566 --> 00:14:15,933
+những hãng mà chị nói
 
 230
-00:16:51,500 --> 00:16:55,633
-rất tốt!  mình sẽ tiếp tục chơi vào tuần sau
+00:14:16,566 --> 00:14:18,600
+ừm ừm đúng chị có bạn của chị 
 
 231
-00:16:55,933 --> 00:16:57,466
-hẹn gặp các bạn tuần sau 
+00:14:18,600 --> 00:14:21,833
+ hình như nó xài Xiaomi hay sao á 
 
 232
-00:16:57,466 --> 00:16:59,333
-cảm ơn các bạn đã xem! Chào bạn
+00:14:21,833 --> 00:14:25,833
+hay là ... ờ Xiaomi chị nghĩ là thế, chị nghĩ là thế
+
+233
+00:14:26,433 --> 00:14:29,533
+thế còn em thì em thích iPhone hả?
+
+234
+00:14:33,533 --> 00:14:38,100
+điện thoại đầu tiên của em là do anh trai em mua cho em
+
+235
+00:14:38,433 --> 00:14:41,766
+thì anh anh trai em dùng iPhone
+
+236
+00:14:42,233 --> 00:14:44,000
+nên cũng mua cho em iPhone
+
+237
+00:14:44,500 --> 00:14:48,533
+và em dùng iPhone từ đó tới bây giờ luôn 
+
+238
+00:14:49,133 --> 00:14:51,833
+vì em quen rồi đúng không? em quen rồi 
+
+239
+00:14:51,833 --> 00:14:53,033
+dạ đúng rồi chị
+
+240
+00:14:53,166 --> 00:14:55,700
+chị nghĩ là do thói quen á, do thói quen
+
+241
+00:14:56,366 --> 00:14:59,633
+nếu mà em đã dùng iPhone á thì em sẽ có thể là
+
+242
+00:15:00,200 --> 00:15:03,700
+không có lý do gì để đổi sang dùng Android
+
+243
+00:15:04,000 --> 00:15:05,966
+và chị quen dùng Android rồi
+
+244
+00:15:06,133 --> 00:15:08,700
+thế nên là chị cũng không muốn đổi sang iPhone
+
+245
+00:15:11,400 --> 00:15:14,966
+thế bình thường em thường dùng điện thoại để làm gì?
+
+246
+00:15:17,233 --> 00:15:21,733
+bình thường ở nhà thì em dùng để xem video
+
+247
+00:15:22,366 --> 00:15:25,266
+trên TikTok hoặc là YouTube 
+
+248
+00:15:25,266 --> 00:15:29,833
+ khi đi làm thì em dùng để liên lạc vớ iđồng nghiệp ừm
+
+249
+00:15:29,833 --> 00:15:33,100
+ để gọi điện đấy hả để nhắn tin đấy hả
+
+250
+00:15:33,200 --> 00:15:34,900
+gọi điện và nhắn tin đúng không?
+
+251
+00:15:35,300 --> 00:15:36,800
+dạ đúng rồi và nhắn tin
+
+252
+00:15:37,500 --> 00:15:41,666
+và có làm một số công việc khác ừm
+
+253
+00:15:41,666 --> 00:15:45,033
+ ví dụ như là trên Excel 
+
+254
+00:15:45,200 --> 00:15:46,400
+ở trên điện thoại ấy hả?
+
+255
+00:15:46,400 --> 00:15:48,166
+em dùng Excel ở trên điện thoại
+
+256
+00:15:48,633 --> 00:15:49,633
+oa giỏi vậy
+
+257
+00:15:52,000 --> 00:15:54,700
+cũng không có gì quá phức tạp 
+
+258
+00:15:54,700 --> 00:15:58,966
+chỉ chủ yếu là để điểm danh các học sinh 
+
+259
+00:16:01,600 --> 00:16:03,833
+bài ghi điểm, ghi điểm bài tập
+
+260
+00:16:04,600 --> 00:16:05,766
+à rồi rồi rồi rồi
+
+261
+00:16:05,933 --> 00:16:08,233
+tại vì Excel thì cái chị nghĩ là điện
+
+262
+00:16:08,433 --> 00:16:10,300
+màn hình của cái điện thoại ấy rất nhỏ
+
+263
+00:16:10,700 --> 00:16:13,400
+thế là thường chị không bao giờ dùng Excel 
+
+264
+00:16:13,400 --> 00:16:14,233
+ở trên điện thoại cả
+
+265
+00:16:14,600 --> 00:16:16,633
+chị dùng Excel ở trên a laptop
+
+266
+00:16:16,900 --> 00:16:19,700
+hay là trên máy tính bàn của chị 
+
+267
+00:16:20,000 --> 00:16:22,100
+chị có rất chị nghĩ là chị có rất nhiều
+
+268
+00:16:22,300 --> 00:16:23,566
+chị có máy tính bàn
+
+269
+00:16:24,166 --> 00:16:24,966
+chị có laptop
+
+270
+00:16:25,566 --> 00:16:28,033
+chị có một cái máy tính bảng 
+
+271
+00:16:28,033 --> 00:16:30,200
+ và chị có điện thoại nữa
+
+272
+00:16:32,633 --> 00:16:36,200
+vậy máy tính bảng của chị là của hãng nào
+
+273
+00:16:36,766 --> 00:16:39,733
+ờ chị mua máy tính bảng của Lenovo
+
+274
+00:16:43,500 --> 00:16:45,233
+máy tính bảng thì chị nghĩ là
+
+275
+00:16:46,700 --> 00:16:49,300
+Lenovo cũng cũng khá là ổn 
+
+276
+00:16:49,300 --> 00:16:51,733
+Lenovo thì rẻ hơn Samsung
+
+277
+00:16:52,566 --> 00:16:54,900
+còn Samsung thì rẻ hơn iPad
+
+278
+00:16:57,600 --> 00:17:00,733
+em em thì xài iPad
+
+279
+00:17:00,733 --> 00:17:03,466
+đúng, tại vì nếu mà em đã dùng Iphone rồi đúng không 
+
+280
+00:17:03,466 --> 00:17:05,033
+thì chắc chắn là em sẽ dùng Ipad nữa
+
+281
+00:17:06,300 --> 00:17:09,033
+thế em thường dùng Ipad để làm gì?
+
+282
+00:17:10,966 --> 00:17:18,133
+ờ cái iPad là của anh em mua để chỉnh sửa các video
+
+283
+00:17:18,133 --> 00:17:20,166
+ à em chỉnh sửa video
+
+284
+00:17:21,200 --> 00:17:24,833
+nhưng mà cái đó là anh em làm thôi
+
+285
+00:17:25,433 --> 00:17:27,833
+còn em thì chủ yếu dùng để xem YouTube
+
+286
+00:17:28,166 --> 00:17:29,900
+tại vì nó có màn hình rộng hơn
+
+287
+00:17:30,300 --> 00:17:31,500
+đúng đúng đúng đúng đúng
+
+288
+00:17:31,800 --> 00:17:34,333
+cái iPad của em màn hình bao nhiêu inch
+
+289
+00:17:38,333 --> 00:17:40,533
+em cũng không biết nó bao nhiêu inch nữa chị
+
+290
+00:17:41,533 --> 00:17:42,633
+ô kê ờ
+
+291
+00:17:42,800 --> 00:17:45,000
+màn hình thường á, chị nghĩ là thường bình thường
+
+292
+00:17:45,233 --> 00:17:47,166
+cái cái máy tính bảng bình thường
+
+293
+00:17:47,300 --> 00:17:50,566
+á thì là có màn hình khoảng 10 đến 11 inch ừm
+
+294
+00:17:52,333 --> 00:17:56,500
+ờ tại vì em cũng em chỉ sử dụng mà không
+
+295
+00:17:57,700 --> 00:18:01,400
+chú trọng quá đến cái những cái thông số của nó
+
+296
+00:18:01,833 --> 00:18:03,966
+à rồi thế em có laptop đúng không
+
+297
+00:18:04,400 --> 00:18:05,900
+chị nghĩ là em đang gọi chị
+
+298
+00:18:06,133 --> 00:18:08,400
+em đang gọi chị ở trên laptop đúng không
+
+299
+00:18:09,233 --> 00:18:10,033
+đúng rồi chị 
+
+300
+00:18:10,033 --> 00:18:12,200
+ờ thế laptop của em bao nhiêu inch
+
+301
+00:18:15,233 --> 00:18:16,200
+em cũng không biết
+
+302
+00:18:18,166 --> 00:18:19,233
+em cũng không biết ô kê
+
+303
+00:18:19,533 --> 00:18:21,833
+thế em nhìn cái bàn phím ở trên laptop ấy
+
+304
+00:18:22,100 --> 00:18:23,233
+bàn phím ở trên laptop
+
+305
+00:18:23,733 --> 00:18:26,300
+nếu mà bàn phím của em chỉ có chữ 
+
+306
+00:18:26,300 --> 00:18:29,600
+không có số ở bên cạnh thì thường chị nghĩ là
+
+307
+00:18:29,900 --> 00:18:31,600
+là laptop của em khoảng 14 inch
+
+308
+00:18:32,133 --> 00:18:34,833
+còn nếu mà có số á thì là khoảng 15 inch
+
+309
+00:18:35,700 --> 00:18:37,200
+chị nghĩ là thế ờ
+
+310
+00:18:37,700 --> 00:18:42,133
+thế thì cái của em có thể là 14 inch à rồi ô kê
+
+311
+00:18:42,566 --> 00:18:44,733
+thế thì 14 inch được khoảng như thế này đúng không
+
+312
+00:18:45,033 --> 00:18:49,000
+thì 10 11 inch là nhỏ hơn chút xíu như thế này 
+
+313
+00:18:49,233 --> 00:18:52,333
+cái cái cái máy tính bảng của chị là như thế rồi ô kê ô kê
+
+314
+00:18:53,033 --> 00:18:57,233
+ô kê thì chị thì thường dùng máy tính bảng để học và
+
+315
+00:18:58,433 --> 00:18:59,566
+và để xem phim
+
+316
+00:18:59,900 --> 00:19:02,600
+chị cũng dùng để học và để xem phim và xem YouTube nữa
+
+317
+00:19:03,033 --> 00:19:05,366
+tại vì chị có cái bút á cái bút để viết
+
+318
+00:19:06,033 --> 00:19:07,700
+viết ở trên máy tính bảng á
+
+319
+00:19:07,933 --> 00:19:09,666
+thế nên là có mấy cái quyển sách 
+
+320
+00:19:09,666 --> 00:19:12,600
+là chị có thể làm bài tập ở trên cái máy tính bảng luôn
+
+321
+00:19:13,100 --> 00:19:14,800
+chị không cần in ra nữa
+
+322
+00:19:16,366 --> 00:19:20,233
+em thấy có cái bút thì rất là tiện lợi 
+
+323
+00:19:20,300 --> 00:19:22,166
+em cũng có một cái bút  
+
+324
+00:19:22,166 --> 00:19:25,633
+nhưng mà lâu không dùng nên nó bị hư rồi
+
+325
+00:19:25,633 --> 00:19:26,333
+ ôi giời ơi!
+
+326
+00:19:26,900 --> 00:19:30,233
+cái bút đấy là bút của iPad hay là một cái bút khác
+
+327
+00:19:31,633 --> 00:19:35,733
+dạ bút của iPad mua nó cũng rất là đắt tiền
+
+328
+00:19:36,166 --> 00:19:37,433
+nhưng mà giờ nó đã bị hư
+
+329
+00:19:37,900 --> 00:19:41,133
+trời ơi sao bị hư vậy?! phí của vậy! phí tiền quá!
+
+330
+00:19:41,633 --> 00:19:42,800
+phí tiền quá tiếc tiền quá
+
+331
+00:19:45,200 --> 00:19:48,700
+dạ  tại vì không có dùng nhiều nên là 
+
+332
+00:19:48,700 --> 00:19:51,900
+bây giờ không có khởi động nó được nữa
+
+333
+00:19:52,433 --> 00:19:54,500
+à ô kê có thể là em cần đi sửa
+
+334
+00:19:55,033 --> 00:19:57,400
+ừm tại vì chị nghĩ là có iPad á
+
+335
+00:19:57,433 --> 00:19:59,700
+thì là em không cần phải in sách nhiều nữa
+
+336
+00:19:59,833 --> 00:20:01,800
+là em có thể viết ở trên iPad luôn
+
+337
+00:20:02,166 --> 00:20:03,600
+chị thấy là rất tiện rất tốt
+
+338
+00:20:03,766 --> 00:20:05,133
+chị rất thích học với iPad
+
+339
+00:20:07,233 --> 00:20:10,300
+chị thường coi gì trên YouTube?
+
+340
+00:20:10,900 --> 00:20:12,300
+chị thường coi mấy cái video
+
+341
+00:20:12,433 --> 00:20:13,800
+về set up của người khác ấy
+
+342
+00:20:13,833 --> 00:20:15,900
+tại vì chị thích mấy cái đồ dễ thương á
+
+343
+00:20:16,166 --> 00:20:18,200
+kiểu mấy mấy mấy cái set up màu á ờ
+
+344
+00:20:18,366 --> 00:20:20,400
+tại vì chị mua những cái thứ như thế ờ
+
+345
+00:20:21,900 --> 00:20:23,800
+ờ chị coi set up của người khác ờ
+
+346
+00:20:25,266 --> 00:20:29,600
+ờ nhưng mà hiện tại thì em chưa có phòng riêng ờ
+
+347
+00:20:29,833 --> 00:20:32,166
+nếu trong tương lai em có một phòng riêng
+
+348
+00:20:32,466 --> 00:20:35,466
+thì em sẽ set up màu xanh lá
+
+349
+00:20:35,633 --> 00:20:37,366
+màu xanh lá em thích màu xanh lá hả
+
+350
+00:20:37,866 --> 00:20:39,366
+ờ tại sao em thích màu xanh lá
+
+351
+00:20:41,466 --> 00:20:44,566
+tại vì em thấy nó dịu mắt và nó
+
+352
+00:20:45,400 --> 00:20:48,366
+em thích nó ngay từ khi còn nhỏ
+
+353
+00:20:48,800 --> 00:20:50,166
+á rồi rồi rồi
+
+354
+00:20:50,766 --> 00:20:53,700
+ờm từ khi còn nhỏ là chị thích màu tím cơ
+
+355
+00:20:54,066 --> 00:20:54,866
+chị thích màu tím
+
+356
+00:20:55,300 --> 00:20:57,700
+thế thế sau rồi bây giờ chuyển sang màu hồng
+
+357
+00:20:58,233 --> 00:20:59,633
+tên của chị là Diệp
+
+358
+00:21:00,300 --> 00:21:02,633
+ thế là Diệp là liên quan đến màu xanh lá
+
+359
+00:21:02,900 --> 00:21:03,700
+chị nghĩ là thế
+
+360
+00:21:04,233 --> 00:21:05,900
+đúng không ờ ờ
+
+361
+00:21:06,700 --> 00:21:08,300
+thế tên của em là Linh
+
+362
+00:21:08,600 --> 00:21:10,466
+thế Linh thì là liên quan đến cái gì ta
+
+363
+00:21:15,400 --> 00:21:19,733
+cũng không biết nhưng mà cái tên đệm của em là Diệu
+
+364
+00:21:21,666 --> 00:21:22,300
+Diệu Linh
+
+365
+00:21:22,300 --> 00:21:24,633
+trời ơi trước kia chị cũng có một bạn tên là Diệu Linh
+
+366
+00:21:24,700 --> 00:21:26,700
+nhưng mà chị cũng không biết nghĩa của nó là gì
+
+367
+00:21:27,100 --> 00:21:28,633
+chắc là lát nữa chị phải đi Google
+
+368
+00:21:29,266 --> 00:21:31,000
+chị phải đi Google ờ ô kê
+
+369
+00:21:31,800 --> 00:21:38,433
+mẹ em nói là đặt tên lót chữ diệu thì con gái sẽ dịu dàng 
+
+370
+00:21:38,900 --> 00:21:41,233
+Diệu là ở trong dịu dàng rồi rồi
+
+371
+00:21:41,866 --> 00:21:43,600
+con mèo của chị thấy chị đi học là
+
+372
+00:21:43,733 --> 00:21:45,266
+nó luôn luôn xuất hiện để chào
+
+373
+00:21:46,633 --> 00:21:50,133
+đến đây chào Linh đi chào Linh đi chào chị Linh
+
+374
+00:21:54,233 --> 00:21:56,066
+con mèo của chị bao nhiêu tuổi
+
+375
+00:21:56,666 --> 00:21:58,300
+con mèo của chị á chắc là
+
+376
+00:21:59,400 --> 00:22:00,333
+chưa đến một tuổi luôn
+
+377
+00:22:00,833 --> 00:22:03,066
+con mèo của chị 11 tháng chưa đến một tuổi
+
+378
+00:22:03,266 --> 00:22:04,066
+chưa đến một tuổi
+
+379
+00:22:05,100 --> 00:22:06,833
+vậy là chị mới nuôi nó
+
+380
+00:22:07,533 --> 00:22:09,933
+ờ ờ cũng cũng khá là nhỏ khá là mới
+
+381
+00:22:10,800 --> 00:22:13,500
+ờ chị nghĩ là hết giờ rồi! hết giờ rồi ô kê
+
+382
+00:22:13,933 --> 00:22:16,633
+cảm ơn em hôm nay đã nói chuyện với chị
+
+383
+00:22:17,233 --> 00:22:21,133
+cảm ơn em đã nói rất chậm để mọi người có thể nghe ờ
+
+384
+00:22:21,400 --> 00:22:22,233
+cảm ơn em rất nhiều
+
+385
+00:22:22,866 --> 00:22:25,533
+khi nào mà chị upload cái video này
+
+386
+00:22:25,933 --> 00:22:28,033
+thì chị sẽ gửi link cho em được chưa?
+
+387
+00:22:28,100 --> 00:22:28,933
+dạ, dạ
+
+388
+00:22:29,066 --> 00:22:31,833
+à ô kê cảm ơn em rất nhiều chào em
+
+389
+00:22:31,833 --> 00:22:33,266
+tam biệt chị
 
