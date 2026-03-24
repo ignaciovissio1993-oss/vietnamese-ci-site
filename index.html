@@ -458,6 +458,7 @@
     const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
     const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
     const CAPTIONS_DIR = "./captions";
+    const LOCAL_VIDEOS_PATH = "./data/videos.json";
 
     // Dictionary: will try these paths (first that exists wins)
     const DICT_CANDIDATES = [
@@ -554,6 +555,70 @@
         throw new Error(`HTTP ${res.status} ${text}`.slice(0,180));
       }
       return res.json();
+    }
+
+    function normalizePlaylistTitle(t){
+      return (t || "").trim().toLowerCase();
+    }
+
+    async function loadLocalVideos(){
+      try{
+        const res = await fetch(LOCAL_VIDEOS_PATH, {cache:"no-store"});
+        if(!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function mergeLocalVideos(localVideos){
+      if(!Array.isArray(localVideos) || !localVideos.length) return;
+
+      const existingById = new Set(allVideosDeduped.map(v => v.videoId));
+      const playlistByTitle = new Map(playlists.map(p => [normalizePlaylistTitle(p.title), p]));
+
+      for(const raw of localVideos){
+        if(!raw || typeof raw !== "object") continue;
+        const videoId = String(raw.videoId || "").trim();
+        const title = String(raw.title || "").trim();
+        const playlistName = String(raw.playlist || "").trim();
+        if(!videoId || !title || !playlistName) continue;
+        if(existingById.has(videoId)) continue;
+
+        let playlist = playlistByTitle.get(normalizePlaylistTitle(playlistName));
+        if(!playlist){
+          let baseId = `local:${playlistName.replace(/\s+/g," ").trim()}`;
+          let id = baseId;
+          let n = 2;
+          while(playlists.find(p => p.id === id)){
+            id = `${baseId}:${n++}`;
+          }
+          playlist = { id, title: playlistName };
+          playlists.push(playlist);
+          playlistByTitle.set(normalizePlaylistTitle(playlistName), playlist);
+        }
+
+        const v = {
+          videoId,
+          title,
+          thumb: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+          playlistId: playlist.id,
+          playlistTitle: playlist.title,
+          publishedAt: raw.published || ""
+        };
+
+        const list = videosByPlaylist.get(playlist.id) || [];
+        list.push(v);
+        videosByPlaylist.set(playlist.id, list);
+        allVideosDeduped.push(v);
+        existingById.add(videoId);
+      }
+
+      const prev = playlistFilter.value;
+      playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
+        playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
+      if(playlists.some(p => p.id === prev)) playlistFilter.value = prev;
     }
 
     // ========= Dictionary =========
@@ -1007,7 +1072,7 @@
     });
 
     // ========= YouTube Data API loading =========
-    async function loadPlaylists(){
+    async function loadPlaylists(extraVideos){
       if(!YT_API_KEY || YT_API_KEY.includes("PASTE_")){
         setStatus(false, "API key not set.", "Paste your restricted API key in index.html");
         return;
@@ -1059,6 +1124,7 @@
       }
       allVideosDeduped = flat;
 
+      mergeLocalVideos(extraVideos);
       setStatus(true, "Loaded from YouTube API.", `${allVideosDeduped.length} unique videos`);
       render();
     }
@@ -1113,7 +1179,8 @@
     // ========= Boot =========
     (async function init(){
       await loadDictionary();
-      try{ await loadPlaylists(); }
+      const localVideos = await loadLocalVideos();
+      try{ await loadPlaylists(localVideos); }
       catch(err){ setStatus(false, "Could not load from YouTube API.", err.message || String(err)); }
     })();
   </script>
