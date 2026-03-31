@@ -463,9 +463,15 @@
 
     const SUPABASE_URL = "https://fsfqykryknfdhrhiezew.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS";
-    const supabase = createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    const supabase = window.supabaseClient || (createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null);
 
     async function fetchPatreonUser() {
+      const existingUser = window.patreonUser || window.__patreonUser;
+      if (existingUser?.id) return existingUser;
+      if (window.patreonUserPromise) {
+        const awaitedUser = await window.patreonUserPromise;
+        if (awaitedUser?.id) return awaitedUser;
+      }
       const res = await fetch("/auth/me", { credentials: "include" });
       if (!res.ok) {
         throw new Error("Could not load Patreon user.");
