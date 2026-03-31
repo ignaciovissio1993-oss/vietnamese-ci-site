@@ -498,7 +498,7 @@
 
       const { data: created, error: createError } = await supabase
         .from("profiles")
-        .insert(payload)
+        .upsert(payload, { onConflict: "patreon_user_id" })
         .select("id")
         .single();
 
