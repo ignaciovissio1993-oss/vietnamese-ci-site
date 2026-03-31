@@ -1,0 +1,1180 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flashcards SRS - Supabase Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .card-flip {
+        perspective: 1200px;
+        width: 100%;
+      }
+      .card-flip-inner {
+        position: relative;
+        width: 100%;
+        min-height: 360px;
+        display: grid;
+        transform-style: preserve-3d;
+        transition: transform 420ms ease;
+      }
+      .card-flip-inner.is-flipped {
+        transform: rotateY(180deg);
+      }
+      .card-face {
+        position: relative;
+        grid-area: 1 / 1;
+        width: 100%;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        box-sizing: border-box;
+        word-break: break-word;
+      }
+      .card-face.card-back {
+        transform: rotateY(180deg);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+    <div id="root" class="p-4 md:p-8"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script type="text/babel">
+      const { useEffect, useMemo, useState } = React;
+      const { createClient } = window.supabase;
+
+      // =====================================================
+      // CONFIGURACIÃ“N
+      // 1) PegÃ¡ tu URL de Supabase
+      // 2) PegÃ¡ tu ANON / publishable key
+      // 3) PegÃ¡ el profile_id demo que vas a crear en la tabla profiles
+      // =====================================================
+      const SUPABASE_URL = 'https://fsfqykryknfdhrhiezew.supabase.co';
+      const SUPABASE_ANON_KEY = 'sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS';
+      const DEMO_PROFILE_ID = '11111111-1111-1111-1111-111111111111';
+      const DEFAULT_DECK_SLUG = 'vietnamese-core-a1';
+      const RESOLVED_PROFILE_ID = new URLSearchParams(window.location.search).get('profile_id') || DEMO_PROFILE_ID;
+
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // =========================
+      // Helpers
+      // =========================
+      const DAY = 24 * 60 * 60 * 1000;
+      const nowISO = () => new Date().toISOString();
+      const isDue = (iso) => !iso || new Date(iso).getTime() <= Date.now();
+      const fmtDateTime = (iso) => {
+        if (!iso) return 'now';
+        return new Intl.DateTimeFormat('en-US', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        }).format(new Date(iso));
+      };
+      const daysBetween = (a, b) => Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / DAY));
+
+      function uid(prefix = 'id') {
+        return `${prefix}_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
+      }
+
+      // =========================
+      // Scheduler estilo Anki-lite
+      // =========================
+      function previewScheduling(card, rating) {
+        const next = scheduleCard({ ...card }, rating, true);
+        return next.due_at;
+      }
+
+      function scheduleCard(card, rating, previewOnly = false) {
+        const currentState = card.state;
+        const prevDue = card.due_at || nowISO();
+        const now = new Date();
+        const out = { ...card };
+
+        const setDueMinutes = (m) => {
+          out.due_at = new Date(now.getTime() + m * 60 * 1000).toISOString();
+          out.scheduled_days = 0;
+        };
+        const setDueDays = (d) => {
+          out.due_at = new Date(now.getTime() + d * DAY).toISOString();
+          out.scheduled_days = d;
+        };
+
+        if (rating === 'again') {
+          out.lapses += currentState === 'review' ? 1 : 0;
+          out.state = currentState === 'review' ? 'relearning' : 'learning';
+          out.stability = Math.max(0, Number(out.stability || 0) * 0.5);
+          out.difficulty = Math.min(10, Number(out.difficulty || 5) + 0.8);
+          setDueMinutes(1);
+        } else if (currentState === 'new') {
+          if (rating === 'hard') {
+            out.state = 'learning';
+            out.stability = 1;
+            out.difficulty = 6;
+            setDueMinutes(10);
+          }
+          if (rating === 'good') {
+            out.state = 'learning';
+            out.stability = 2;
+            out.difficulty = 5;
+            setDueMinutes(15);
+          }
+          if (rating === 'easy') {
+            out.state = 'review';
+            out.stability = 4;
+            out.difficulty = 3.5;
+            setDueDays(4);
+          }
+        } else if (currentState === 'learning' || currentState === 'relearning') {
+          if (rating === 'hard') {
+            out.state = currentState;
+            out.stability = Math.max(1, Number(out.stability || 1) + 0.4);
+            out.difficulty = Math.min(10, Number(out.difficulty || 5) + 0.2);
+            setDueMinutes(20);
+          }
+          if (rating === 'good') {
+            out.state = 'review';
+            out.stability = Math.max(2, Number(out.stability || 2) + 1);
+            out.difficulty = Math.max(1, Number(out.difficulty || 5) - 0.2);
+            setDueDays(Math.max(1, Math.round(Number(out.stability))));
+          }
+          if (rating === 'easy') {
+            out.state = 'review';
+            out.stability = Math.max(3, Number(out.stability || 2) + 2);
+            out.difficulty = Math.max(1, Number(out.difficulty || 5) - 0.5);
+            setDueDays(Math.max(3, Math.round(Number(out.stability) + 2)));
+          }
+        } else if (currentState === 'review') {
+          const currentInterval = Math.max(1, Number(out.scheduled_days || daysBetween(out.last_review_at || prevDue, prevDue) || 1));
+          if (rating === 'hard') {
+            const nextInterval = Math.max(1, Math.round(currentInterval * 1.2));
+            out.stability = Math.max(2, Number(out.stability || currentInterval) + 0.5);
+            out.difficulty = Math.min(10, Number(out.difficulty || 5) + 0.15);
+            setDueDays(nextInterval);
+          }
+          if (rating === 'good') {
+            const nextInterval = Math.max(2, Math.round(currentInterval * 2.5));
+            out.stability = Math.max(nextInterval, Number(out.stability || currentInterval) * 1.4);
+            out.difficulty = Math.max(1, Number(out.difficulty || 5) - 0.1);
+            setDueDays(nextInterval);
+          }
+          if (rating === 'easy') {
+            const nextInterval = Math.max(4, Math.round(currentInterval * 3.5));
+            out.stability = Math.max(nextInterval, Number(out.stability || currentInterval) * 1.8);
+            out.difficulty = Math.max(1, Number(out.difficulty || 5) - 0.25);
+            setDueDays(nextInterval);
+          }
+        }
+
+        if (!previewOnly) {
+          out.reps = Number(out.reps || 0) + 1;
+          out.elapsed_days = card.last_review_at ? daysBetween(card.last_review_at, nowISO()) : 0;
+          out.last_review_at = nowISO();
+          out.updated_at = nowISO();
+        }
+
+        return out;
+      }
+
+      function getQueue(cards) {
+        const dueCards = cards.filter(c => c.state !== 'suspended' && isDue(c.due_at));
+        const newCards = dueCards.filter(c => c.state === 'new');
+        const learningCards = dueCards.filter(c => c.state === 'learning' || c.state === 'relearning');
+        const reviewCards = dueCards.filter(c => c.state === 'review');
+        return [...learningCards, ...reviewCards, ...newCards];
+      }
+
+      // =========================
+      // Supabase API
+      // =========================
+      async function ensureDemoProfile() {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', RESOLVED_PROFILE_ID)
+          .maybeSingle();
+
+        if (error) throw error;
+        return data;
+      }
+
+      async function loadDeckBySlug(slug, profileId) {
+        const { data, error } = await supabase
+          .from('decks')
+          .select('*')
+          .eq('slug', slug)
+          .eq('owner_id', profileId)
+          .eq('is_active', true)
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+
+      async function loadNotes(deckId, profileId) {
+        const { data, error } = await supabase
+          .from('notes')
+          .select('*, category:deck_categories(id, name)')
+          .eq('deck_id', deckId)
+          .eq('owner_id', profileId)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+      }
+
+      async function loadStudyCards(deckId, profileId) {
+        const { data, error } = await supabase
+          .from('cards')
+          .select(`
+            *,
+            note:notes!inner(
+              *,
+              category:deck_categories(id, name)
+            )
+          `)
+          .eq('deck_id', deckId)
+          .eq('note.owner_id', profileId)
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        return (data || []).map(normalizeStudyCard).filter(card => card.noteId);
+      }
+
+      async function loadCategories(deckId) {
+        const { data, error } = await supabase
+          .from('deck_categories')
+          .select('*')
+          .eq('deck_id', deckId)
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+      }
+
+      async function createCategory(deckId, name) {
+        const { data, error } = await supabase
+          .from('deck_categories')
+          .insert({ deck_id: deckId, name })
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      }
+
+      async function renameCategory(categoryId, name) {
+        const { error } = await supabase
+          .from('deck_categories')
+          .update({ name, updated_at: nowISO() })
+          .eq('id', categoryId);
+        if (error) throw error;
+      }
+
+      async function deleteCategory(categoryId) {
+        const { error } = await supabase
+          .from('deck_categories')
+          .delete()
+          .eq('id', categoryId);
+        if (error) throw error;
+      }
+
+      async function loadProgress(profileId, cardIds) {
+        if (!cardIds.length) return [];
+        const { data, error } = await supabase
+          .from('study_progress')
+          .select('*')
+          .eq('profile_id', profileId)
+          .in('card_id', cardIds);
+
+        if (error) throw error;
+        return data || [];
+      }
+
+      async function loadReviewLogs(profileId, limit = 20) {
+        const { data, error } = await supabase
+          .from('review_logs')
+          .select('*')
+          .eq('profile_id', profileId)
+          .order('reviewed_at', { ascending: false })
+          .limit(limit);
+
+        if (error) throw error;
+        return data || [];
+      }
+
+      async function createNoteWithCard(deckId, form, profileId) {
+        const { data: note, error: noteError } = await supabase
+          .from('notes')
+          .insert({
+            deck_id: deckId,
+            owner_id: profileId,
+            type: 'basic',
+            fields: {
+              front: form.front,
+              back: form.back,
+              example_vi: form.example_vi,
+              example_en: form.example_en,
+              hint: form.hint
+            },
+            category_id: form.category_id || null,
+            tags: parseTags(form.tags),
+            sort_order: Date.now()
+          })
+          .select('*, category:deck_categories(id, name)')
+          .single();
+
+        if (noteError) throw noteError;
+
+        const { data: card, error: cardError } = await supabase
+          .from('cards')
+          .insert({
+            note_id: note.id,
+            deck_id: deckId,
+            card_ord: 0,
+            template_name: 'Basic',
+            is_active: true
+          })
+          .select()
+          .single();
+
+        if (cardError) throw cardError;
+        return {
+          note,
+          card: normalizeStudyCard({ ...card, note })
+        };
+      }
+
+      async function updateNote(noteId, form, profileId) {
+        const { data, error } = await supabase
+          .from('notes')
+          .update({
+            fields: {
+              front: form.front,
+              back: form.back,
+              example_vi: form.example_vi,
+              example_en: form.example_en,
+              hint: form.hint
+            },
+            category_id: form.category_id || null,
+            tags: parseTags(form.tags),
+            updated_at: nowISO()
+          })
+          .eq('id', noteId)
+          .eq('owner_id', profileId)
+          .select('*, category:deck_categories(id, name)')
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+
+      async function deleteNoteCascade(noteId, profileId) {
+        const { data: cards, error: cardsError } = await supabase
+          .from('cards')
+          .select('id, note:notes!inner(owner_id)')
+          .eq('note_id', noteId)
+          .eq('note.owner_id', profileId);
+        if (cardsError) throw cardsError;
+
+        const cardIds = (cards || []).map(c => c.id);
+
+        if (cardIds.length) {
+          const { error: logsError } = await supabase
+            .from('review_logs')
+            .delete()
+            .in('card_id', cardIds);
+          if (logsError) throw logsError;
+
+          const { error: progressError } = await supabase
+            .from('study_progress')
+            .delete()
+            .in('card_id', cardIds);
+          if (progressError) throw progressError;
+
+          const { error: deleteCardsError } = await supabase
+            .from('cards')
+            .delete()
+            .in('id', cardIds);
+          if (deleteCardsError) throw deleteCardsError;
+        }
+
+        const { error: noteError } = await supabase
+          .from('notes')
+          .delete()
+          .eq('id', noteId)
+          .eq('owner_id', profileId);
+        if (noteError) throw noteError;
+
+        return { noteId, cardIds };
+      }
+
+      async function saveReview(profileId, card, nextCard, rating) {
+        const cardId = card?.cardId || card?.id;
+        if (!cardId) {
+          console.error('Missing real cards.id for review submission.', card);
+          throw new Error('Could not save the review because cards.id is missing.');
+        }
+
+        const reviewedAt = nowISO();
+        const progressPayload = {
+          profile_id: profileId,
+          card_id: cardId,
+          state: nextCard.state,
+          due_at: nextCard.due_at,
+          last_review_at: nextCard.last_review_at,
+          stability: nextCard.stability,
+          difficulty: nextCard.difficulty,
+          elapsed_days: nextCard.elapsed_days,
+          scheduled_days: nextCard.scheduled_days,
+          reps: nextCard.reps,
+          lapses: nextCard.lapses,
+          updated_at: reviewedAt
+        };
+
+        const { error: upsertError } = await supabase
+          .from('study_progress')
+          .upsert(progressPayload, { onConflict: 'profile_id,card_id' });
+        if (upsertError) throw upsertError;
+
+        const { error: logError } = await supabase
+          .from('review_logs')
+          .insert({
+            id: uid('rev'),
+            profile_id: profileId,
+            card_id: cardId,
+            reviewed_at: reviewedAt,
+            rating,
+            state_before: card.state,
+            state_after: nextCard.state,
+            due_before: card.due_at,
+            due_after: nextCard.due_at,
+            scheduled_days_before: card.scheduled_days,
+            scheduled_days_after: nextCard.scheduled_days,
+            elapsed_days: nextCard.elapsed_days
+          });
+        if (logError) throw logError;
+      }
+
+      function parseTags(raw) {
+        return (raw || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+      }
+
+      function sortCategories(items) {
+        return [...items].sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      function sortNotes(items) {
+        return [...items].sort((a, b) => {
+          const left = Number(a.sort_order || 0);
+          const right = Number(b.sort_order || 0);
+          if (left !== right) return left - right;
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        });
+      }
+
+      function sortStudyCards(items) {
+        return [...items].sort((a, b) => {
+          const left = Number(a.sort_order || 0);
+          const right = Number(b.sort_order || 0);
+          if (left !== right) return left - right;
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        });
+      }
+
+      function normalizeStudyCard(cardRow) {
+        const note = cardRow?.note || null;
+        const noteId = cardRow?.note_id || note?.id || null;
+        return {
+          ...cardRow,
+          cardId: cardRow?.id || null,
+          noteId,
+          note_id: noteId,
+          note
+        };
+      }
+
+      function emptyWordForm() {
+        return {
+          front: '',
+          back: '',
+          example_vi: '',
+          example_en: '',
+          hint: '',
+          tags: '',
+          category_id: ''
+        };
+      }
+
+      function StatPill({ label, value, tone }) {
+        const tones = {
+          blue: 'bg-blue-50 text-blue-700 border-blue-200',
+          amber: 'bg-amber-50 text-amber-700 border-amber-200',
+          emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          slate: 'bg-slate-50 text-slate-700 border-slate-200'
+        };
+        return (
+          <div className={`rounded-2xl border px-4 py-3 ${tones[tone || 'slate']}`}>
+            <div className="text-xs uppercase tracking-wide">{label}</div>
+            <div className="text-2xl font-bold mt-1">{value}</div>
+          </div>
+        );
+      }
+
+      function WordForm({ value, onChange, onSubmit, submitText, onCancel, categories }) {
+        return (
+          <div className="rounded-3xl border bg-white p-5 shadow-sm space-y-3">
+            <h3 className="text-lg font-semibold">{submitText === 'Save changes' ? 'Edit word' : 'Add word'}</h3>
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Vietnamita (front)" value={value.front} onChange={e => onChange({ ...value, front: e.target.value })} />
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Translation (back)" value={value.back} onChange={e => onChange({ ...value, back: e.target.value })} />
+            <select className="w-full rounded-2xl border px-4 py-3 bg-white" value={value.category_id || ''} onChange={e => onChange({ ...value, category_id: e.target.value })}>
+              <option value="">No category</option>
+              {(categories || []).map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Hint" value={value.hint} onChange={e => onChange({ ...value, hint: e.target.value })} />
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Vietnamese example" value={value.example_vi} onChange={e => onChange({ ...value, example_vi: e.target.value })} />
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="English example" value={value.example_en} onChange={e => onChange({ ...value, example_en: e.target.value })} />
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Comma-separated tags" value={value.tags} onChange={e => onChange({ ...value, tags: e.target.value })} />
+            <div className="flex flex-wrap gap-2">
+              <button onClick={onSubmit} className="rounded-2xl bg-blue-600 text-white px-4 py-3 font-medium">{submitText}</button>
+              {onCancel && <button onClick={onCancel} className="rounded-2xl border px-4 py-3 bg-slate-50">Cancel</button>}
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [profile, setProfile] = useState(null);
+        const [deck, setDeck] = useState(null);
+        const [notes, setNotes] = useState([]);
+        const [categories, setCategories] = useState([]);
+        const [cards, setCards] = useState([]);
+        const [progressMap, setProgressMap] = useState({});
+        const [reviewLogs, setReviewLogs] = useState([]);
+        const [search, setSearch] = useState('');
+        const [categoryFilter, setCategoryFilter] = useState('');
+        const [showBack, setShowBack] = useState(false);
+        const [loading, setLoading] = useState(true);
+        const [saving, setSaving] = useState(false);
+        const [error, setError] = useState('');
+        const [wordForm, setWordForm] = useState(emptyWordForm());
+        const [editingNoteId, setEditingNoteId] = useState(null);
+        const [categoryDraft, setCategoryDraft] = useState('');
+        const [editingCategoryId, setEditingCategoryId] = useState(null);
+        const [editingCategoryName, setEditingCategoryName] = useState('');
+
+        useEffect(() => {
+          if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+        }, []);
+
+        async function loadAll() {
+          try {
+            setLoading(true);
+            setError('');
+            const demoProfile = await ensureDemoProfile();
+            const deckRow = await loadDeckBySlug(DEFAULT_DECK_SLUG, demoProfile?.id || RESOLVED_PROFILE_ID);
+            const categoryRows = await loadCategories(deckRow.id);
+            const noteRows = await loadNotes(deckRow.id, demoProfile?.id || RESOLVED_PROFILE_ID);
+            const cardRows = await loadStudyCards(deckRow.id, demoProfile?.id || RESOLVED_PROFILE_ID);
+            const progressRows = await loadProgress(RESOLVED_PROFILE_ID, cardRows.map(c => c.cardId));
+            const logRows = await loadReviewLogs(RESOLVED_PROFILE_ID, 30);
+
+            const progressByCard = {};
+            for (const row of progressRows) progressByCard[row.card_id] = row;
+
+            setProfile(demoProfile);
+            setDeck(deckRow);
+            setCategories(sortCategories(categoryRows));
+            setNotes(sortNotes(noteRows));
+            setCards(sortStudyCards(cardRows));
+            setProgressMap(progressByCard);
+            setReviewLogs(logRows);
+            setShowBack(false);
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Error loading data from Supabase.');
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        useEffect(() => {
+          loadAll();
+        }, []);
+
+        const notesById = useMemo(() => Object.fromEntries(notes.map(n => [n.id, n])), [notes]);
+        const cardsById = useMemo(() => Object.fromEntries(cards.map(card => [card.cardId, card])), [cards]);
+
+        const mergedCards = useMemo(() => {
+          return cards.map(card => ({
+            ...card,
+            ...(progressMap[card.cardId] || {
+              state: 'new',
+              due_at: nowISO(),
+              last_review_at: null,
+              stability: 0,
+              difficulty: 0,
+              elapsed_days: 0,
+              scheduled_days: 0,
+              reps: 0,
+              lapses: 0
+            })
+          }));
+        }, [cards, progressMap]);
+
+        const filteredCards = useMemo(() => {
+          const q = search.trim().toLowerCase();
+          return mergedCards.filter(card => {
+            const note = card.note || notesById[card.noteId];
+            if (categoryFilter && note?.category_id !== categoryFilter) return false;
+            if (!q) return true;
+            const text = [
+              note?.fields?.front,
+              note?.fields?.back,
+              note?.fields?.example_vi,
+              note?.fields?.example_en,
+              note?.fields?.hint,
+              ...(note?.tags || [])
+            ].join(' ').toLowerCase();
+            return text.includes(q);
+          });
+        }, [mergedCards, notesById, search, categoryFilter]);
+
+        const filteredNotes = useMemo(() => {
+          if (!categoryFilter) return notes;
+          return notes.filter(note => note.category_id === categoryFilter);
+        }, [notes, categoryFilter]);
+
+        const queue = useMemo(() => getQueue(filteredCards), [filteredCards]);
+        const currentCard = queue[0] || null;
+        const currentNote = currentCard ? (currentCard.note || notesById[currentCard.noteId]) : null;
+
+        const stats = useMemo(() => ({
+          newCount: filteredCards.filter(c => c.state === 'new' && isDue(c.due_at)).length,
+          learningCount: filteredCards.filter(c => (c.state === 'learning' || c.state === 'relearning') && isDue(c.due_at)).length,
+          reviewCount: filteredCards.filter(c => c.state === 'review' && isDue(c.due_at)).length,
+          total: filteredCards.length
+        }), [filteredCards]);
+
+        async function answer(rating) {
+          if (!currentCard || !profile) return;
+          if (!currentCard.cardId) {
+            console.error('Review aborted because the current study item is missing cards.id.', currentCard);
+            setError('Could not save the review because cards.id is missing.');
+            return;
+          }
+          try {
+            setSaving(true);
+            setError('');
+            const nextCard = scheduleCard(currentCard, rating, false);
+            await saveReview(profile.id, currentCard, nextCard, rating);
+            const reviewedAt = nowISO();
+            setProgressMap(prev => ({
+              ...prev,
+              [currentCard.cardId]: {
+                profile_id: profile.id,
+                card_id: currentCard.cardId,
+                state: nextCard.state,
+                due_at: nextCard.due_at,
+                last_review_at: nextCard.last_review_at,
+                stability: nextCard.stability,
+                difficulty: nextCard.difficulty,
+                elapsed_days: nextCard.elapsed_days,
+                scheduled_days: nextCard.scheduled_days,
+                reps: nextCard.reps,
+                lapses: nextCard.lapses
+              }
+            }));
+            setReviewLogs(prev => {
+              const nextLog = {
+                id: uid('rev'),
+                profile_id: profile.id,
+                card_id: currentCard.cardId,
+                reviewed_at: reviewedAt,
+                rating,
+                state_before: currentCard.state,
+                state_after: nextCard.state,
+                due_before: currentCard.due_at,
+                due_after: nextCard.due_at,
+                scheduled_days_before: currentCard.scheduled_days,
+                scheduled_days_after: nextCard.scheduled_days,
+                elapsed_days: nextCard.elapsed_days
+              };
+              return [nextLog, ...prev].slice(0, 30);
+            });
+            setShowBack(false);
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Could not save the review.');
+          } finally {
+            setSaving(false);
+          }
+        }
+
+        function startEdit(note) {
+          setEditingNoteId(note.id);
+          setWordForm({
+            front: note.fields?.front || '',
+            back: note.fields?.back || '',
+            example_vi: note.fields?.example_vi || '',
+            example_en: note.fields?.example_en || '',
+            hint: note.fields?.hint || '',
+            tags: (note.tags || []).join(', '),
+            category_id: note.category_id || ''
+          });
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+          setEditingNoteId(null);
+          setWordForm(emptyWordForm());
+        }
+
+        async function handleSaveWord() {
+          if (!deck) return;
+          if (!wordForm.front.trim() || !wordForm.back.trim()) {
+            setError('Word and translation are required.');
+            return;
+          }
+          try {
+            setSaving(true);
+            setError('');
+            if (editingNoteId) {
+              const updatedNote = await updateNote(editingNoteId, wordForm, profile.id);
+              setNotes(prev => sortNotes(prev.map(note => note.id === editingNoteId ? updatedNote : note)));
+              setCards(prev => sortStudyCards(prev.map(card => (
+                card.noteId === editingNoteId
+                  ? { ...card, note: updatedNote, noteId: updatedNote.id, note_id: updatedNote.id }
+                  : card
+              ))));
+            } else {
+              const created = await createNoteWithCard(deck.id, wordForm, profile.id);
+              setNotes(prev => sortNotes([...prev, created.note]));
+              setCards(prev => sortStudyCards([...prev, created.card]));
+            }
+            resetForm();
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Could not save the word.');
+          } finally {
+            setSaving(false);
+          }
+        }
+
+        async function handleDeleteWord(noteId) {
+          if (!profile) return;
+          const ok = window.confirm('Are you sure you want to delete this word? Its progress and logs will also be removed in this demo.');
+          if (!ok) return;
+          try {
+            setSaving(true);
+            setError('');
+            const deleted = await deleteNoteCascade(noteId, profile.id);
+            if (editingNoteId === noteId) resetForm();
+            setNotes(prev => prev.filter(note => note.id !== deleted.noteId));
+            setCards(prev => prev.filter(card => !deleted.cardIds.includes(card.cardId)));
+            setProgressMap(prev => {
+              const next = { ...prev };
+              for (const cardId of deleted.cardIds) delete next[cardId];
+              return next;
+            });
+            setReviewLogs(prev => prev.filter(log => !deleted.cardIds.includes(log.card_id)));
+            setShowBack(false);
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Could not delete the word.');
+          } finally {
+            setSaving(false);
+          }
+        }
+
+        async function handleCreateCategory() {
+          if (!deck) return;
+          const name = categoryDraft.trim();
+          if (!name) return;
+          if (categories.some(cat => cat.name.trim().toLowerCase() === name.toLowerCase())) {
+            setError('A category with that name already exists.');
+            return;
+          }
+          try {
+            setSaving(true);
+            setError('');
+            const created = await createCategory(deck.id, name);
+            setCategories(prev => sortCategories([...prev, created]));
+            setCategoryDraft('');
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Could not create the category.');
+          } finally {
+            setSaving(false);
+          }
+        }
+
+        function startEditCategory(cat) {
+          setEditingCategoryId(cat.id);
+          setEditingCategoryName(cat.name);
+        }
+
+        function cancelEditCategory() {
+          setEditingCategoryId(null);
+          setEditingCategoryName('');
+        }
+
+        async function handleRenameCategory(categoryId) {
+          const name = editingCategoryName.trim();
+          if (!name) return;
+          if (categories.some(cat => cat.id !== categoryId && cat.name.trim().toLowerCase() === name.toLowerCase())) {
+            setError('A category with that name already exists.');
+            return;
+          }
+          try {
+            setSaving(true);
+            setError('');
+            await renameCategory(categoryId, name);
+            setCategories(prev => sortCategories(prev.map(cat => cat.id === categoryId ? { ...cat, name } : cat)));
+            setNotes(prev => prev.map(note => {
+              if (note.category_id !== categoryId) return note;
+              return { ...note, category: { ...(note.category || {}), id: categoryId, name } };
+            }));
+            setCards(prev => prev.map(card => {
+              if (card.note?.category_id !== categoryId) return card;
+              return {
+                ...card,
+                note: {
+                  ...card.note,
+                  category: { ...(card.note.category || {}), id: categoryId, name }
+                }
+              };
+            }));
+            cancelEditCategory();
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Could not rename the category.');
+          } finally {
+            setSaving(false);
+          }
+        }
+
+        async function handleDeleteCategory(categoryId) {
+          const ok = window.confirm('Are you sure you want to delete this category? Words will remain uncategorized.');
+          if (!ok) return;
+          try {
+            setSaving(true);
+            setError('');
+            await deleteCategory(categoryId);
+            setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+            setNotes(prev => prev.map(note => (
+              note.category_id === categoryId ? { ...note, category_id: null, category: null } : note
+            )));
+            setCards(prev => prev.map(card => (
+              card.note?.category_id === categoryId
+                ? {
+                    ...card,
+                    note: {
+                      ...card.note,
+                      category_id: null,
+                      category: null
+                    }
+                  }
+                : card
+            )));
+            if (categoryFilter === categoryId) setCategoryFilter('');
+            if (wordForm.category_id === categoryId) setWordForm(prev => ({ ...prev, category_id: '' }));
+          } catch (err) {
+            console.error(err);
+            setError(err.message || 'Could not delete the category.');
+          } finally {
+            setSaving(false);
+          }
+        }
+
+        if (loading) {
+          return <div className="max-w-5xl mx-auto text-center py-20 text-slate-600">Loading Supabase...</div>;
+        }
+
+        return (
+          <div className="max-w-6xl mx-auto space-y-6">
+            <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="text-sm text-slate-500">Standalone feature, ready to be integrated into the main site later</div>
+                <h1 className="text-3xl font-bold tracking-tight">Flashcards for Vietnamese CI</h1>
+              </div>
+
+              <div className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
+                <div className="text-xs uppercase tracking-wide text-slate-500">Demo user</div>
+                <div className="font-semibold">{profile?.full_name}</div>
+                <div className="text-sm text-slate-500">Patreon ID: {profile?.patreon_user_id}</div>
+                <div className="text-sm text-slate-500">Membership: {profile?.membership_status}</div>
+              </div>
+            </header>
+
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 text-red-700 px-4 py-3">
+                {error}
+              </div>
+            )}
+
+            <section className="grid md:grid-cols-4 gap-3">
+              <StatPill label="New" value={stats.newCount} tone="blue" />
+              <StatPill label="Learning" value={stats.learningCount} tone="amber" />
+              <StatPill label="Review" value={stats.reviewCount} tone="emerald" />
+              <StatPill label="Total deck" value={stats.total} tone="slate" />
+            </section>
+
+            <section className="rounded-3xl border bg-white shadow-sm p-4 md:p-6 space-y-4">
+              <div className="grid md:grid-cols-[1fr_220px_260px] gap-4">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search word, translation, example, or tag..."
+                  className="w-full rounded-2xl border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-200"
+                />
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="w-full rounded-2xl border px-4 py-3 bg-white"
+                >
+                  <option value="">All categories</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <div className="rounded-2xl border px-4 py-3 bg-slate-50 text-sm text-slate-600">
+                  Active deck: <strong>{deck?.title}</strong>
+                </div>
+              </div>
+
+              {currentCard && currentNote ? (
+                <div className="card-flip max-w-3xl mx-auto w-full">
+                  <div className={`card-flip-inner ${showBack ? 'is-flipped' : ''}`}>
+                    <div className="card-face card-front rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8 shadow-md">
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Front</div>
+                          <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm bg-white">
+                            <span>State:</span>
+                            <strong className="capitalize">{currentCard.state}</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 flex-1 flex flex-col items-center justify-center text-center space-y-4">
+                        <div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">{currentNote.fields.front}</div>
+                        <div className="text-slate-600 text-base sm:text-lg">Hint: {currentNote.fields.hint || 'no hint'}</div>
+                        <div className="flex flex-wrap justify-center gap-2 pt-1">
+                          {(currentNote.tags || []).map(tag => (
+                            <span key={tag} className="rounded-full border px-3 py-1 text-sm bg-white text-slate-600">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-6 w-full flex flex-col sm:flex-row gap-3 sm:justify-center pb-2">
+                        <button onClick={() => setShowBack(true)} className="w-full sm:w-auto min-h-[44px] rounded-2xl bg-blue-600 text-white px-5 py-3 font-medium shadow transition-transform duration-150 active:scale-95 hover:opacity-95">
+                          Show answer
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="card-face card-back rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8 shadow-md">
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Answer</div>
+                          <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm bg-white">
+                            <span>State:</span>
+                            <strong className="capitalize">{currentCard.state}</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 flex-1 flex flex-col items-center justify-center text-center space-y-5">
+                        <div className="max-w-xl">
+                          <div className="text-sm text-slate-500">Translation</div>
+                          <div className="text-2xl sm:text-3xl font-bold mt-1">{currentNote.fields.back}</div>
+                        </div>
+                        <div className="rounded-2xl border bg-white p-4 space-y-2 text-left w-full sm:max-w-xl">
+                          <div>
+                            <div className="text-sm text-slate-500">Vietnamese example</div>
+                            <div className="font-medium">{currentNote.fields.example_vi}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-slate-500">English example</div>
+                            <div>{currentNote.fields.example_en}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 w-full flex flex-col sm:flex-row gap-3 sm:justify-center pb-2">
+                        {['again', 'hard', 'good', 'easy'].map(rating => (
+                          <button
+                            key={rating}
+                            disabled={saving}
+                            onClick={() => answer(rating)}
+                            className={`w-full sm:w-auto min-h-[44px] rounded-2xl px-4 py-3 font-medium border transition-transform duration-150 active:scale-95 ${
+                              rating === 'again' ? 'bg-red-50 border-red-200 text-red-700' :
+                              rating === 'hard' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                              rating === 'good' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+                              'bg-blue-50 border-blue-200 text-blue-700'
+                            } ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
+                          >
+                            {rating[0].toUpperCase() + rating.slice(1)}
+                            <div className="text-xs mt-1 normal-case">{fmtDateTime(previewScheduling(currentCard, rating))}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-3xl border bg-slate-50 p-10 text-center text-slate-600">
+                  No pending cards with those filters. Quiet little win.
+                </div>
+              )}
+            </section>
+
+            <section className="grid lg:grid-cols-[1fr_360px] gap-5 items-start">
+              <div className="rounded-3xl border bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <h2 className="text-xl font-semibold">Deck word list</h2>
+                  <div className="text-sm text-slate-500">You can edit or delete items</div>
+                </div>
+                <div className="space-y-3 max-h-[620px] overflow-auto pr-1">
+                  {filteredNotes.length === 0 ? (
+                    <div className="text-slate-500 text-sm">There are no words yet.</div>
+                  ) : filteredNotes.map(note => (
+                    <div key={note.id} className="rounded-2xl border p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <div className="font-semibold text-lg">{note.fields.front}</div>
+                        <div className="text-slate-600">{note.fields.back}</div>
+                        <div className="text-sm text-slate-500 mt-1">{note.fields.hint || 'no hint'}</div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          Category: <span className="font-medium text-slate-700">{note.category?.name || 'no category'}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {(note.tags || []).map(tag => (
+                            <span key={tag} className="rounded-full border px-3 py-1 text-xs bg-slate-50 text-slate-600">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => startEdit(note)} className="rounded-2xl border px-4 py-2 bg-slate-50">Edit</button>
+                        <button onClick={() => handleDeleteWord(note.id)} className="rounded-2xl border px-4 py-2 bg-red-50 border-red-200 text-red-700">Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-3xl border bg-white p-4 shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-slate-500">Manage</div>
+                      <div className="text-base font-semibold text-slate-800">Categories</div>
+                    </div>
+                    <div className="text-xs text-slate-500">{categories.length} total</div>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <input
+                      value={categoryDraft}
+                      onChange={(e) => setCategoryDraft(e.target.value)}
+                      placeholder="New category"
+                      className="flex-1 min-w-[160px] rounded-2xl border px-3 py-2 bg-white"
+                    />
+                    <button
+                      onClick={handleCreateCategory}
+                      disabled={saving}
+                      className={`rounded-2xl border px-4 py-2 bg-slate-900 text-white ${saving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'}`}
+                    >
+                      Create
+                    </button>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {categories.length === 0 ? (
+                      <div className="text-sm text-slate-500">There are no categories yet.</div>
+                    ) : categories.map(cat => (
+                      <div key={cat.id} className="flex flex-wrap items-center gap-2 rounded-2xl border bg-slate-50 px-3 py-2">
+                        {editingCategoryId === cat.id ? (
+                          <input
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="flex-1 min-w-[140px] rounded-xl border px-3 py-1.5 bg-white"
+                          />
+                        ) : (
+                          <div className="text-sm font-medium text-slate-700 flex-1 min-w-[140px]">{cat.name}</div>
+                        )}
+                        <div className="flex gap-2">
+                          {editingCategoryId === cat.id ? (
+                            <>
+                              <button
+                                onClick={() => handleRenameCategory(cat.id)}
+                                disabled={saving}
+                                className={`rounded-xl border px-3 py-1.5 bg-white ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={cancelEditCategory}
+                                className="rounded-xl border px-3 py-1.5 bg-white"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => startEditCategory(cat)}
+                                className="rounded-xl border px-3 py-1.5 bg-white"
+                              >
+                                Rename
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCategory(cat.id)}
+                                disabled={saving}
+                                className={`rounded-xl border px-3 py-1.5 bg-red-50 border-red-200 text-red-700 ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <WordForm
+                  value={wordForm}
+                  onChange={setWordForm}
+                  onSubmit={handleSaveWord}
+                  submitText={editingNoteId ? 'Save changes' : 'Add word'}
+                  onCancel={editingNoteId ? resetForm : null}
+                  categories={categories}
+                />
+              </div>
+            </section>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
+
+

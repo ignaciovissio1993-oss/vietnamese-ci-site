@@ -349,6 +349,9 @@
 
 <body>
   <div class="app-wrap">
+    <div class="tabs" aria-label="Main">
+      <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/index.html" href="/features/flashcards/index.html">Flashcards</a>
+    </div>
     <div id="seriesView">
       <div class="series-grid">
 
@@ -453,7 +456,73 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const { createClient } = window.supabase || {};
+
+    const SUPABASE_URL = "https://fsfqykryknfdhrhiezew.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS";
+    const supabase = createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    async function fetchPatreonUser() {
+      const res = await fetch("/auth/me", { credentials: "include" });
+      if (!res.ok) {
+        throw new Error("Could not load Patreon user.");
+      }
+      const data = await res.json();
+      if (!data?.user?.id) {
+        throw new Error("Missing Patreon user id.");
+      }
+      return data.user;
+    }
+
+    async function getOrCreateProfileId(patreonUser) {
+      if (!supabase) throw new Error("Supabase client not available.");
+      const patreonUserId = String(patreonUser.id);
+
+      const { data: existing, error } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("patreon_user_id", patreonUserId)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (existing?.id) return existing.id;
+
+      const payload = { patreon_user_id: patreonUserId };
+      if (patreonUser.email) payload.email = patreonUser.email;
+      if (patreonUser.full_name) payload.full_name = patreonUser.full_name;
+      if (patreonUser.membership_status) payload.membership_status = patreonUser.membership_status;
+      if (patreonUser.membership_tier) payload.membership_tier = patreonUser.membership_tier;
+
+      const { data: created, error: createError } = await supabase
+        .from("profiles")
+        .insert(payload)
+        .select("id")
+        .single();
+
+      if (createError) throw createError;
+      return created.id;
+    }
+
+    function updateFlashcardsLink(profileId) {
+      const link = document.getElementById("flashcardsLink");
+      if (!link) return;
+      const baseHref = link.getAttribute("data-base-href") || link.getAttribute("href") || "/features/flashcards/index.html";
+      const url = new URL(baseHref, window.location.origin);
+      url.searchParams.set("profile_id", profileId);
+      link.setAttribute("href", url.pathname + url.search);
+    }
+
+    (async function initFlashcardsProfileLink() {
+      try {
+        const patreonUser = await fetchPatreonUser();
+        const profileId = await getOrCreateProfileId(patreonUser);
+        updateFlashcardsLink(profileId);
+      } catch (err) {
+        console.error("Flashcards link setup failed.", err);
+      }
+    })();
     // ========= CONFIG =========
     const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
     const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
