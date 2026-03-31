@@ -477,7 +477,7 @@
       return data.user;
     }
 
-    async function getOrCreateProfileId(patreonUser) {
+    async function getProfileId(patreonUser) {
       if (!supabase) throw new Error("Supabase client not available.");
       const patreonUserId = String(patreonUser.id);
 
@@ -489,21 +489,7 @@
 
       if (error) throw error;
       if (existing?.id) return existing.id;
-
-      const payload = { patreon_user_id: patreonUserId };
-      if (patreonUser.email) payload.email = patreonUser.email;
-      if (patreonUser.full_name) payload.full_name = patreonUser.full_name;
-      if (patreonUser.membership_status) payload.membership_status = patreonUser.membership_status;
-      if (patreonUser.membership_tier) payload.membership_tier = patreonUser.membership_tier;
-
-      const { data: created, error: createError } = await supabase
-        .from("profiles")
-        .upsert(payload, { onConflict: "patreon_user_id" })
-        .select("id")
-        .single();
-
-      if (createError) throw createError;
-      return created.id;
+      throw new Error("Profile not found for Patreon user.");
     }
 
     function updateFlashcardsLink(profileId) {
@@ -518,7 +504,7 @@
     (async function initFlashcardsProfileLink() {
       try {
         const patreonUser = await fetchPatreonUser();
-        const profileId = await getOrCreateProfileId(patreonUser);
+        const profileId = await getProfileId(patreonUser);
         updateFlashcardsLink(profileId);
       } catch (err) {
         console.error("Flashcards link setup failed.", err);
