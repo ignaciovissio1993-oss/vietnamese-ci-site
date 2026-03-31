@@ -350,7 +350,7 @@
 <body>
   <div class="app-wrap">
     <div class="tabs" aria-label="Main">
-      <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/index.html" href="/features/flashcards/index.html">Flashcards</a>
+      <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/">Flashcards</a>
     </div>
     <div id="seriesView">
       <div class="series-grid">
@@ -495,8 +495,11 @@
     function updateFlashcardsLink(profileId) {
       const link = document.getElementById("flashcardsLink");
       if (!link) return;
-      const baseHref = link.getAttribute("data-base-href") || link.getAttribute("href") || "/features/flashcards/index.html";
+      const baseHref = link.getAttribute("data-base-href") || link.getAttribute("href") || "/features/flashcards/";
       const url = new URL(baseHref, window.location.origin);
+      if (url.pathname.endsWith("/index.html")) {
+        url.pathname = url.pathname.replace(/\/index\.html$/, "/");
+      }
       url.searchParams.set("profile_id", profileId);
       link.setAttribute("href", url.pathname + url.search);
     }
