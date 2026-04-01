@@ -350,7 +350,7 @@
 <body>
   <div class="app-wrap">
     <div class="tabs" aria-label="Main">
-      <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/">Flashcards</a>
+      <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/?patreon_user_id=">Flashcards</a>
     </div>
     <div id="seriesView">
       <div class="series-grid">
@@ -459,12 +459,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     (() => {
-    const { createClient } = window.supabase || {};
-
-    const SUPABASE_URL = "https://fsfqykryknfdhrhiezew.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS";
-    const supabase = window.supabaseClient || (createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null);
-
     async function fetchPatreonUser() {
       const existingUser = window.patreonUser || window.__patreonUser;
       if (existingUser?.id) return existingUser;
@@ -483,22 +477,7 @@
       return data.user;
     }
 
-    async function getProfileId(patreonUser) {
-      if (!supabase) throw new Error("Supabase client not available.");
-      const patreonUserId = String(patreonUser.id);
-
-      const { data: existing, error } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("patreon_user_id", patreonUserId)
-        .maybeSingle();
-
-      if (error) throw error;
-      if (existing?.id) return existing.id;
-      throw new Error("Profile not found for Patreon user.");
-    }
-
-    function updateFlashcardsLink(profileId) {
+    function updateFlashcardsLink(patreonUserId) {
       const link = document.getElementById("flashcardsLink");
       if (!link) return;
       const baseHref = link.getAttribute("data-base-href") || link.getAttribute("href") || "/features/flashcards/";
@@ -506,15 +485,14 @@
       if (url.pathname.endsWith("/index.html")) {
         url.pathname = url.pathname.replace(/\/index\.html$/, "/");
       }
-      url.searchParams.set("profile_id", profileId);
+      url.searchParams.set("patreon_user_id", patreonUserId);
       link.setAttribute("href", url.pathname + url.search);
     }
 
     (async function initFlashcardsProfileLink() {
       try {
         const patreonUser = await fetchPatreonUser();
-        const profileId = await getProfileId(patreonUser);
-        updateFlashcardsLink(profileId);
+        updateFlashcardsLink(String(patreonUser.id));
       } catch (err) {
         console.error("Flashcards link setup failed.", err);
       }

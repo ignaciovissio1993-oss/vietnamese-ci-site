@@ -62,8 +62,7 @@
       const SUPABASE_ANON_KEY = 'sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS';
       const DEMO_PROFILE_ID = '11111111-1111-1111-1111-111111111111';
       const DEFAULT_DECK_SLUG = 'vietnamese-core-a1';
-      const profileIdParam = new URLSearchParams(window.location.search).get('profile_id');
-      const RESOLVED_PROFILE_ID = profileIdParam === null ? DEMO_PROFILE_ID : profileIdParam;
+      const patreonUserIdParam = new URLSearchParams(window.location.search).get('patreon_user_id');
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -196,15 +195,44 @@
       // =========================
       // Supabase API
       // =========================
-      async function ensureDemoProfile() {
+      async function loadProfileById(profileId) {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', RESOLVED_PROFILE_ID)
+          .eq('id', profileId)
           .maybeSingle();
 
         if (error) throw error;
         return data;
+      }
+
+      async function resolveProfileFromPatreon(patreonUserId) {
+        const { data: existing, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('patreon_user_id', patreonUserId)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (existing?.id) return existing;
+
+        const { data: created, error: createError } = await supabase
+          .from('profiles')
+          .insert({ patreon_user_id: patreonUserId })
+          .select('*')
+          .single();
+
+        if (!createError) return created;
+        if (createError.code !== '23505') throw createError;
+
+        const { data: fallback, error: fallbackError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('patreon_user_id', patreonUserId)
+          .maybeSingle();
+
+        if (fallbackError) throw fallbackError;
+        return fallback;
       }
 
       async function loadDeckBySlug(slug, profileId) {
@@ -589,8 +617,14 @@
           try {
             setLoading(true);
             setError('');
-            const profileId = RESOLVED_PROFILE_ID;
-            const demoProfile = await ensureDemoProfile();
+            let resolvedProfile = null;
+            if (patreonUserIdParam) {
+              resolvedProfile = await resolveProfileFromPatreon(String(patreonUserIdParam));
+            } else {
+              resolvedProfile = await loadProfileById(DEMO_PROFILE_ID);
+            }
+            const profileId = resolvedProfile?.id;
+            if (!profileId) throw new Error('Could not resolve profile id.');
             const deckRow = await loadDeckBySlug(DEFAULT_DECK_SLUG, profileId);
             const categoryRows = await loadCategories(deckRow.id);
             const noteRows = await loadNotes(deckRow.id, profileId);
@@ -601,7 +635,7 @@
             const progressByCard = {};
             for (const row of progressRows) progressByCard[row.card_id] = row;
 
-            setProfile(demoProfile);
+            setProfile(resolvedProfile);
             setDeck(deckRow);
             setCategories(sortCategories(categoryRows));
             setNotes(sortNotes(noteRows));
