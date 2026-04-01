@@ -334,6 +334,62 @@
       cursor:pointer;
       font-size:12px;
     }
+    .dictActions{margin-top:10px;display:flex;justify-content:flex-end}
+    .dictAdd{
+      border:1px solid rgba(106,92,255,.25);
+      background: linear-gradient(135deg, rgba(106,92,255,.15), rgba(167,216,255,.25));
+      border-radius: 999px;
+      padding:6px 12px;
+      font-weight:900;
+      cursor:pointer;
+      font-size:12px;
+      color:#2b2750;
+    }
+    .dictSavePanel{
+      margin-top:10px;
+      border-top:1px solid rgba(106,92,255,.12);
+      padding-top:10px;
+      display:none;
+      font-size:12px;
+      color:rgba(29,27,43,.85);
+    }
+    .dictSavePanel.open{display:block}
+    .dictSaveRow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+    .dictSaveRow b{font-size:12px}
+    .dictSaveSelect,
+    .dictSaveInput{
+      width:100%;
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius: 10px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.85);
+      font-size:12px;
+      outline:none;
+    }
+    .dictSaveActions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+    .dictSaveBtn{
+      border:1px solid rgba(60,190,120,.35);
+      background: rgba(60,190,120,.12);
+      border-radius: 999px;
+      padding:6px 12px;
+      font-weight:900;
+      cursor:pointer;
+      font-size:12px;
+      color:#1f4b2e;
+    }
+    .dictCancelBtn{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.9);
+      border-radius: 999px;
+      padding:6px 10px;
+      font-weight:900;
+      cursor:pointer;
+      font-size:12px;
+    }
+    .dictSaveMsg{margin-top:8px;font-size:12px}
+    .dictSaveMsg.ok{color:#1f4b2e}
+    .dictSaveMsg.err{color:#8b1e36}
 
     @media (max-width: 980px){
       .series-cards{grid-template-columns: repeat(2, minmax(0,1fr));}
@@ -450,6 +506,28 @@
   <div class="dictPop" id="dictPop" role="dialog" aria-label="Dictionary">
     <p class="dictWord" id="dictWord">word</p>
     <p class="dictDef" id="dictDef">definition</p>
+    <div class="dictActions">
+      <button class="dictAdd" id="dictAdd">Add to Flashcards</button>
+    </div>
+    <div class="dictSavePanel" id="dictSavePanel" aria-live="polite">
+      <div class="dictSaveRow"><span>Word:</span> <b id="dictSaveWord">word</b></div>
+      <div class="dictSaveRow"><span>Translation:</span> <span id="dictSaveDef">definition</span></div>
+      <label>
+        <div style="margin-top:6px;font-weight:700">Category</div>
+        <select class="dictSaveSelect" id="dictCategorySelect">
+          <option value="">No category</option>
+        </select>
+      </label>
+      <label>
+        <div style="margin-top:6px;font-weight:700">New category (optional)</div>
+        <input class="dictSaveInput" id="dictNewCategory" placeholder="e.g. Food" />
+      </label>
+      <div class="dictSaveActions">
+        <button class="dictSaveBtn" id="dictSaveBtn">Save</button>
+        <button class="dictCancelBtn" id="dictCancelBtn">Cancel</button>
+      </div>
+      <div class="dictSaveMsg" id="dictSaveMsg"></div>
+    </div>
     <div class="dictMeta">
       <span id="dictHint">click outside to close</span>
       <button class="dictClose" id="dictClose">Close</button>
@@ -536,6 +614,15 @@
     const dictWordEl = document.getElementById("dictWord");
     const dictDefEl = document.getElementById("dictDef");
     const dictClose = document.getElementById("dictClose");
+    const dictAdd = document.getElementById("dictAdd");
+    const dictSavePanel = document.getElementById("dictSavePanel");
+    const dictSaveWord = document.getElementById("dictSaveWord");
+    const dictSaveDef = document.getElementById("dictSaveDef");
+    const dictCategorySelect = document.getElementById("dictCategorySelect");
+    const dictNewCategory = document.getElementById("dictNewCategory");
+    const dictSaveBtn = document.getElementById("dictSaveBtn");
+    const dictCancelBtn = document.getElementById("dictCancelBtn");
+    const dictSaveMsg = document.getElementById("dictSaveMsg");
 
     // ========= State =========
     let playlists = [];
@@ -554,6 +641,19 @@
     // Dictionary
     let dict = null;
     let dictLoadedFrom = "";
+    let lastDictContext = { example_vi: "", example_en: "" };
+
+    // Flashcards (Supabase)
+    const { createClient } = window.supabase || {};
+    const SUPABASE_URL = "https://fsfqykryknfdhrhiezew.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS";
+    const DEFAULT_DECK_SLUG = "vietnamese-core-a1";
+    const supabase = createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    let flashProfile = null;
+    let flashDeck = null;
+    let flashCategories = [];
+    let categoriesLoadedForDeckId = null;
+    let savingToFlashcards = false;
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -759,9 +859,224 @@
       return { phrase: single || w0, def: lookupWord(single || w0) };
     }
 
-    function openDictPopup(word, definition, anchorRect){
+    function nowISO(){ return new Date().toISOString(); }
+
+    function setDictSaveMsg(text, kind){
+      dictSaveMsg.textContent = text || "";
+      dictSaveMsg.classList.remove("ok","err");
+      if(kind) dictSaveMsg.classList.add(kind);
+    }
+
+    function resetDictSavePanel(){
+      dictNewCategory.value = "";
+      dictCategorySelect.value = "";
+      setDictSaveMsg("");
+    }
+
+    function openDictSavePanel(){
+      dictSaveWord.textContent = dictWordEl.textContent || "";
+      dictSaveDef.textContent = dictDefEl.textContent || "";
+      dictSavePanel.classList.add("open");
+      setDictSaveMsg("");
+      loadFlashcardCategories().catch(err => {
+        console.error("Failed to load flashcard categories.", err);
+        setDictSaveMsg("Could not load categories.", "err");
+      });
+    }
+
+    function closeDictSavePanel(){
+      dictSavePanel.classList.remove("open");
+      resetDictSavePanel();
+    }
+
+    async function resolveProfileFromPatreon(patreonUserId){
+      const { data: existing, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("patreon_user_id", patreonUserId)
+        .maybeSingle();
+
+      if(error) throw error;
+      if(existing?.id) return existing;
+
+      const { data: created, error: createError } = await supabase
+        .from("profiles")
+        .insert({ patreon_user_id: patreonUserId })
+        .select("*")
+        .single();
+
+      if(!createError) return created;
+      if(createError.code !== "23505") throw createError;
+
+      const { data: fallback, error: fallbackError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("patreon_user_id", patreonUserId)
+        .maybeSingle();
+
+      if(fallbackError) throw fallbackError;
+      if(!fallback?.id) throw new Error("Could not resolve profile for Patreon user.");
+      return fallback;
+    }
+
+    async function resolveDefaultDeck(profileId){
+      const { data: existing, error } = await supabase
+        .from("decks")
+        .select("*")
+        .eq("slug", DEFAULT_DECK_SLUG)
+        .eq("owner_id", profileId)
+        .maybeSingle();
+
+      if(error) throw error;
+      if(existing?.id) return existing;
+
+      const { data: created, error: createError } = await supabase
+        .from("decks")
+        .insert({ slug: DEFAULT_DECK_SLUG, title: "Vietnamese Core A1", owner_id: profileId })
+        .select("*")
+        .single();
+
+      if(!createError) return created;
+      if(createError.code !== "23505") throw createError;
+
+      const { data: fallback, error: fallbackError } = await supabase
+        .from("decks")
+        .select("*")
+        .eq("slug", DEFAULT_DECK_SLUG)
+        .eq("owner_id", profileId)
+        .maybeSingle();
+
+      if(fallbackError) throw fallbackError;
+      if(!fallback?.id) throw new Error("Could not resolve default deck.");
+      return fallback;
+    }
+
+    async function loadDeckCategories(deckId){
+      const { data, error } = await supabase
+        .from("deck_categories")
+        .select("*")
+        .eq("deck_id", deckId)
+        .order("name", { ascending: true });
+      if(error) throw error;
+      return data || [];
+    }
+
+    async function createDeckCategory(deckId, name){
+      const { data, error } = await supabase
+        .from("deck_categories")
+        .insert({ deck_id: deckId, name })
+        .select("*")
+        .single();
+      if(error) throw error;
+      return data;
+    }
+
+    async function findExistingNote(deckId, profileId, front, back){
+      const { data, error } = await supabase
+        .from("notes")
+        .select("id, category_id")
+        .eq("deck_id", deckId)
+        .eq("owner_id", profileId)
+        .eq("fields->>front", front)
+        .eq("fields->>back", back)
+        .maybeSingle();
+      if(error) throw error;
+      return data;
+    }
+
+    async function ensureCardForNote(deckId, noteId){
+      const { data, error } = await supabase
+        .from("cards")
+        .select("id")
+        .eq("note_id", noteId)
+        .maybeSingle();
+      if(error) throw error;
+      if(data?.id) return data;
+
+      const { data: created, error: createError } = await supabase
+        .from("cards")
+        .insert({
+          note_id: noteId,
+          deck_id: deckId,
+          card_ord: 0,
+          template_name: "Basic",
+          is_active: true
+        })
+        .select("id")
+        .single();
+      if(createError) throw createError;
+      return created;
+    }
+
+    async function createNoteWithCard(deckId, profileId, payload){
+      const { data: note, error: noteError } = await supabase
+        .from("notes")
+        .insert({
+          deck_id: deckId,
+          owner_id: profileId,
+          type: "basic",
+          fields: {
+            front: payload.front,
+            back: payload.back,
+            example_vi: payload.example_vi || "",
+            example_en: payload.example_en || "",
+            hint: payload.hint || ""
+          },
+          category_id: payload.category_id || null,
+          sort_order: Date.now()
+        })
+        .select("id, category_id")
+        .single();
+      if(noteError) throw noteError;
+
+      await ensureCardForNote(deckId, note.id);
+      return note;
+    }
+
+    async function ensureFlashcardContext(){
+      if(!supabase) throw new Error("Supabase client not available.");
+      if(flashProfile?.id && flashDeck?.id) return { profile: flashProfile, deck: flashDeck };
+
+      const patreonUser = await fetchPatreonUser();
+      const profile = await resolveProfileFromPatreon(String(patreonUser.id));
+      const deck = await resolveDefaultDeck(profile.id);
+      flashProfile = profile;
+      flashDeck = deck;
+      return { profile, deck };
+    }
+
+    async function loadFlashcardCategories(){
+      dictCategorySelect.disabled = true;
+      dictCategorySelect.innerHTML = `<option value="">Loading...</option>`;
+      const { deck } = await ensureFlashcardContext();
+      if(categoriesLoadedForDeckId === deck.id && flashCategories.length){
+        renderFlashcardCategories(flashCategories);
+        return flashCategories;
+      }
+      const cats = await loadDeckCategories(deck.id);
+      flashCategories = cats;
+      categoriesLoadedForDeckId = deck.id;
+      renderFlashcardCategories(cats);
+      return cats;
+    }
+
+    function renderFlashcardCategories(cats){
+      const options = [`<option value="">No category</option>`];
+      for(const cat of (cats || [])){
+        options.push(`<option value="${cat.id}">${escapeHtml(cat.name)}</option>`);
+      }
+      dictCategorySelect.innerHTML = options.join("");
+      dictCategorySelect.disabled = false;
+    }
+
+    function openDictPopup(word, definition, anchorRect, context){
       dictWordEl.textContent = word;
       dictDefEl.textContent = definition;
+      lastDictContext = {
+        example_vi: context?.example_vi || "",
+        example_en: context?.example_en || ""
+      };
+      closeDictSavePanel();
 
       const pad = 10;
       const popW = 360;
@@ -781,9 +1096,90 @@
       dictPop.classList.add("open");
     }
 
-    function closeDictPopup(){ dictPop.classList.remove("open"); }
+    function closeDictPopup(){
+      dictPop.classList.remove("open");
+      closeDictSavePanel();
+    }
 
     dictClose.addEventListener("click", closeDictPopup);
+    dictAdd.addEventListener("click", () => {
+      if(!supabase){
+        setDictSaveMsg("Flashcards not configured.", "err");
+        dictSavePanel.classList.add("open");
+        return;
+      }
+      openDictSavePanel();
+    });
+    dictCancelBtn.addEventListener("click", closeDictSavePanel);
+    dictSaveBtn.addEventListener("click", async () => {
+      if(savingToFlashcards) return;
+      if(!supabase){
+        setDictSaveMsg("Flashcards not configured.", "err");
+        return;
+      }
+
+      const word = (dictWordEl.textContent || "").trim();
+      const translation = (dictDefEl.textContent || "").trim();
+      if(!word || !translation){
+        setDictSaveMsg("Missing word or translation.", "err");
+        return;
+      }
+
+      savingToFlashcards = true;
+      dictSaveBtn.disabled = true;
+      setDictSaveMsg("Saving...");
+
+      try{
+        const { profile, deck } = await ensureFlashcardContext();
+        const cats = await loadFlashcardCategories();
+
+        let categoryId = "";
+        const newCategoryName = (dictNewCategory.value || "").trim();
+        if(newCategoryName){
+          const existing = cats.find(c => c.name.trim().toLowerCase() === newCategoryName.toLowerCase());
+          if(existing){
+            categoryId = existing.id;
+          }else{
+            const created = await createDeckCategory(deck.id, newCategoryName);
+            flashCategories = [...cats, created].sort((a,b)=>a.name.localeCompare(b.name));
+            renderFlashcardCategories(flashCategories);
+            categoryId = created.id;
+          }
+        }else{
+          categoryId = dictCategorySelect.value || "";
+        }
+
+        const existingNote = await findExistingNote(deck.id, profile.id, word, translation);
+        if(existingNote?.id){
+          if(categoryId && existingNote.category_id !== categoryId){
+            const { error: updateError } = await supabase
+              .from("notes")
+              .update({ category_id: categoryId, updated_at: nowISO() })
+              .eq("id", existingNote.id)
+              .eq("owner_id", profile.id);
+            if(updateError) throw updateError;
+          }
+          await ensureCardForNote(deck.id, existingNote.id);
+          setDictSaveMsg("Already in Flashcards.", "ok");
+        }else{
+          await createNoteWithCard(deck.id, profile.id, {
+            front: word,
+            back: translation,
+            example_vi: lastDictContext.example_vi,
+            example_en: lastDictContext.example_en,
+            category_id: categoryId || null,
+            hint: ""
+          });
+          setDictSaveMsg("Added to Flashcards.", "ok");
+        }
+      }catch(err){
+        console.error("Flashcards save failed.", err);
+        setDictSaveMsg(err?.message || "Could not save word.", "err");
+      }finally{
+        savingToFlashcards = false;
+        dictSaveBtn.disabled = false;
+      }
+    });
     window.addEventListener("click", (e) => {
       if(dictPop.classList.contains("open")){
         const inside = dictPop.contains(e.target);
@@ -907,8 +1303,12 @@
           ev.stopPropagation();
           const rect = wel.getBoundingClientRect();
           const { phrase, def } = lookupBestPhraseFromSpan(wel, 4);
-          if(def) openDictPopup(phrase, def, rect);
-          else openDictPopup(phrase || (wel.getAttribute("data-w")||""), dict ? "Not found in dictionary." : "Dictionary not loaded.", rect);
+          const lineEl = wel.closest(".capLine");
+          const lineIndex = lineEl ? parseInt(lineEl.getAttribute("data-i"), 10) : -1;
+          const example_vi = lineIndex >= 0 ? (cues[lineIndex]?.text || "") : "";
+          const context = { example_vi };
+          if(def) openDictPopup(phrase, def, rect, context);
+          else openDictPopup(phrase || (wel.getAttribute("data-w")||""), dict ? "Not found in dictionary." : "Dictionary not loaded.", rect, context);
         });
       });
     }
