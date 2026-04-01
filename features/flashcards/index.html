@@ -242,19 +242,28 @@
       }
 
       async function loadDeckBySlug(slug, profileId) {
-        const { data, error } = await supabase
+        const { data: existing, error } = await supabase
           .from('decks')
           .select('*')
           .eq('slug', slug)
           .eq('owner_id', profileId)
-          .eq('is_active', true)
           .maybeSingle();
 
         if (error) {
           console.error('Failed to load deck by slug.', { slug, profileId, error });
           throw error;
         }
-        if (data) return data;
+        if (existing) {
+          if (existing.is_active) return existing;
+          const { data: reactivated, error: reactivateError } = await supabase
+            .from('decks')
+            .update({ is_active: true })
+            .eq('id', existing.id)
+            .select('*')
+            .single();
+          if (reactivateError) throw reactivateError;
+          return reactivated;
+        }
 
         const { data: created, error: createError } = await supabase
           .from('decks')
@@ -278,12 +287,21 @@
           .select('*')
           .eq('slug', slug)
           .eq('owner_id', profileId)
-          .eq('is_active', true)
           .maybeSingle();
 
         if (fallbackError) throw fallbackError;
-        if (!fallback) throw new Error(`No active deck found for slug "${slug}".`);
-        return fallback;
+        if (fallback) {
+          if (fallback.is_active) return fallback;
+          const { data: reactivated, error: reactivateError } = await supabase
+            .from('decks')
+            .update({ is_active: true })
+            .eq('id', fallback.id)
+            .select('*')
+            .single();
+          if (reactivateError) throw reactivateError;
+          return reactivated;
+        }
+        throw new Error(`Default deck "${slug}" could not be created for this profile.`);
       }
 
       async function loadNotes(deckId, profileId) {
