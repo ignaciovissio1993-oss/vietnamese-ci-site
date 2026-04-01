@@ -242,6 +242,12 @@
       }
 
       async function loadDeckBySlug(slug, profileId) {
+        const insertPayload = {
+          slug,
+          title: 'Vietnamese Core A1',
+          owner_id: profileId
+        };
+
         const { data: existing, error } = await supabase
           .from('decks')
           .select('*')
@@ -250,66 +256,45 @@
           .maybeSingle();
 
         if (error) {
-          console.error('Failed to load deck by slug.', { slug, profileId, error });
-          throw error;
+          console.error('Failed to load deck by slug.', { slug, profileId, insertPayload, error });
+          throw new Error('Could not load default deck.');
         }
-        if (existing) {
-          if (existing.is_active) return existing;
-          const { data: reactivated, error: reactivateError } = await supabase
-            .from('decks')
-            .update({ is_active: true })
-            .eq('id', existing.id)
-            .select('*')
-            .single();
-          if (reactivateError) throw reactivateError;
-          return reactivated;
-        }
-
-        const insertPayload = {
-          slug,
-          title: 'Vietnamese Core A1',
-          owner_id: profileId,
-          is_active: true,
-          description: 'Core Vietnamese A1 starter deck.'
-        };
+        if (existing) return existing;
 
         const { data: created, error: createError } = await supabase
           .from('decks')
           .insert(insertPayload)
           .select('*')
-          .single();
-
-        if (!createError) return created;
-        console.error('Failed to create default deck.', {
-          slug,
-          profileId,
-          error: createError,
-          insertPayload
-        });
-        if (createError.code !== '23505') {
-          throw createError;
-        }
-
-        const { data: fallback, error: fallbackError } = await supabase
-          .from('decks')
-          .select('*')
-          .eq('slug', slug)
-          .eq('owner_id', profileId)
           .maybeSingle();
 
-        if (fallbackError) throw fallbackError;
-        if (fallback) {
-          if (fallback.is_active) return fallback;
-          const { data: reactivated, error: reactivateError } = await supabase
-            .from('decks')
-            .update({ is_active: true })
-            .eq('id', fallback.id)
-            .select('*')
-            .single();
-          if (reactivateError) throw reactivateError;
-          return reactivated;
+        if (!createError && created) return created;
+        if (createError) {
+          if (createError.status === 409 || createError.code === '23505') {
+            const { data: fallback, error: fallbackError } = await supabase
+              .from('decks')
+              .select('*')
+              .eq('slug', slug)
+              .eq('owner_id', profileId)
+              .maybeSingle();
+
+            if (fallbackError) {
+              console.error('Failed to reload deck after conflict.', { slug, profileId, insertPayload, error: fallbackError });
+              throw new Error('Could not load default deck.');
+            }
+            if (fallback) return fallback;
+          }
+
+          console.error('Failed to create default deck.', {
+            slug,
+            profileId,
+            error: createError,
+            insertPayload
+          });
+          throw new Error('Could not load default deck.');
         }
-        throw new Error(`Default deck "${slug}" could not be created for this profile.`);
+
+        console.error('Default deck insert returned no data.', { slug, profileId, insertPayload });
+        throw new Error('Could not load default deck.');
       }
 
       async function loadNotes(deckId, profileId) {
