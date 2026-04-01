@@ -265,20 +265,27 @@
           return reactivated;
         }
 
+        const insertPayload = {
+          slug,
+          title: 'Vietnamese Core A1',
+          owner_id: profileId,
+          is_active: true,
+          description: 'Core Vietnamese A1 starter deck.'
+        };
+
         const { data: created, error: createError } = await supabase
           .from('decks')
-          .insert({
-            slug,
-            title: 'Vietnamese Core A1',
-            owner_id: profileId,
-            is_active: true,
-            description: 'Core Vietnamese A1 starter deck.'
-          })
+          .insert(insertPayload)
           .select('*')
           .single();
 
         if (!createError) return created;
-        console.error('Failed to create default deck.', { slug, profileId, error: createError });
+        console.error('Failed to create default deck.', {
+          slug,
+          profileId,
+          error: createError,
+          insertPayload
+        });
         if (createError.code !== '23505') {
           throw createError;
         }
