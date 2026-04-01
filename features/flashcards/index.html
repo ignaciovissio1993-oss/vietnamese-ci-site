@@ -254,8 +254,36 @@
           console.error('Failed to load deck by slug.', { slug, profileId, error });
           throw error;
         }
-        if (!data) throw new Error(`No active deck found for slug "${slug}".`);
-        return data;
+        if (data) return data;
+
+        const { data: created, error: createError } = await supabase
+          .from('decks')
+          .insert({
+            slug,
+            title: 'Vietnamese Core A1',
+            owner_id: profileId,
+            is_active: true
+          })
+          .select('*')
+          .single();
+
+        if (!createError) return created;
+        if (createError.code !== '23505') {
+          console.error('Failed to create default deck.', { slug, profileId, error: createError });
+          throw createError;
+        }
+
+        const { data: fallback, error: fallbackError } = await supabase
+          .from('decks')
+          .select('*')
+          .eq('slug', slug)
+          .eq('owner_id', profileId)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (fallbackError) throw fallbackError;
+        if (!fallback) throw new Error(`No active deck found for slug "${slug}".`);
+        return fallback;
       }
 
       async function loadNotes(deckId, profileId) {
