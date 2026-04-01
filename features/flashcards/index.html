@@ -271,14 +271,15 @@
             slug,
             title: 'Vietnamese Core A1',
             owner_id: profileId,
-            is_active: true
+            is_active: true,
+            description: 'Core Vietnamese A1 starter deck.'
           })
           .select('*')
           .single();
 
         if (!createError) return created;
+        console.error('Failed to create default deck.', { slug, profileId, error: createError });
         if (createError.code !== '23505') {
-          console.error('Failed to create default deck.', { slug, profileId, error: createError });
           throw createError;
         }
 
