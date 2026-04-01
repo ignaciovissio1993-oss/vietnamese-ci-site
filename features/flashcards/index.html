@@ -62,7 +62,9 @@
       const SUPABASE_ANON_KEY = 'sb_publishable__BU5x4tUIvi0MwvyGFhEzQ_ot6pp-RS';
       const DEMO_PROFILE_ID = '11111111-1111-1111-1111-111111111111';
       const DEFAULT_DECK_SLUG = 'vietnamese-core-a1';
-      const patreonUserIdParam = new URLSearchParams(window.location.search).get('patreon_user_id');
+      const urlParams = new URLSearchParams(window.location.search);
+      const patreonUserIdParam = urlParams.get('patreon_user_id');
+      const hasPatreonUserIdParam = urlParams.has('patreon_user_id');
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -223,7 +225,10 @@
           .single();
 
         if (!createError) return created;
-        if (createError.code !== '23505') throw createError;
+        if (createError.code !== '23505') {
+          console.error('Failed to create profile for patreon_user_id:', patreonUserId, createError);
+          throw new Error(`Could not create profile for Patreon user ${patreonUserId}. ${createError.message || 'Insert failed.'}`);
+        }
 
         const { data: fallback, error: fallbackError } = await supabase
           .from('profiles')
@@ -232,6 +237,7 @@
           .maybeSingle();
 
         if (fallbackError) throw fallbackError;
+        if (!fallback?.id) throw new Error(`Could not resolve profile for Patreon user ${patreonUserId}.`);
         return fallback;
       }
 
@@ -618,8 +624,12 @@
             setLoading(true);
             setError('');
             let resolvedProfile = null;
-            if (patreonUserIdParam) {
-              resolvedProfile = await resolveProfileFromPatreon(String(patreonUserIdParam));
+            if (hasPatreonUserIdParam) {
+              const trimmedPatreonId = String(patreonUserIdParam || '').trim();
+              if (!trimmedPatreonId) {
+                throw new Error('Missing patreon_user_id in the URL query string.');
+              }
+              resolvedProfile = await resolveProfileFromPatreon(trimmedPatreonId);
             } else {
               resolvedProfile = await loadProfileById(DEMO_PROFILE_ID);
             }
