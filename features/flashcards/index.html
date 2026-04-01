@@ -248,9 +248,13 @@
           .eq('slug', slug)
           .eq('owner_id', profileId)
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Failed to load deck by slug.', { slug, profileId, error });
+          throw error;
+        }
+        if (!data) throw new Error(`No active deck found for slug "${slug}".`);
         return data;
       }
 
