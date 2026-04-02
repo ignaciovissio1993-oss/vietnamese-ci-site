@@ -164,6 +164,20 @@
           timeStyle: 'short'
         }).format(new Date(iso));
       };
+      const fmtRelativeReviewTime = (iso) => {
+        if (!iso) return 'now';
+        const deltaMs = new Date(iso).getTime() - Date.now();
+        const totalMinutes = Math.max(1, Math.round(deltaMs / (60 * 1000)));
+        if (totalMinutes < 60) return `${totalMinutes} min`;
+
+        const totalHours = Math.max(1, Math.round(totalMinutes / 60));
+        if (totalHours < 24) return `${totalHours} h`;
+
+        const totalDays = Math.max(1, Math.round(totalHours / 24));
+        if (totalDays < 7) return `${totalDays} d`;
+        if (totalDays < 30) return `${Math.max(1, Math.round(totalDays / 7))} wk`;
+        return `${Math.max(1, Math.round(totalDays / 30))} mo`;
+      };
       const daysBetween = (a, b) => Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / DAY));
 
       function uid(prefix = 'id') {
@@ -797,7 +811,7 @@
                       } ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       {rating[0].toUpperCase() + rating.slice(1)}
-                      <div className="text-xs mt-1 normal-case">{fmtDateTime(previewScheduling(currentCard, rating))}</div>
+                      <div className="text-xs mt-1 normal-case">{fmtRelativeReviewTime(previewScheduling(currentCard, rating))}</div>
                     </button>
                   ))}
                 </div>
