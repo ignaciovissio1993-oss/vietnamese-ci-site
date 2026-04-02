@@ -1209,6 +1209,7 @@
           }
           await ensureCardForNote(deck.id, existingNote.id);
           setDictSaveMsg("Already in Flashcards.", "ok");
+          closeDictPopup();
         }else{
           await createNoteWithCard(deck.id, profile.id, {
             front: word,
@@ -1219,6 +1220,7 @@
             hint: ""
           });
           setDictSaveMsg("Added to Flashcards.", "ok");
+          closeDictPopup();
         }
       }catch(err){
         console.error("Flashcards save failed.", err);

@@ -669,7 +669,7 @@
         return (
           <div className="rounded-3xl border bg-white p-5 shadow-sm space-y-3">
             <h3 className="text-lg font-semibold">{submitText === 'Save changes' ? 'Edit word' : 'Add word'}</h3>
-            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Vietnamita (front)" value={value.front} onChange={e => onChange({ ...value, front: e.target.value })} />
+            <input className="w-full rounded-2xl border px-4 py-3" placeholder="Vietnamese (front)" value={value.front} onChange={e => onChange({ ...value, front: e.target.value })} />
             <input className="w-full rounded-2xl border px-4 py-3" placeholder="Translation (back)" value={value.back} onChange={e => onChange({ ...value, back: e.target.value })} />
             <select className="w-full rounded-2xl border px-4 py-3 bg-white" value={value.category_id || ''} onChange={e => onChange({ ...value, category_id: e.target.value })}>
               <option value="">No category</option>
@@ -1051,7 +1051,7 @@
         }
 
         if (loading) {
-          return <div className="max-w-5xl mx-auto text-center py-20 text-slate-600">Loading Supabase...</div>;
+          return <div className="max-w-5xl mx-auto text-center py-20 text-slate-600">loading database</div>;
         }
 
         return (
