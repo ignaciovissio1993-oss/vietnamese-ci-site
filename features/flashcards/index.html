@@ -100,7 +100,7 @@
 
     <script type="text/babel">
       (() => {
-      const { useEffect, useLayoutEffect, useMemo, useState } = React;
+      const { useEffect, useMemo, useState } = React;
       const { createClient } = window.supabase;
 
       // =====================================================
@@ -689,6 +689,92 @@
         );
       }
 
+      function Flashcard({ currentCard, currentNote, saving, answer }) {
+        const [showBack, setShowBack] = useState(false);
+
+        return (
+          <div className="card-flip max-w-3xl mx-auto w-full">
+            <div className={`card-flip-inner ${showBack ? 'is-flipped' : ''}`}>
+              <div className="card-face card-front flashcards-panel rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8">
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Front</div>
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm bg-white">
+                      <span>State:</span>
+                      <strong className="capitalize">{currentCard.state}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex-1 flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">{currentNote.fields.front}</div>
+                  <div className="text-slate-600 text-base sm:text-lg">Hint: {currentNote.fields.hint || 'no hint'}</div>
+                  <div className="flex flex-wrap justify-center gap-2 pt-1">
+                    {(currentNote.tags || []).map(tag => (
+                      <span key={tag} className="rounded-full border px-3 py-1 text-sm bg-white text-slate-600">#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6 w-full flex flex-col sm:flex-row gap-3 sm:justify-center pb-2">
+                  <button onClick={() => setShowBack(true)} className="w-full sm:w-auto min-h-[44px] rounded-2xl bg-blue-600 text-white px-5 py-3 font-medium shadow transition-transform duration-150 active:scale-95 hover:opacity-95">
+                    Show answer
+                  </button>
+                </div>
+              </div>
+
+              <div className="card-face card-back flashcards-panel rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8">
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Answer</div>
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm bg-white">
+                      <span>State:</span>
+                      <strong className="capitalize">{currentCard.state}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex-1 flex flex-col items-center justify-center text-center space-y-5">
+                  <div className="max-w-xl">
+                    <div className="text-sm text-slate-500">Translation</div>
+                    <div className="text-2xl sm:text-3xl font-bold mt-1">{currentNote.fields.back}</div>
+                  </div>
+                  <div className="flashcards-panel rounded-2xl border p-4 space-y-2 text-left w-full sm:max-w-xl">
+                    <div>
+                      <div className="text-sm text-slate-500">Vietnamese example</div>
+                      <div className="font-medium">{currentNote.fields.example_vi}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-slate-500">English example</div>
+                      <div>{currentNote.fields.example_en}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 w-full flex flex-col sm:flex-row gap-3 sm:justify-center pb-2">
+                  {['again', 'hard', 'good', 'easy'].map(rating => (
+                    <button
+                      key={rating}
+                      disabled={saving}
+                      onClick={() => answer(rating)}
+                      className={`w-full sm:w-auto min-h-[44px] rounded-2xl px-4 py-3 font-medium border transition-transform duration-150 active:scale-95 ${
+                        rating === 'again' ? 'bg-red-50 border-red-200 text-red-700' :
+                        rating === 'hard' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                        rating === 'good' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+                        'bg-blue-50 border-blue-200 text-blue-700'
+                      } ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    >
+                      {rating[0].toUpperCase() + rating.slice(1)}
+                      <div className="text-xs mt-1 normal-case">{fmtDateTime(previewScheduling(currentCard, rating))}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       function App() {
         const flashcardsHref = `${window.location.pathname}${window.location.search}`;
         const videosHref = "/";
@@ -701,7 +787,6 @@
         const [reviewLogs, setReviewLogs] = useState([]);
         const [search, setSearch] = useState('');
         const [categoryFilter, setCategoryFilter] = useState('');
-        const [showBack, setShowBack] = useState(false);
         const [loading, setLoading] = useState(true);
         const [saving, setSaving] = useState(false);
         const [error, setError] = useState('');
@@ -748,7 +833,6 @@
             setCards(sortStudyCards(cardRows));
             setProgressMap(progressByCard);
             setReviewLogs(logRows);
-            setShowBack(false);
           } catch (err) {
             console.error(err);
             setError(err.message || 'Error loading data from Supabase.');
@@ -812,10 +896,6 @@
         const currentCard = queue[0] || null;
         const currentNote = currentCard ? (currentCard.note || notesById[currentCard.noteId]) : null;
 
-        useLayoutEffect(() => {
-          setShowBack(false);
-        }, [currentCard?.cardId]);
-
         const stats = useMemo(() => ({
           newCount: filteredCards.filter(c => c.state === 'new' && isDue(c.due_at)).length,
           learningCount: filteredCards.filter(c => (c.state === 'learning' || c.state === 'relearning') && isDue(c.due_at)).length,
@@ -869,7 +949,6 @@
               };
               return [nextLog, ...prev].slice(0, 30);
             });
-            setShowBack(false);
           } catch (err) {
             console.error(err);
             setError(err.message || 'Could not save the review.');
@@ -945,7 +1024,6 @@
               return next;
             });
             setReviewLogs(prev => prev.filter(log => !deleted.cardIds.includes(log.card_id)));
-            setShowBack(false);
           } catch (err) {
             console.error(err);
             setError(err.message || 'Could not delete the word.');
@@ -1104,85 +1182,13 @@
               </div>
 
               {currentCard && currentNote ? (
-                <div className="card-flip max-w-3xl mx-auto w-full">
-                  <div className={`card-flip-inner ${showBack ? 'is-flipped' : ''}`}>
-                    <div className="card-face card-front flashcards-panel rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8">
-                      <div className="flex items-center justify-between gap-3 w-full">
-                        <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Front</div>
-                          <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm bg-white">
-                            <span>State:</span>
-                            <strong className="capitalize">{currentCard.state}</strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-8 flex-1 flex flex-col items-center justify-center text-center space-y-4">
-                        <div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">{currentNote.fields.front}</div>
-                        <div className="text-slate-600 text-base sm:text-lg">Hint: {currentNote.fields.hint || 'no hint'}</div>
-                        <div className="flex flex-wrap justify-center gap-2 pt-1">
-                          {(currentNote.tags || []).map(tag => (
-                            <span key={tag} className="rounded-full border px-3 py-1 text-sm bg-white text-slate-600">#{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="mt-6 w-full flex flex-col sm:flex-row gap-3 sm:justify-center pb-2">
-                        <button onClick={() => setShowBack(true)} className="w-full sm:w-auto min-h-[44px] rounded-2xl bg-blue-600 text-white px-5 py-3 font-medium shadow transition-transform duration-150 active:scale-95 hover:opacity-95">
-                          Show answer
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="card-face card-back flashcards-panel rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8">
-                      <div className="flex items-center justify-between gap-3 w-full">
-                        <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Answer</div>
-                          <div className="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm bg-white">
-                            <span>State:</span>
-                            <strong className="capitalize">{currentCard.state}</strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-8 flex-1 flex flex-col items-center justify-center text-center space-y-5">
-                        <div className="max-w-xl">
-                          <div className="text-sm text-slate-500">Translation</div>
-                          <div className="text-2xl sm:text-3xl font-bold mt-1">{currentNote.fields.back}</div>
-                        </div>
-                        <div className="flashcards-panel rounded-2xl border p-4 space-y-2 text-left w-full sm:max-w-xl">
-                          <div>
-                            <div className="text-sm text-slate-500">Vietnamese example</div>
-                            <div className="font-medium">{currentNote.fields.example_vi}</div>
-                          </div>
-                          <div>
-                            <div className="text-sm text-slate-500">English example</div>
-                            <div>{currentNote.fields.example_en}</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-6 w-full flex flex-col sm:flex-row gap-3 sm:justify-center pb-2">
-                        {['again', 'hard', 'good', 'easy'].map(rating => (
-                          <button
-                            key={rating}
-                            disabled={saving}
-                            onClick={() => answer(rating)}
-                            className={`w-full sm:w-auto min-h-[44px] rounded-2xl px-4 py-3 font-medium border transition-transform duration-150 active:scale-95 ${
-                              rating === 'again' ? 'bg-red-50 border-red-200 text-red-700' :
-                              rating === 'hard' ? 'bg-amber-50 border-amber-200 text-amber-700' :
-                              rating === 'good' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
-                              'bg-blue-50 border-blue-200 text-blue-700'
-                            } ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
-                          >
-                            {rating[0].toUpperCase() + rating.slice(1)}
-                            <div className="text-xs mt-1 normal-case">{fmtDateTime(previewScheduling(currentCard, rating))}</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Flashcard
+                  key={currentCard.cardId}
+                  currentCard={currentCard}
+                  currentNote={currentNote}
+                  saving={saving}
+                  answer={answer}
+                />
               ) : (
                 <div className="rounded-3xl border bg-slate-50 p-10 text-center text-slate-600">
                   No pending cards with those filters. Quiet little win.
