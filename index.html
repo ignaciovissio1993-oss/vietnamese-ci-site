@@ -1359,17 +1359,15 @@
       if(!el) return;
       el.classList.add("active");
       const adjust = () => {
-        const viewH = capBody.clientHeight;
-        const top = el.offsetTop;
-        const h = el.offsetHeight;
-        const maxScroll = Math.max(0, capBody.scrollHeight - viewH);
-        const target = Math.min(Math.max(0, top - (viewH / 2) + (h / 2)), maxScroll);
-        const delta = Math.abs(capBody.scrollTop - target);
+        const bodyRect = capBody.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const bodyCenter = bodyRect.top + (bodyRect.height / 2);
+        const elCenter = elRect.top + (elRect.height / 2);
+        const delta = Math.abs(elCenter - bodyCenter);
         if(delta < 6) return;
-        const behavior = userInitiated ? "smooth" : (delta > 60 ? "smooth" : "auto");
-        capBody.scrollTo({ top: target, behavior });
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
       };
-      requestAnimationFrame(() => requestAnimationFrame(adjust));
+      requestAnimationFrame(adjust);
     }
 
     function tickSync(){
