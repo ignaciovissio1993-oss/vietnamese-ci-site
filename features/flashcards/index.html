@@ -13,6 +13,13 @@
           radial-gradient(900px 600px at 90% 10%, #f7e6ff 0%, transparent 60%),
           linear-gradient(180deg, #f7f4ff, #f7fbff);
       }
+      .flashcards-panel {
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
       .section-tabs {
         margin: 6px auto 0;
         display: flex;
@@ -83,7 +90,7 @@
       }
     </style>
   </head>
-  <body class="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+  <body class="min-h-screen text-slate-900">
     <div id="root" class="p-4 md:p-8"></div>
 
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -1055,7 +1062,7 @@
                 <h1 className="text-3xl font-bold tracking-tight">Flashcards for Vietnamese CI</h1>
               </div>
 
-              <div className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
+              <div className="flashcards-panel rounded-2xl border px-4 py-3">
                 <div className="text-xs uppercase tracking-wide text-slate-500">Demo user</div>
                 <div className="font-semibold">{profile?.full_name}</div>
                 <div className="text-sm text-slate-500">Patreon ID: {profile?.patreon_user_id}</div>
@@ -1076,7 +1083,7 @@
               <StatPill label="Total deck" value={stats.total} tone="slate" />
             </section>
 
-            <section className="rounded-3xl border bg-white shadow-sm p-4 md:p-6 space-y-4">
+            <section className="flashcards-panel rounded-3xl border p-4 md:p-6 space-y-4">
               <div className="grid md:grid-cols-[1fr_220px_260px] gap-4">
                 <input
                   value={search}
@@ -1102,7 +1109,7 @@
               {currentCard && currentNote ? (
                 <div className="card-flip max-w-3xl mx-auto w-full">
                   <div className={`card-flip-inner ${showBack ? 'is-flipped' : ''}`}>
-                    <div className="card-face card-front rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8 shadow-md">
+                    <div className="card-face card-front flashcards-panel rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8">
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div>
                           <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Front</div>
@@ -1130,7 +1137,7 @@
                       </div>
                     </div>
 
-                    <div className="card-face card-back rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8 shadow-md">
+                    <div className="card-face card-back flashcards-panel rounded-3xl border bg-gradient-to-b from-white to-slate-50 p-5 sm:p-6 md:p-8">
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div>
                           <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Answer</div>
@@ -1146,7 +1153,7 @@
                           <div className="text-sm text-slate-500">Translation</div>
                           <div className="text-2xl sm:text-3xl font-bold mt-1">{currentNote.fields.back}</div>
                         </div>
-                        <div className="rounded-2xl border bg-white p-4 space-y-2 text-left w-full sm:max-w-xl">
+                        <div className="flashcards-panel rounded-2xl border p-4 space-y-2 text-left w-full sm:max-w-xl">
                           <div>
                             <div className="text-sm text-slate-500">Vietnamese example</div>
                             <div className="font-medium">{currentNote.fields.example_vi}</div>
