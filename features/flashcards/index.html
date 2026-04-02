@@ -6,6 +6,50 @@
     <title>Flashcards SRS - Supabase Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      body {
+        margin: 0;
+        color: #1d1b2b;
+        background: radial-gradient(1200px 700px at 15% 0%, #e8f3ff 0%, transparent 60%),
+          radial-gradient(900px 600px at 90% 10%, #f7e6ff 0%, transparent 60%),
+          linear-gradient(180deg, #f7f4ff, #f7fbff);
+      }
+      .section-tabs {
+        margin: 6px auto 0;
+        display: flex;
+        gap: 18px;
+        align-items: flex-end;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(106, 92, 255, 0.18);
+      }
+      .section-tab {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 2px;
+        border: 0;
+        background: transparent;
+        font-weight: 700;
+        color: rgba(29, 27, 43, 0.65);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .section-tab:hover {
+        color: rgba(29, 27, 43, 0.9);
+      }
+      .section-tab.active {
+        color: rgba(29, 27, 43, 0.98);
+      }
+      .section-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -7px;
+        height: 2px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #6a5cff, #a7d8ff);
+      }
       .card-flip {
         perspective: 1200px;
         width: 100%;
@@ -639,6 +683,8 @@
       }
 
       function App() {
+        const flashcardsHref = `${window.location.pathname}${window.location.search}`;
+        const videosHref = "/";
         const [profile, setProfile] = useState(null);
         const [deck, setDeck] = useState(null);
         const [notes, setNotes] = useState([]);
@@ -999,6 +1045,10 @@
 
         return (
           <div className="max-w-6xl mx-auto space-y-6">
+            <div className="section-tabs" aria-label="Sections">
+              <a className="section-tab" href={videosHref}>Videos</a>
+              <a className="section-tab active" href={flashcardsHref}>Flashcards</a>
+            </div>
             <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <div className="text-sm text-slate-500">Standalone feature, ready to be integrated into the main site later</div>

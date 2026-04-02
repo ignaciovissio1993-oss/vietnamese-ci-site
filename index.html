@@ -39,18 +39,39 @@
     a{color:inherit;text-decoration:none}
     .app-wrap{max-width:1200px;margin:24px auto;padding:0 16px 50px}
 
-    .tabs{margin-top:16px;display:flex;gap:10px;justify-content:center;}
+    .tabs{
+      margin-top:18px;
+      display:flex;
+      gap:18px;
+      justify-content:flex-start;
+      align-items:flex-end;
+      padding-bottom:6px;
+      border-bottom:1px solid rgba(106,92,255,.18);
+    }
     .tab{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:10px 14px;border-radius:999px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.65);
-      backdrop-filter: blur(10px);
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 2px;
+      border:0;
+      background: transparent;
       font-weight:700;
-      box-shadow: 0 10px 25px rgba(20,14,60,.08);
+      color:rgba(29,27,43,.65);
       cursor:pointer;
     }
-    .tab.active{border-color: rgba(106,92,255,.25);outline: 3px solid rgba(106,92,255,.10);}
+    .tab:hover{color:rgba(29,27,43,.9)}
+    .tab.active{color:rgba(29,27,43,.98)}
+    .tab.active::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-7px;
+      height:2px;
+      border-radius:999px;
+      background: linear-gradient(90deg, #6a5cff, #a7d8ff);
+    }
 
     /* ✅ ONLY CHANGE YOU ASKED: make filters panel sit ABOVE videos (no left column) */
     .series-grid{
@@ -406,6 +427,7 @@
 <body>
   <div class="app-wrap">
     <div class="tabs" aria-label="Main">
+      <a class="tab active" href="/">Videos</a>
       <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/?patreon_user_id=">Flashcards</a>
     </div>
     <div id="seriesView">
@@ -1336,30 +1358,18 @@
       const el = capBody.querySelector(`.capLine[data-i="${i}"]`);
       if(!el) return;
       el.classList.add("active");
-
-      const isMobile = window.matchMedia("(max-width: 980px)").matches;
-
-      if(isMobile){
-        const adjust = () => {
-          const cb = capBody.getBoundingClientRect();
-          const eb = el.getBoundingClientRect();
-          const pad = 22;
-
-          const above = eb.top < (cb.top + pad);
-          const below = eb.bottom > (cb.bottom - pad);
-
-          if(above) capBody.scrollTop -= (cb.top + pad - eb.top);
-          else if(below) capBody.scrollTop += (eb.bottom - (cb.bottom - pad));
-        };
-        requestAnimationFrame(() => requestAnimationFrame(adjust));
-        return;
-      }
-
-      const top = el.offsetTop;
-      const h = el.offsetHeight;
-      const viewH = capBody.clientHeight;
-      const target = top - (viewH/2) + (h/2);
-      capBody.scrollTo({ top: Math.max(0, target), behavior: userInitiated ? "smooth" : "auto" });
+      const adjust = () => {
+        const viewH = capBody.clientHeight;
+        const top = el.offsetTop;
+        const h = el.offsetHeight;
+        const maxScroll = Math.max(0, capBody.scrollHeight - viewH);
+        const target = Math.min(Math.max(0, top - (viewH / 2) + (h / 2)), maxScroll);
+        const delta = Math.abs(capBody.scrollTop - target);
+        if(delta < 6) return;
+        const behavior = userInitiated ? "smooth" : (delta > 60 ? "smooth" : "auto");
+        capBody.scrollTo({ top: target, behavior });
+      };
+      requestAnimationFrame(() => requestAnimationFrame(adjust));
     }
 
     function tickSync(){
