@@ -1058,15 +1058,7 @@
             </div>
             <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <div className="text-sm text-slate-500">Standalone feature, ready to be integrated into the main site later</div>
                 <h1 className="text-3xl font-bold tracking-tight">Flashcards for Vietnamese CI</h1>
-              </div>
-
-              <div className="flashcards-panel rounded-2xl border px-4 py-3">
-                <div className="text-xs uppercase tracking-wide text-slate-500">Demo user</div>
-                <div className="font-semibold">{profile?.full_name}</div>
-                <div className="text-sm text-slate-500">Patreon ID: {profile?.patreon_user_id}</div>
-                <div className="text-sm text-slate-500">Membership: {profile?.membership_status}</div>
               </div>
             </header>
 
@@ -1080,7 +1072,7 @@
               <StatPill label="New" value={stats.newCount} tone="blue" />
               <StatPill label="Learning" value={stats.learningCount} tone="amber" />
               <StatPill label="Review" value={stats.reviewCount} tone="emerald" />
-              <StatPill label="Total deck" value={stats.total} tone="slate" />
+              <StatPill label="Total cards" value={stats.total} tone="slate" />
             </section>
 
             <section className="flashcards-panel rounded-3xl border p-4 md:p-6 space-y-4">
