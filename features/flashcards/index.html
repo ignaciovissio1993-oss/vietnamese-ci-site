@@ -100,7 +100,7 @@
 
     <script type="text/babel">
       (() => {
-      const { useEffect, useMemo, useState } = React;
+      const { useEffect, useLayoutEffect, useMemo, useState } = React;
       const { createClient } = window.supabase;
 
       // =====================================================
@@ -811,6 +811,10 @@
         const queue = useMemo(() => getQueue(filteredCards), [filteredCards]);
         const currentCard = queue[0] || null;
         const currentNote = currentCard ? (currentCard.note || notesById[currentCard.noteId]) : null;
+
+        useLayoutEffect(() => {
+          setShowBack(false);
+        }, [currentCard?.cardId]);
 
         const stats = useMemo(() => ({
           newCount: filteredCards.filter(c => c.state === 'new' && isDue(c.due_at)).length,
