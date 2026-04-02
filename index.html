@@ -900,6 +900,7 @@
       dictSaveDef.textContent = dictDefEl.textContent || "";
       dictSavePanel.classList.add("open");
       setDictSaveMsg("");
+      positionDictPopup(lastDictAnchorRect);
       loadFlashcardCategories().catch(err => {
         console.error("Failed to load flashcard categories.", err);
         setDictSaveMsg("Could not load categories.", "err");
@@ -1091,6 +1092,46 @@
       dictCategorySelect.disabled = false;
     }
 
+    let lastDictAnchorRect = null;
+
+    function positionDictPopup(anchorRect){
+      if(!anchorRect) return;
+      const pad = 10;
+      const gap = 8;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      dictPop.classList.add("open");
+      dictPop.style.visibility = "hidden";
+
+      const popRect = dictPop.getBoundingClientRect();
+      const spaceBelow = vh - pad - anchorRect.bottom;
+      const spaceAbove = anchorRect.top - pad;
+
+      let left = anchorRect.left;
+      if(left + popRect.width > vw - pad) left = vw - pad - popRect.width;
+      if(left < pad) left = pad;
+
+      let top;
+      if(spaceBelow >= popRect.height){
+        top = anchorRect.bottom + gap;
+      }else if(spaceAbove >= popRect.height){
+        top = anchorRect.top - gap - popRect.height;
+      }else{
+        if(spaceBelow >= spaceAbove){
+          top = Math.min(anchorRect.bottom + gap, vh - pad - popRect.height);
+        }else{
+          top = Math.max(anchorRect.top - gap - popRect.height, pad);
+        }
+      }
+
+      top = Math.min(Math.max(top, pad), vh - pad - popRect.height);
+
+      dictPop.style.left = `${left}px`;
+      dictPop.style.top = `${top}px`;
+      dictPop.style.visibility = "";
+    }
+
     function openDictPopup(word, definition, anchorRect, context){
       dictWordEl.textContent = word;
       dictDefEl.textContent = definition;
@@ -1099,23 +1140,8 @@
         example_en: context?.example_en || ""
       };
       closeDictSavePanel();
-
-      const pad = 10;
-      const popW = 360;
-      const popH = 160;
-
-      let left = anchorRect.left;
-      let top = anchorRect.bottom + 8;
-
-      if(left + popW > window.innerWidth - pad) left = window.innerWidth - pad - popW;
-      if(left < pad) left = pad;
-
-      if(top + popH > window.innerHeight - pad) top = anchorRect.top - 8 - popH;
-      if(top < pad) top = pad;
-
-      dictPop.style.left = `${left}px`;
-      dictPop.style.top = `${top}px`;
-      dictPop.classList.add("open");
+      lastDictAnchorRect = anchorRect;
+      positionDictPopup(anchorRect);
     }
 
     function closeDictPopup(){
