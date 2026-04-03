@@ -24,9 +24,15 @@
         margin: 6px auto 0;
         display: flex;
         gap: 18px;
+        justify-content: center;
         align-items: flex-end;
         padding-bottom: 6px;
         border-bottom: 1px solid rgba(106, 92, 255, 0.18);
+      }
+      @media (max-width: 640px) {
+        .section-tabs {
+          justify-content: flex-start;
+        }
       }
       .section-tab {
         position: relative;
@@ -941,8 +947,8 @@
           return notes.filter(note => note.category_id === categoryFilter);
         }, [notes, categoryFilter]);
         const selectedCategoryLabel = useMemo(() => {
-          if (!categoryFilter) return 'All categories';
-          return categories.find(cat => cat.id === categoryFilter)?.name || 'All categories';
+          if (!categoryFilter) return 'All decks';
+          return categories.find(cat => cat.id === categoryFilter)?.name || 'All decks';
         }, [categories, categoryFilter]);
 
         const queue = useMemo(() => getQueue(filteredCards), [filteredCards]);
@@ -1276,7 +1282,7 @@
             </div>
             <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">Flashcards for Vietnamese CI</h1>
+                <h1 className="text-3xl font-bold tracking-tight">My Vocabulary</h1>
               </div>
             </header>
 
@@ -1522,7 +1528,7 @@
                       onChange={(e) => setCategoryFilter(e.target.value)}
                       className="w-full rounded-2xl border px-4 py-3 bg-white"
                     >
-                      <option value="">All categories</option>
+                      <option value="">All decks</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
@@ -1532,7 +1538,7 @@
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-3">
                       <h2 className="text-xl font-semibold">Word list</h2>
-                      <div className="text-sm text-slate-500">Category: {selectedCategoryLabel}</div>
+                      <div className="text-sm text-slate-500">Deck: {selectedCategoryLabel}</div>
                     </div>
                     <div className="text-sm text-slate-500">You can edit or delete items</div>
                   </div>
@@ -1546,7 +1552,7 @@
                           <div className="text-slate-600">{note.fields.back}</div>
                           <div className="text-sm text-slate-500 mt-1">{note.fields.hint || 'no hint'}</div>
                           <div className="text-xs text-slate-500 mt-1">
-                            Category: <span className="font-medium text-slate-700">{note.category?.name || 'no category'}</span>
+                            Deck: <span className="font-medium text-slate-700">{note.category?.name || 'no category'}</span>
                           </div>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {(note.tags || []).map(tag => (
