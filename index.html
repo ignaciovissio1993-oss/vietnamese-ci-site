@@ -535,9 +535,9 @@
       <div class="dictSaveRow"><span>Word:</span> <b id="dictSaveWord">word</b></div>
       <div class="dictSaveRow"><span>Translation:</span> <span id="dictSaveDef">definition</span></div>
       <label>
-        <div style="margin-top:6px;font-weight:700">Category</div>
+        <div style="margin-top:6px;font-weight:700">Deck</div>
         <select class="dictSaveSelect" id="dictCategorySelect">
-          <option value="">No category</option>
+          <option value="">Default</option>
         </select>
       </label>
       <label>
@@ -1084,7 +1084,7 @@
     }
 
     function renderFlashcardCategories(cats){
-      const options = [`<option value="">No category</option>`];
+      const options = [`<option value="">Default</option>`];
       for(const cat of (cats || [])){
         options.push(`<option value="${cat.id}">${escapeHtml(cat.name)}</option>`);
       }
