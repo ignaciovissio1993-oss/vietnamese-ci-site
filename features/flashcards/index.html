@@ -132,7 +132,7 @@
 
     <script type="text/babel">
       (() => {
-      const { useEffect, useMemo, useState } = React;
+      const { useEffect, useLayoutEffect, useMemo, useRef, useState } = React;
       const { createClient } = window.supabase;
 
       // =====================================================
@@ -843,6 +843,9 @@
         const [editingCategoryName, setEditingCategoryName] = useState('');
         const [managementTab, setManagementTab] = useState('categories');
         const [openCategoryMenuId, setOpenCategoryMenuId] = useState(null);
+        const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] = useState(null);
+        const [categoryMenuStyle, setCategoryMenuStyle] = useState(null);
+        const categoryMenuRef = useRef(null);
         const [studyReady, setStudyReady] = useState(false);
 
         useEffect(() => {
@@ -1188,6 +1191,43 @@
           }
         }
 
+        useEffect(() => {
+          if (!openCategoryMenuId) {
+            setCategoryMenuAnchorEl(null);
+            setCategoryMenuStyle(null);
+          }
+        }, [openCategoryMenuId]);
+
+        useLayoutEffect(() => {
+          if (!openCategoryMenuId || !categoryMenuAnchorEl || !categoryMenuRef.current) return;
+
+          const updatePosition = () => {
+            const anchorRect = categoryMenuAnchorEl.getBoundingClientRect();
+            const menuRect = categoryMenuRef.current.getBoundingClientRect();
+            const margin = 8;
+            const spaceBelow = window.innerHeight - anchorRect.bottom;
+            const spaceAbove = anchorRect.top;
+            const shouldOpenBelow = spaceBelow >= menuRect.height + margin || spaceBelow >= spaceAbove;
+            let top = shouldOpenBelow
+              ? anchorRect.bottom + margin
+              : anchorRect.top - menuRect.height - margin;
+            const maxTop = window.innerHeight - menuRect.height - margin;
+            top = Math.min(Math.max(margin, top), Math.max(margin, maxTop));
+            let left = anchorRect.right - menuRect.width;
+            const maxLeft = window.innerWidth - menuRect.width - margin;
+            left = Math.min(Math.max(margin, left), Math.max(margin, maxLeft));
+            setCategoryMenuStyle({ top: Math.round(top), left: Math.round(left), position: 'fixed' });
+          };
+
+          updatePosition();
+          window.addEventListener('resize', updatePosition);
+          window.addEventListener('scroll', updatePosition, true);
+          return () => {
+            window.removeEventListener('resize', updatePosition);
+            window.removeEventListener('scroll', updatePosition, true);
+          };
+        }, [openCategoryMenuId, categoryMenuAnchorEl]);
+
         if (loading) {
           return <div className="max-w-5xl mx-auto text-center py-20 text-slate-600">loading database</div>;
         }
@@ -1365,7 +1405,14 @@
                                   aria-expanded={openCategoryMenuId === cat.id}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setOpenCategoryMenuId(prev => (prev === cat.id ? null : cat.id));
+                                    const anchorEl = e.currentTarget;
+                                    if (openCategoryMenuId === cat.id) {
+                                      setOpenCategoryMenuId(null);
+                                      setCategoryMenuAnchorEl(null);
+                                    } else {
+                                      setOpenCategoryMenuId(cat.id);
+                                      setCategoryMenuAnchorEl(anchorEl);
+                                    }
                                   }}
                                   className="rounded-xl border px-2.5 py-1.5 bg-white text-slate-600 hover:text-slate-900"
                                 >
@@ -1374,7 +1421,9 @@
                                 {openCategoryMenuId === cat.id && (
                                   <div
                                     role="menu"
-                                    className="absolute right-0 top-full mt-2 w-32 rounded-xl border bg-white shadow-lg p-1 z-10"
+                                    ref={categoryMenuRef}
+                                    className="fixed w-32 rounded-xl border bg-white shadow-lg p-1 z-10"
+                                    style={categoryMenuStyle ? categoryMenuStyle : { top: 0, left: 0, position: 'fixed', visibility: 'hidden' }}
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <button
