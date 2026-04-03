@@ -844,6 +844,7 @@
         const [managementTab, setManagementTab] = useState('categories');
         const [openCategoryMenuId, setOpenCategoryMenuId] = useState(null);
         const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] = useState(null);
+        const [categoryMenuTriggerRect, setCategoryMenuTriggerRect] = useState(null);
         const [categoryMenuStyle, setCategoryMenuStyle] = useState(null);
         const categoryMenuRef = useRef(null);
         const [studyReady, setStudyReady] = useState(false);
@@ -1191,12 +1192,39 @@
           }
         }
 
+        const closeCategoryMenu = () => {
+          setOpenCategoryMenuId(null);
+          setCategoryMenuAnchorEl(null);
+          setCategoryMenuTriggerRect(null);
+          setCategoryMenuStyle(null);
+        };
+
         useEffect(() => {
           if (!openCategoryMenuId) {
             setCategoryMenuAnchorEl(null);
+            setCategoryMenuTriggerRect(null);
             setCategoryMenuStyle(null);
           }
         }, [openCategoryMenuId]);
+
+        useEffect(() => {
+          if (!openCategoryMenuId) return;
+          const handlePointerDown = (event) => {
+            const menuEl = categoryMenuRef.current;
+            if (menuEl?.contains(event.target)) return;
+            if (categoryMenuAnchorEl?.contains(event.target)) return;
+            closeCategoryMenu();
+          };
+          const handleKeyDown = (event) => {
+            if (event.key === 'Escape') closeCategoryMenu();
+          };
+          window.addEventListener('mousedown', handlePointerDown);
+          window.addEventListener('keydown', handleKeyDown);
+          return () => {
+            window.removeEventListener('mousedown', handlePointerDown);
+            window.removeEventListener('keydown', handleKeyDown);
+          };
+        }, [openCategoryMenuId, categoryMenuAnchorEl]);
 
         useLayoutEffect(() => {
           if (!openCategoryMenuId || !categoryMenuAnchorEl || !categoryMenuRef.current) return;
@@ -1234,7 +1262,7 @@
             window.removeEventListener('resize', scheduleUpdate);
             window.removeEventListener('scroll', scheduleUpdate, true);
           };
-        }, [openCategoryMenuId, categoryMenuAnchorEl]);
+        }, [openCategoryMenuId, categoryMenuAnchorEl, categoryMenuTriggerRect]);
 
         if (loading) {
           return <div className="max-w-5xl mx-auto text-center py-20 text-slate-600">loading database</div>;
@@ -1415,19 +1443,20 @@
                                     e.stopPropagation();
                                     const anchorEl = e.currentTarget;
                                     if (openCategoryMenuId === cat.id) {
-                                      setOpenCategoryMenuId(null);
-                                      setCategoryMenuAnchorEl(null);
+                                      closeCategoryMenu();
                                     } else {
+                                      const anchorRect = anchorEl.getBoundingClientRect();
                                       setCategoryMenuStyle(null);
                                       setOpenCategoryMenuId(cat.id);
                                       setCategoryMenuAnchorEl(anchorEl);
+                                      setCategoryMenuTriggerRect(anchorRect);
                                     }
                                   }}
                                   className="rounded-xl border px-2.5 py-1.5 bg-white text-slate-600 hover:text-slate-900"
                                 >
                                   ▾
                                 </button>
-                                {openCategoryMenuId === cat.id && (
+                                {openCategoryMenuId === cat.id && ReactDOM.createPortal(
                                   <div
                                     role="menu"
                                     ref={categoryMenuRef}
@@ -1438,18 +1467,25 @@
                                     <button
                                       role="menuitem"
                                       className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-50"
-                                      onClick={() => startEditCategory(cat)}
+                                      onClick={() => {
+                                        closeCategoryMenu();
+                                        startEditCategory(cat);
+                                      }}
                                     >
                                       Rename
                                     </button>
                                     <button
                                       role="menuitem"
                                       className="w-full text-left px-3 py-2 text-sm rounded-lg text-red-700 hover:bg-red-50"
-                                      onClick={() => handleDeleteCategory(cat.id)}
+                                      onClick={() => {
+                                        closeCategoryMenu();
+                                        handleDeleteCategory(cat.id);
+                                      }}
                                     >
                                       Delete
                                     </button>
-                                  </div>
+                                  </div>,
+                                  document.body
                                 )}
                               </>
                             )}
