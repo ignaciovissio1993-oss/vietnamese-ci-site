@@ -166,10 +166,18 @@
       }
 
       function getMembershipAccess(user) {
-        return {
+        const access = {
           isPaidSupporter: !!user?.is_paid_supporter,
           isFreeMember: !!user?.is_free_member
         };
+        console.info('[membership] detected', {
+          membershipType: user?.membership_type || 'unknown',
+          membershipStatus: user?.membership_status || null,
+          entitledTier: user?.membership_tier || null,
+          isPaidPatron: access.isPaidSupporter,
+          isFreePatron: access.isFreeMember
+        });
+        return access;
       }
 
       // =========================
