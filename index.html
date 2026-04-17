@@ -62,6 +62,7 @@
     }
     .tab:hover{color:rgba(29,27,43,.9)}
     .tab.active{color:rgba(29,27,43,.98)}
+    .tab.is-locked{color:rgba(29,27,43,.55)}
     .tab.active::after{
       content:"";
       position:absolute;
@@ -72,6 +73,14 @@
       border-radius:999px;
       background: linear-gradient(90deg, #6a5cff, #a7d8ff);
     }
+    .accessMsg{
+      display:none;
+      margin-top:8px;
+      text-align:center;
+      font-size:12px;
+      color:rgba(29,27,43,.7);
+    }
+    .accessMsg.open{display:block}
 
     /* ✅ ONLY CHANGE YOU ASKED: make filters panel sit ABOVE videos (no left column) */
     .series-grid{
@@ -158,6 +167,8 @@
       min-height: 210px;
       cursor:pointer;
     }
+    .card.locked{cursor:not-allowed}
+    .card.locked .thumb img{filter: grayscale(.2) brightness(.75)}
     .thumb{
       height: 120px;
       background: linear-gradient(135deg, rgba(106,92,255,.12), rgba(255,87,200,.10));
@@ -174,6 +185,15 @@
       font-size:12px;font-weight:800;
       border:1px solid rgba(255,255,255,.7);
       background: rgba(255,255,255,.65);
+      backdrop-filter: blur(10px);
+    }
+    .lockChip{
+      position:absolute;top:10px;right:10px;
+      padding:6px 10px;border-radius:999px;
+      font-size:12px;font-weight:800;
+      color:#5d1730;
+      border:1px solid rgba(255,80,120,.2);
+      background: rgba(255,255,255,.82);
       backdrop-filter: blur(10px);
     }
     .cardBody{padding:10px 12px}
@@ -366,6 +386,15 @@
       font-size:12px;
       color:#2b2750;
     }
+    .dictAdd[disabled]{opacity:.65;cursor:not-allowed}
+    .dictAccessNote{
+      display:none;
+      margin-top:8px;
+      font-size:12px;
+      color:#8b1e36;
+      text-align:right;
+    }
+    .dictAccessNote.open{display:block}
     .dictSavePanel{
       margin-top:10px;
       border-top:1px solid rgba(106,92,255,.12);
@@ -430,6 +459,7 @@
       <a class="tab active" href="/">Videos</a>
       <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/?patreon_user_id=">Flashcards</a>
     </div>
+    <div class="accessMsg" id="memberAccessMsg" aria-live="polite"></div>
     <div id="seriesView">
       <div class="series-grid">
 
@@ -531,6 +561,7 @@
     <div class="dictActions">
       <button class="dictAdd" id="dictAdd">Add to Flashcards</button>
     </div>
+    <div class="dictAccessNote" id="dictAccessNote">Flashcards are only available for paid supporters.</div>
     <div class="dictSavePanel" id="dictSavePanel" aria-live="polite">
       <div class="dictSaveRow"><span>Word:</span> <b id="dictSaveWord">word</b></div>
       <div class="dictSaveRow"><span>Translation:</span> <span id="dictSaveDef">definition</span></div>
@@ -577,6 +608,20 @@
       return data.user;
     }
 
+    function getMembershipAccess(user) {
+      return {
+        isPaidSupporter: !!user?.is_paid_supporter,
+        isFreeMember: !!user?.is_free_member
+      };
+    }
+
+    function showMemberAccessMessage(message) {
+      const el = document.getElementById("memberAccessMsg");
+      if (!el) return;
+      el.textContent = message || "";
+      el.classList.toggle("open", !!message);
+    }
+
     function updateFlashcardsLink(patreonUserId) {
       const link = document.getElementById("flashcardsLink");
       if (!link) return;
@@ -589,9 +634,35 @@
       link.setAttribute("href", url.pathname + url.search);
     }
 
+    function applyFlashcardsTabAccess(user) {
+      const link = document.getElementById("flashcardsLink");
+      if (!link) return;
+      const access = getMembershipAccess(user);
+      const blockedMessage = "Flashcards are only available for paid supporters.";
+
+      link.classList.toggle("is-locked", access.isFreeMember);
+      link.setAttribute("aria-disabled", access.isFreeMember ? "true" : "false");
+      link.title = access.isFreeMember ? blockedMessage : "";
+
+      if (!link.dataset.accessBound) {
+        link.addEventListener("click", (event) => {
+          if (!window.currentMembershipAccess?.isFreeMember) return;
+          event.preventDefault();
+          showMemberAccessMessage(blockedMessage);
+        });
+        link.dataset.accessBound = "true";
+      }
+
+      if (!access.isFreeMember) {
+        showMemberAccessMessage("");
+      }
+    }
+
     (async function initFlashcardsProfileLink() {
       try {
         const patreonUser = await fetchPatreonUser();
+        window.currentMembershipAccess = getMembershipAccess(patreonUser);
+        applyFlashcardsTabAccess(patreonUser);
         updateFlashcardsLink(String(patreonUser.id));
       } catch (err) {
         console.error("Flashcards link setup failed.", err);
@@ -645,6 +716,7 @@
     const dictSaveBtn = document.getElementById("dictSaveBtn");
     const dictCancelBtn = document.getElementById("dictCancelBtn");
     const dictSaveMsg = document.getElementById("dictSaveMsg");
+    const dictAccessNote = document.getElementById("dictAccessNote");
 
     // ========= State =========
     let playlists = [];
@@ -676,6 +748,7 @@
     let flashCategories = [];
     let categoriesLoadedForDeckId = null;
     let savingToFlashcards = false;
+    let currentViewerAccess = { isPaidSupporter: false, isFreeMember: false };
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -704,6 +777,22 @@
       if(t.includes("story") || t.includes("cuento") || t.includes("historia")) return "Stories";
       if(t.includes("chat") || t.includes("conversation") || t.includes("convers")) return "Conversation";
       return "Daily";
+    }
+
+    function isVideoLockedForCurrentUser(video) {
+      return !!(currentViewerAccess.isFreeMember && video?.isPatreonExclusive);
+    }
+
+    function applyDictionaryFlashcardAccess() {
+      const blocked = currentViewerAccess.isFreeMember;
+      dictAdd.disabled = blocked;
+      dictAdd.setAttribute("aria-disabled", blocked ? "true" : "false");
+      dictAdd.title = blocked ? "Flashcards are only available for paid supporters." : "";
+      dictAccessNote.classList.toggle("open", blocked);
+      if (!blocked) {
+        dictSavePanel.classList.remove("open");
+        setDictSaveMsg("");
+      }
     }
 
     function fmtTime(sec){
@@ -770,7 +859,8 @@
           thumb: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
           playlistId: playlist.id,
           playlistTitle: playlist.title,
-          publishedAt: raw.published || ""
+          publishedAt: raw.published || "",
+          isPatreonExclusive: true
         };
 
         const list = videosByPlaylist.get(playlist.id) || [];
@@ -1058,6 +1148,7 @@
 
     async function ensureFlashcardContext(){
       if(!supabase) throw new Error("Supabase client not available.");
+      if(currentViewerAccess.isFreeMember) throw new Error("Flashcards are only available for paid supporters.");
       if(flashProfile?.id && flashDeck?.id) return { profile: flashProfile, deck: flashDeck };
 
       const patreonUser = await fetchPatreonUser();
@@ -1140,6 +1231,7 @@
         example_en: context?.example_en || ""
       };
       closeDictSavePanel();
+      applyDictionaryFlashcardAccess();
       lastDictAnchorRect = anchorRect;
       positionDictPopup(anchorRect);
     }
@@ -1151,6 +1243,12 @@
 
     dictClose.addEventListener("click", closeDictPopup);
     dictAdd.addEventListener("click", () => {
+      if(currentViewerAccess.isFreeMember){
+        dictSavePanel.classList.remove("open");
+        setDictSaveMsg("");
+        dictAccessNote.classList.add("open");
+        return;
+      }
       if(!supabase){
         setDictSaveMsg("Flashcards not configured.", "err");
         dictSavePanel.classList.add("open");
@@ -1453,6 +1551,10 @@
 
     function openVideo(v){
       if(!v || !v.videoId) return;
+      if(isVideoLockedForCurrentUser(v)){
+        showMemberAccessMessage("This video is available to paid supporters only.");
+        return;
+      }
       currentVideoId = v.videoId;
 
       modalVideoTitle.textContent = v.title || "Video";
@@ -1514,11 +1616,13 @@
       cards.innerHTML = items.map(v => {
         const lvl = v.level ? `<span class="tag">${escapeHtml(v.level)}</span>` : "";
         const top = v.topic ? `<span class="tag">${escapeHtml(v.topic)}</span>` : "";
+        const locked = isVideoLockedForCurrentUser(v);
         return `
-          <div class="card" data-vid="${v.videoId}">
+          <div class="card${locked ? ` locked` : ``}" data-vid="${v.videoId}">
             <div class="thumb">
               ${v.thumb ? `<img src="${escapeHtml(v.thumb)}" alt="">` : ""}
               <div class="chip">${escapeHtml(v.playlistTitle)}</div>
+              ${locked ? `<div class="lockChip">🔒 Paid only</div>` : ``}
             </div>
             <div class="cardBody">
               <p class="title">${escapeHtml(v.title)}</p>
@@ -1653,6 +1757,20 @@
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
       document.head.appendChild(tag);
+    })();
+
+    (async function initMembershipAccess(){
+      try{
+        const patreonUser = await fetchPatreonUser();
+        currentViewerAccess = getMembershipAccess(patreonUser);
+        window.currentMembershipAccess = currentViewerAccess;
+        applyFlashcardsTabAccess(patreonUser);
+      }catch(err){
+        currentViewerAccess = { isPaidSupporter: false, isFreeMember: false };
+      }finally{
+        applyDictionaryFlashcardAccess();
+        render();
+      }
     })();
 
     // ========= Boot =========

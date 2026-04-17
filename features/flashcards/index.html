@@ -157,6 +157,21 @@
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+      async function fetchPatreonUser() {
+        const res = await fetch('/auth/me', { credentials: 'include' });
+        if (res.status === 401) return null;
+        if (!res.ok) throw new Error('Could not load Patreon user.');
+        const data = await res.json();
+        return data?.user?.id ? data.user : null;
+      }
+
+      function getMembershipAccess(user) {
+        return {
+          isPaidSupporter: !!user?.is_paid_supporter,
+          isFreeMember: !!user?.is_free_member
+        };
+      }
+
       // =========================
       // Helpers
       // =========================
@@ -854,6 +869,7 @@
         const [categoryMenuStyle, setCategoryMenuStyle] = useState(null);
         const categoryMenuRef = useRef(null);
         const [studyReady, setStudyReady] = useState(false);
+        const [accessBlocked, setAccessBlocked] = useState(false);
 
         useEffect(() => {
           if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
@@ -863,6 +879,13 @@
           try {
             setLoading(true);
             setError('');
+            setAccessBlocked(false);
+            const patreonUser = await fetchPatreonUser();
+            const membershipAccess = getMembershipAccess(patreonUser);
+            if (membershipAccess.isFreeMember) {
+              setAccessBlocked(true);
+              return;
+            }
             let resolvedProfile = null;
             if (hasPatreonUserIdParam) {
               const trimmedPatreonId = String(patreonUserIdParam || '').trim();
@@ -1272,6 +1295,24 @@
 
         if (loading) {
           return <div className="max-w-5xl mx-auto text-center py-20 text-slate-600">loading database</div>;
+        }
+
+        if (accessBlocked) {
+          return (
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="section-tabs" aria-label="Sections">
+                <a className="section-tab" href={videosHref}>Videos</a>
+                <a className="section-tab active" href={flashcardsHref}>Flashcards</a>
+              </div>
+              <div className="flashcards-panel rounded-3xl border px-5 py-8 md:px-6 text-center space-y-3">
+                <h1 className="text-3xl font-bold tracking-tight">Flashcards</h1>
+                <div className="text-slate-600">Flashcards are only available for paid supporters.</div>
+                <div>
+                  <a className="inline-flex rounded-2xl border px-4 py-2 bg-white" href={videosHref}>Back to videos</a>
+                </div>
+              </div>
+            </div>
+          );
         }
 
         return (

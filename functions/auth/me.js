@@ -45,6 +45,11 @@ export async function onRequest({ request, env }) {
       if (status) user.membership_status = status;
 
       const tiers = membership?.relationships?.currently_entitled_tiers?.data || [];
+      const hasEntitledTiers = Array.isArray(tiers) && tiers.length > 0;
+      const isPaidSupporter = status === "active_patron" || hasEntitledTiers;
+      user.membership_type = isPaidSupporter ? "paid" : "free";
+      user.is_paid_supporter = isPaidSupporter;
+      user.is_free_member = !isPaidSupporter;
       if (Array.isArray(tiers) && tiers.length > 0) {
         const tierId = String(tiers[0]?.id ?? "");
         const tier = included.find(
