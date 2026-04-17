@@ -610,15 +610,15 @@
 
     function getMembershipAccess(user) {
       const access = {
-        isPaidSupporter: !!user?.is_paid_supporter,
-        isFreeMember: !!user?.is_free_member
+        isPaidPatron: !!user?.is_paid_supporter,
+        isFreePatron: !!user?.is_free_member
       };
       console.info("[membership] detected", {
-        membershipType: user?.membership_type || "unknown",
+        membershipExists: !!user?.membership_exists,
         membershipStatus: user?.membership_status || null,
-        entitledTier: user?.membership_tier || null,
-        isPaidPatron: access.isPaidSupporter,
-        isFreePatron: access.isFreeMember
+        currentlyEntitledAmountCents: Number(user?.membership_entitled_amount_cents ?? 0),
+        isPaidPatron: access.isPaidPatron,
+        isFreePatron: access.isFreePatron
       });
       return access;
     }
@@ -648,20 +648,20 @@
       const access = getMembershipAccess(user);
       const blockedMessage = "Flashcards are only available for paid supporters.";
 
-      link.classList.toggle("is-locked", access.isFreeMember);
-      link.setAttribute("aria-disabled", access.isFreeMember ? "true" : "false");
-      link.title = access.isFreeMember ? blockedMessage : "";
+      link.classList.toggle("is-locked", access.isFreePatron);
+      link.setAttribute("aria-disabled", access.isFreePatron ? "true" : "false");
+      link.title = access.isFreePatron ? blockedMessage : "";
 
       if (!link.dataset.accessBound) {
         link.addEventListener("click", (event) => {
-          if (!window.currentMembershipAccess?.isFreeMember) return;
+          if (!window.currentMembershipAccess?.isFreePatron) return;
           event.preventDefault();
           showMemberAccessMessage(blockedMessage);
         });
         link.dataset.accessBound = "true";
       }
 
-      if (!access.isFreeMember) {
+      if (!access.isFreePatron) {
         showMemberAccessMessage("");
       }
     }
@@ -756,7 +756,7 @@
     let flashCategories = [];
     let categoriesLoadedForDeckId = null;
     let savingToFlashcards = false;
-    let currentViewerAccess = { isPaidSupporter: false, isFreeMember: false };
+    let currentViewerAccess = { isPaidPatron: false, isFreePatron: false };
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -788,11 +788,11 @@
     }
 
     function isVideoLockedForCurrentUser(video) {
-      return !!(currentViewerAccess.isFreeMember && video?.isPatreonExclusive);
+      return !!(currentViewerAccess.isFreePatron && video?.isPatreonExclusive);
     }
 
     function applyDictionaryFlashcardAccess() {
-      const blocked = currentViewerAccess.isFreeMember;
+      const blocked = currentViewerAccess.isFreePatron;
       dictAdd.disabled = blocked;
       dictAdd.setAttribute("aria-disabled", blocked ? "true" : "false");
       dictAdd.title = blocked ? "Flashcards are only available for paid supporters." : "";
@@ -1156,7 +1156,7 @@
 
     async function ensureFlashcardContext(){
       if(!supabase) throw new Error("Supabase client not available.");
-      if(currentViewerAccess.isFreeMember) throw new Error("Flashcards are only available for paid supporters.");
+      if(currentViewerAccess.isFreePatron) throw new Error("Flashcards are only available for paid supporters.");
       if(flashProfile?.id && flashDeck?.id) return { profile: flashProfile, deck: flashDeck };
 
       const patreonUser = await fetchPatreonUser();
@@ -1251,7 +1251,7 @@
 
     dictClose.addEventListener("click", closeDictPopup);
     dictAdd.addEventListener("click", () => {
-      if(currentViewerAccess.isFreeMember){
+      if(currentViewerAccess.isFreePatron){
         dictSavePanel.classList.remove("open");
         setDictSaveMsg("");
         dictAccessNote.classList.add("open");
@@ -1774,7 +1774,7 @@
         window.currentMembershipAccess = currentViewerAccess;
         applyFlashcardsTabAccess(patreonUser);
       }catch(err){
-        currentViewerAccess = { isPaidSupporter: false, isFreeMember: false };
+        currentViewerAccess = { isPaidPatron: false, isFreePatron: false };
       }finally{
         applyDictionaryFlashcardAccess();
         render();

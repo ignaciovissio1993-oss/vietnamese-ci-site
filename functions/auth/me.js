@@ -2,7 +2,7 @@ import { parseCookies, verifyValue, fetchPatreonJson } from "../../lib/_auth/uti
 
 const SESSION_COOKIE = "patreon_session";
 const PATREON_IDENTITY_URL =
-  "https://www.patreon.com/api/oauth2/v2/identity?include=memberships.campaign,memberships.currently_entitled_tiers&fields[user]=full_name,email&fields[member]=patron_status&fields[tier]=title";
+  "https://www.patreon.com/api/oauth2/v2/identity?include=memberships.campaign,memberships.currently_entitled_tiers&fields[user]=full_name,email&fields[member]=patron_status,currently_entitled_amount_cents&fields[tier]=title";
 
 export async function onRequest({ request, env }) {
   if (!env.SESSION_SECRET) {
@@ -42,14 +42,24 @@ export async function onRequest({ request, env }) {
 
     if (membership) {
       const status = membership?.attributes?.patron_status || null;
+      const entitledAmountCents = Number(
+        membership?.attributes?.currently_entitled_amount_cents ?? 0
+      );
+      const normalizedEntitledAmountCents = Number.isFinite(entitledAmountCents)
+        ? entitledAmountCents
+        : 0;
+      const hasActiveMembership = status === "active_patron";
+      const isPaidPatron = hasActiveMembership && normalizedEntitledAmountCents > 0;
+      const isFreePatron = !isPaidPatron;
+
       if (status) user.membership_status = status;
+      user.membership_exists = true;
+      user.membership_entitled_amount_cents = normalizedEntitledAmountCents;
 
       const tiers = membership?.relationships?.currently_entitled_tiers?.data || [];
-      const entitledTierCount = Array.isArray(tiers) ? tiers.length : 0;
-      const isPaidSupporter = entitledTierCount > 0;
-      user.membership_type = isPaidSupporter ? "paid" : "free";
-      user.is_paid_supporter = isPaidSupporter;
-      user.is_free_member = !isPaidSupporter;
+      user.membership_type = isPaidPatron ? "paid" : "free";
+      user.is_paid_supporter = isPaidPatron;
+      user.is_free_member = isFreePatron;
       if (Array.isArray(tiers) && tiers.length > 0) {
         const tierId = String(tiers[0]?.id ?? "");
         const tier = included.find(
@@ -61,6 +71,28 @@ export async function onRequest({ request, env }) {
           user.membership_tier = tierId;
         }
       }
+
+      console.info("[auth/me] Patreon membership", {
+        membershipExists: true,
+        patronStatus: status,
+        currentlyEntitledAmountCents: normalizedEntitledAmountCents,
+        isPaidPatron,
+        isFreePatron
+      });
+    } else {
+      user.membership_exists = false;
+      user.membership_entitled_amount_cents = 0;
+      user.membership_type = "none";
+      user.is_paid_supporter = false;
+      user.is_free_member = false;
+
+      console.info("[auth/me] Patreon membership", {
+        membershipExists: false,
+        patronStatus: null,
+        currentlyEntitledAmountCents: 0,
+        isPaidPatron: false,
+        isFreePatron: false
+      });
     }
 
     return json({ ok: true, user });
