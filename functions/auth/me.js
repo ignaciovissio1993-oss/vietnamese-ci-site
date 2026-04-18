@@ -45,19 +45,21 @@ export async function onRequest({ request, env }) {
       const entitledAmountCents = Number(
         membership?.attributes?.currently_entitled_amount_cents ?? 0
       );
+      const tiers = membership?.relationships?.currently_entitled_tiers?.data || [];
       const normalizedEntitledAmountCents = Number.isFinite(entitledAmountCents)
         ? entitledAmountCents
         : 0;
-      const hasActiveMembership = status === "active_patron";
-      const isPaidPatron = hasActiveMembership && normalizedEntitledAmountCents > 0;
-      const isFreePatron = !isPaidPatron;
+      const hasMembership =
+        status === "active_patron" ||
+        (Array.isArray(tiers) && tiers.length > 0);
+      const isPaidPatron = hasMembership && normalizedEntitledAmountCents > 0;
+      const isFreePatron = hasMembership && !isPaidPatron;
 
       if (status) user.membership_status = status;
-      user.membership_exists = true;
+      user.membership_exists = hasMembership;
       user.membership_entitled_amount_cents = normalizedEntitledAmountCents;
 
-      const tiers = membership?.relationships?.currently_entitled_tiers?.data || [];
-      user.membership_type = isPaidPatron ? "paid" : "free";
+      user.membership_type = hasMembership ? (isPaidPatron ? "paid" : "free") : "none";
       user.is_paid_supporter = isPaidPatron;
       user.is_free_member = isFreePatron;
       if (Array.isArray(tiers) && tiers.length > 0) {
