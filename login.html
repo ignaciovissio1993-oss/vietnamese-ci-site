@@ -47,13 +47,28 @@
       font-weight: 600;
     }
     a.button:hover { background: #1b5fd1; }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    a.button.secondary {
+      background: #ffffff;
+      color: #1f2430;
+      border: 1px solid #d8deeb;
+    }
+    a.button.secondary:hover { background: #f7f9fc; }
   </style>
 </head>
 <body>
   <main class="card">
     <h1>Members Login</h1>
     <p>Please continue to Patreon to verify your membership.</p>
-    <a class="button" href="/auth/login">Continue to Patreon</a>
+    <div class="actions">
+      <a class="button" href="/auth/login">Continue to Patreon</a>
+      <a class="button secondary" href="/auth/guest?to=/">Continue without logging in</a>
+    </div>
   </main>
 </body>
 </html>

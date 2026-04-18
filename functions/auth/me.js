@@ -1,6 +1,7 @@
 import { parseCookies, verifyValue, fetchPatreonJson } from "../../lib/_auth/utils";
 
 const SESSION_COOKIE = "patreon_session";
+const GUEST_COOKIE = "guest_access";
 const PATREON_IDENTITY_URL =
   "https://www.patreon.com/api/oauth2/v2/identity?include=memberships.campaign,memberships.currently_entitled_tiers&fields[user]=full_name,email&fields[member]=patron_status,currently_entitled_amount_cents&fields[tier]=title";
 
@@ -12,6 +13,21 @@ export async function onRequest({ request, env }) {
   const cookies = parseCookies(request.headers.get("Cookie"));
   const signedSession = cookies[SESSION_COOKIE];
   const session = await verifyValue(env.SESSION_SECRET, signedSession);
+
+  if ((!session || !session.access_token) && cookies[GUEST_COOKIE] === "1") {
+    return json({
+      ok: true,
+      user: {
+        id: null,
+        membership_exists: false,
+        membership_entitled_amount_cents: 0,
+        membership_type: "guest",
+        is_paid_supporter: false,
+        is_free_member: true,
+        is_guest_user: true
+      }
+    });
+  }
 
   if (!session || !session.access_token) {
     return json({ ok: false, reason: "no_session" }, 401);

@@ -162,20 +162,24 @@
         if (res.status === 401) return null;
         if (!res.ok) throw new Error('Could not load Patreon user.');
         const data = await res.json();
-        return data?.user?.id ? data.user : null;
+        return data?.user?.id || data?.user?.is_guest_user ? data.user : null;
       }
 
       function getMembershipAccess(user) {
         const access = {
           isPaidPatron: !!user?.is_paid_supporter,
-          isFreePatron: !!user?.is_free_member
+          isFreePatron: !!user?.is_free_member,
+          isGuestUser: !!user?.is_guest_user,
+          hasLimitedAccess: !!user?.is_free_member || !!user?.is_guest_user
         };
         console.info('[membership] detected', {
           membershipExists: !!user?.membership_exists,
           membershipStatus: user?.membership_status || null,
           currentlyEntitledAmountCents: Number(user?.membership_entitled_amount_cents ?? 0),
           isPaidPatron: access.isPaidPatron,
-          isFreePatron: access.isFreePatron
+          isFreePatron: access.isFreePatron,
+          isGuestUser: access.isGuestUser,
+          hasLimitedAccess: access.hasLimitedAccess
         });
         return access;
       }
@@ -890,7 +894,7 @@
             setAccessBlocked(false);
             const patreonUser = await fetchPatreonUser();
             const membershipAccess = getMembershipAccess(patreonUser);
-            if (membershipAccess.isFreePatron) {
+            if (membershipAccess.hasLimitedAccess) {
               setAccessBlocked(true);
               return;
             }

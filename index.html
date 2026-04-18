@@ -609,17 +609,17 @@
     (() => {
     async function fetchPatreonUser() {
       const existingUser = window.patreonUser || window.__patreonUser;
-      if (existingUser?.id) return existingUser;
+      if (existingUser?.id || existingUser?.is_guest_user) return existingUser;
       if (window.patreonUserPromise) {
         const awaitedUser = await window.patreonUserPromise;
-        if (awaitedUser?.id) return awaitedUser;
+        if (awaitedUser?.id || awaitedUser?.is_guest_user) return awaitedUser;
       }
       const res = await fetch("/auth/me", { credentials: "include" });
       if (!res.ok) {
         throw new Error("Could not load Patreon user.");
       }
       const data = await res.json();
-      if (!data?.user?.id) {
+      if (!data?.user?.id && !data?.user?.is_guest_user) {
         throw new Error("Missing Patreon user id.");
       }
       return data.user;
@@ -628,14 +628,18 @@
     function getMembershipAccess(user) {
       const access = {
         isPaidPatron: !!user?.is_paid_supporter,
-        isFreePatron: !!user?.is_free_member
+        isFreePatron: !!user?.is_free_member,
+        isGuestUser: !!user?.is_guest_user,
+        hasLimitedAccess: !!user?.is_free_member || !!user?.is_guest_user
       };
       console.info("[membership] detected", {
         membershipExists: !!user?.membership_exists,
         membershipStatus: user?.membership_status || null,
         currentlyEntitledAmountCents: Number(user?.membership_entitled_amount_cents ?? 0),
         isPaidPatron: access.isPaidPatron,
-        isFreePatron: access.isFreePatron
+        isFreePatron: access.isFreePatron,
+        isGuestUser: access.isGuestUser,
+        hasLimitedAccess: access.hasLimitedAccess
       });
       return access;
     }
@@ -655,6 +659,10 @@
       if (url.pathname.endsWith("/index.html")) {
         url.pathname = url.pathname.replace(/\/index\.html$/, "/");
       }
+      if (!patreonUserId) {
+        link.setAttribute("href", url.pathname + url.search);
+        return;
+      }
       url.searchParams.set("patreon_user_id", patreonUserId);
       link.setAttribute("href", url.pathname + url.search);
     }
@@ -665,20 +673,20 @@
       const access = getMembershipAccess(user);
       const blockedMessage = "Flashcards are only available for paid supporters.";
 
-      link.classList.toggle("is-locked", access.isFreePatron);
-      link.setAttribute("aria-disabled", access.isFreePatron ? "true" : "false");
-      link.title = access.isFreePatron ? blockedMessage : "";
+      link.classList.toggle("is-locked", access.hasLimitedAccess);
+      link.setAttribute("aria-disabled", access.hasLimitedAccess ? "true" : "false");
+      link.title = access.hasLimitedAccess ? blockedMessage : "";
 
       if (!link.dataset.accessBound) {
         link.addEventListener("click", (event) => {
-          if (!window.currentMembershipAccess?.isFreePatron) return;
+          if (!window.currentMembershipAccess?.hasLimitedAccess) return;
           event.preventDefault();
           showMemberAccessMessage(blockedMessage);
         });
         link.dataset.accessBound = "true";
       }
 
-      if (!access.isFreePatron) {
+      if (!access.hasLimitedAccess) {
         showMemberAccessMessage("");
       }
     }
@@ -688,7 +696,7 @@
         const patreonUser = await fetchPatreonUser();
         window.currentMembershipAccess = getMembershipAccess(patreonUser);
         applyFlashcardsTabAccess(patreonUser);
-        updateFlashcardsLink(String(patreonUser.id));
+        updateFlashcardsLink(patreonUser?.id ? String(patreonUser.id) : "");
       } catch (err) {
         console.error("Flashcards link setup failed.", err);
       }
@@ -773,7 +781,7 @@
     let flashCategories = [];
     let categoriesLoadedForDeckId = null;
     let savingToFlashcards = false;
-    let currentViewerAccess = { isPaidPatron: false, isFreePatron: false };
+    let currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -805,11 +813,11 @@
     }
 
     function isVideoLockedForCurrentUser(video) {
-      return !!(currentViewerAccess.isFreePatron && video?.isPatreonExclusive);
+      return !!(currentViewerAccess.hasLimitedAccess && video?.isPatreonExclusive);
     }
 
     function applyDictionaryFlashcardAccess() {
-      const blocked = currentViewerAccess.isFreePatron;
+      const blocked = currentViewerAccess.hasLimitedAccess;
       dictAdd.disabled = blocked;
       dictAdd.setAttribute("aria-disabled", blocked ? "true" : "false");
       dictAdd.title = blocked ? "Flashcards are only available for paid supporters." : "";
@@ -1189,7 +1197,7 @@
 
     async function ensureFlashcardContext(){
       if(!supabase) throw new Error("Supabase client not available.");
-      if(currentViewerAccess.isFreePatron) throw new Error("Flashcards are only available for paid supporters.");
+      if(currentViewerAccess.hasLimitedAccess) throw new Error("Flashcards are only available for paid supporters.");
       if(flashProfile?.id && flashDeck?.id) return { profile: flashProfile, deck: flashDeck };
 
       const patreonUser = await fetchPatreonUser();
@@ -1284,7 +1292,7 @@
 
     dictClose.addEventListener("click", closeDictPopup);
     dictAdd.addEventListener("click", () => {
-      if(currentViewerAccess.isFreePatron){
+      if(currentViewerAccess.hasLimitedAccess){
         dictSavePanel.classList.remove("open");
         setDictSaveMsg("");
         dictAccessNote.classList.add("open");
@@ -1810,7 +1818,7 @@
         window.currentMembershipAccess = currentViewerAccess;
         applyFlashcardsTabAccess(patreonUser);
       }catch(err){
-        currentViewerAccess = { isPaidPatron: false, isFreePatron: false };
+        currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
       }finally{
         applyDictionaryFlashcardAccess();
         render();
