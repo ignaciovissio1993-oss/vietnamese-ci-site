@@ -651,6 +651,10 @@
       el.classList.toggle("open", !!message);
     }
 
+    function redirectToPatreonMembership() {
+      window.location.href = PATREON_MEMBERSHIP_URL;
+    }
+
     function updateFlashcardsLink(patreonUserId) {
       const link = document.getElementById("flashcardsLink");
       if (!link) return;
@@ -681,7 +685,7 @@
         link.addEventListener("click", (event) => {
           if (!window.currentMembershipAccess?.hasLimitedAccess) return;
           event.preventDefault();
-          showMemberAccessMessage(blockedMessage);
+          redirectToPatreonMembership();
         });
         link.dataset.accessBound = "true";
       }
@@ -706,6 +710,7 @@
     const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
     const CAPTIONS_DIR = "./captions";
     const LOCAL_VIDEOS_PATH = "./data/videos.json";
+    const PATREON_MEMBERSHIP_URL = "https://www.patreon.com/cw/LazyVietnamese/membership";
 
     // Dictionary: will try these paths (first that exists wins)
     const DICT_CANDIDATES = [
@@ -782,6 +787,7 @@
     let categoriesLoadedForDeckId = null;
     let savingToFlashcards = false;
     let currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
+    let publicYouTubeVideoIds = new Set();
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -813,7 +819,7 @@
     }
 
     function isVideoLockedForCurrentUser(video) {
-      return !!(currentViewerAccess.hasLimitedAccess && video?.isPatreonExclusive);
+      return !!(currentViewerAccess.hasLimitedAccess && video?.isPatreonExclusive && !video?.isYouTubePublic);
     }
 
     function applyDictionaryFlashcardAccess() {
@@ -859,6 +865,34 @@
       }
     }
 
+    async function fetchPublicYouTubeVideoIds(videoIds){
+      const ids = Array.from(new Set((videoIds || []).map(id => String(id || "").trim()).filter(Boolean)));
+      if(!ids.length) return new Set();
+
+      const publicIds = new Set();
+      for(let i = 0; i < ids.length; i += 50){
+        const batch = ids.slice(i, i + 50);
+        const u = new URL("https://www.googleapis.com/youtube/v3/videos");
+        u.searchParams.set("part","status");
+        u.searchParams.set("id", batch.join(","));
+        u.searchParams.set("maxResults", String(batch.length));
+        u.searchParams.set("key", YT_API_KEY);
+
+        try{
+          const data = await ytFetch(u.toString());
+          (data.items || []).forEach(it => {
+            if(it?.status?.privacyStatus === "public" && it.id){
+              publicIds.add(it.id);
+            }
+          });
+        }catch(err){
+          console.warn("Could not verify YouTube public visibility for local videos.", err);
+        }
+      }
+
+      return publicIds;
+    }
+
     function mergeLocalVideos(localVideos){
       if(!Array.isArray(localVideos) || !localVideos.length) return;
 
@@ -893,7 +927,8 @@
           playlistId: playlist.id,
           playlistTitle: playlist.title,
           publishedAt: raw.published || "",
-          isPatreonExclusive: true
+          isYouTubePublic: publicYouTubeVideoIds.has(videoId),
+          isPatreonExclusive: !publicYouTubeVideoIds.has(videoId)
         };
 
         const list = videosByPlaylist.get(playlist.id) || [];
@@ -1296,6 +1331,7 @@
         dictSavePanel.classList.remove("open");
         setDictSaveMsg("");
         dictAccessNote.classList.add("open");
+        redirectToPatreonMembership();
         return;
       }
       if(!supabase){
@@ -1601,7 +1637,7 @@
     function openVideo(v){
       if(!v || !v.videoId) return;
       if(isVideoLockedForCurrentUser(v)){
-        showMemberAccessMessage("This video is available to paid supporters only.");
+        redirectToPatreonMembership();
         return;
       }
       currentVideoId = v.videoId;
@@ -1759,6 +1795,7 @@
         sortVideosNewestFirst(vids);
       }
 
+      publicYouTubeVideoIds = await fetchPublicYouTubeVideoIds((extraVideos || []).map(v => v?.videoId));
       mergeLocalVideos(extraVideos);
       setStatus(true, "Loaded from YouTube API.", `${allVideosDeduped.length} unique videos`);
       render();
