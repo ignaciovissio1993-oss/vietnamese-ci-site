@@ -873,10 +873,37 @@
       for(const raw of localVideos){
         if(!raw || typeof raw !== "object") continue;
         const videoId = String(raw.videoId || "").trim();
+        if(!videoId) continue;
+
+        const isLocked = !!(raw.isLocked ?? raw.locked);
+        const isPremium = !!(raw.isPremium ?? raw.premium);
+        const isUnlisted = !!(raw.isUnlisted ?? raw.unlisted);
+        const isPatreonExclusive = !!(raw.isPatreonExclusive ?? raw.patreonExclusive ?? isLocked || isPremium || isUnlisted);
+
+        // Local metadata is the source of truth for lock flags (do not depend on YouTube visibility checks).
+        if(existingById.has(videoId)){
+          for(const v of allVideosDeduped){
+            if(v?.videoId !== videoId) continue;
+            v.isLocked = isLocked;
+            v.isPremium = isPremium;
+            v.isUnlisted = isUnlisted;
+            v.isPatreonExclusive = isPatreonExclusive;
+          }
+          for(const list of videosByPlaylist.values()){
+            for(const v of list){
+              if(v?.videoId !== videoId) continue;
+              v.isLocked = isLocked;
+              v.isPremium = isPremium;
+              v.isUnlisted = isUnlisted;
+              v.isPatreonExclusive = isPatreonExclusive;
+            }
+          }
+          continue;
+        }
+
         const title = String(raw.title || "").trim();
         const playlistName = String(raw.playlist || "").trim();
-        if(!videoId || !title || !playlistName) continue;
-        if(existingById.has(videoId)) continue;
+        if(!title || !playlistName) continue;
 
         let playlist = playlistByTitle.get(normalizePlaylistTitle(playlistName));
         if(!playlist){
@@ -891,7 +918,6 @@
           playlistByTitle.set(normalizePlaylistTitle(playlistName), playlist);
         }
 
-        const isPatreonExclusive = !!(raw.isPatreonExclusive || raw.isLocked || raw.isPremium || raw.isUnlisted);
         const v = {
           videoId,
           title,
@@ -899,6 +925,9 @@
           playlistId: playlist.id,
           playlistTitle: playlist.title,
           publishedAt: raw.published || "",
+          isLocked,
+          isPremium,
+          isUnlisted,
           isPatreonExclusive
         };
 
