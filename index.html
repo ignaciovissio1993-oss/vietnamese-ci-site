@@ -787,7 +787,6 @@
     let categoriesLoadedForDeckId = null;
     let savingToFlashcards = false;
     let currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
-    let publicYouTubeVideoIds = new Set();
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -819,7 +818,7 @@
     }
 
     function isVideoLockedForCurrentUser(video) {
-      return !!(currentViewerAccess.hasLimitedAccess && video?.isPatreonExclusive && !video?.isYouTubePublic);
+      return !!(currentViewerAccess.hasLimitedAccess && (video?.isPatreonExclusive || video?.isLocked || video?.isPremium || video?.isUnlisted));
     }
 
     function applyDictionaryFlashcardAccess() {
@@ -865,34 +864,6 @@
       }
     }
 
-    async function fetchPublicYouTubeVideoIds(videoIds){
-      const ids = Array.from(new Set((videoIds || []).map(id => String(id || "").trim()).filter(Boolean)));
-      if(!ids.length) return new Set();
-
-      const publicIds = new Set();
-      for(let i = 0; i < ids.length; i += 50){
-        const batch = ids.slice(i, i + 50);
-        const u = new URL("https://www.googleapis.com/youtube/v3/videos");
-        u.searchParams.set("part","status");
-        u.searchParams.set("id", batch.join(","));
-        u.searchParams.set("maxResults", String(batch.length));
-        u.searchParams.set("key", YT_API_KEY);
-
-        try{
-          const data = await ytFetch(u.toString());
-          (data.items || []).forEach(it => {
-            if(it?.status?.privacyStatus === "public" && it.id){
-              publicIds.add(it.id);
-            }
-          });
-        }catch(err){
-          console.warn("Could not verify YouTube public visibility for local videos.", err);
-        }
-      }
-
-      return publicIds;
-    }
-
     function mergeLocalVideos(localVideos){
       if(!Array.isArray(localVideos) || !localVideos.length) return;
 
@@ -920,6 +891,7 @@
           playlistByTitle.set(normalizePlaylistTitle(playlistName), playlist);
         }
 
+        const isPatreonExclusive = !!(raw.isPatreonExclusive || raw.isLocked || raw.isPremium || raw.isUnlisted);
         const v = {
           videoId,
           title,
@@ -927,8 +899,7 @@
           playlistId: playlist.id,
           playlistTitle: playlist.title,
           publishedAt: raw.published || "",
-          isYouTubePublic: publicYouTubeVideoIds.has(videoId),
-          isPatreonExclusive: !publicYouTubeVideoIds.has(videoId)
+          isPatreonExclusive
         };
 
         const list = videosByPlaylist.get(playlist.id) || [];
@@ -1795,7 +1766,6 @@
         sortVideosNewestFirst(vids);
       }
 
-      publicYouTubeVideoIds = await fetchPublicYouTubeVideoIds((extraVideos || []).map(v => v?.videoId));
       mergeLocalVideos(extraVideos);
       setStatus(true, "Loaded from YouTube API.", `${allVideosDeduped.length} unique videos`);
       render();
