@@ -853,100 +853,67 @@
       return (t || "").trim().toLowerCase();
     }
 
-    async function loadLocalVideos(){
+    let localLockByVideoId = new Map();
+
+    async function loadLocalVideoLocks(){
       try{
         const res = await fetch(LOCAL_VIDEOS_PATH, {cache:"no-store"});
-        if(!res.ok) return [];
+        if(!res.ok){
+          console.warn(`[videos.json] not loaded (HTTP ${res.status})`);
+          return new Map();
+        }
         const data = await res.json();
-        return Array.isArray(data) ? data : [];
+        if(!Array.isArray(data) || !data.length){
+          console.log("[videos.json] loaded, 0 locked video IDs found");
+          return new Map();
+        }
+
+        const lockMap = new Map();
+        for(const raw of data){
+          if(!raw || typeof raw !== "object") continue;
+          const videoId = String(raw.videoId || "").trim();
+          if(!videoId) continue;
+
+          const isLocked = !!(raw.isLocked ?? raw.locked);
+          const isPremium = !!(raw.isPremium ?? raw.premium);
+          const isUnlisted = !!(raw.isUnlisted ?? raw.unlisted);
+          if(!(isLocked || isPremium || isUnlisted)) continue;
+
+          lockMap.set(videoId, {
+            isLocked,
+            isPremium,
+            isUnlisted,
+            isPatreonExclusive: true
+          });
+        }
+        console.log(`[videos.json] loaded, ${lockMap.size} locked video IDs found`);
+        return lockMap;
       }catch(e){
-        return [];
+        console.warn("[videos.json] failed to load, continuing without local locks");
+        return new Map();
       }
     }
 
-    function mergeLocalVideos(localVideos){
-      if(!Array.isArray(localVideos) || !localVideos.length) return;
-
-      const existingById = new Set(allVideosDeduped.map(v => v.videoId));
-      const playlistByTitle = new Map(playlists.map(p => [normalizePlaylistTitle(p.title), p]));
-
-      for(const raw of localVideos){
-        if(!raw || typeof raw !== "object") continue;
-        const videoId = String(raw.videoId || "").trim();
-        if(!videoId) continue;
-
-        const isLocked = !!(raw.isLocked ?? raw.locked);
-        const isPremium = !!(raw.isPremium ?? raw.premium);
-        const isUnlisted = !!(raw.isUnlisted ?? raw.unlisted);
-        const isPatreonExclusive = !!(raw.isPatreonExclusive ?? raw.patreonExclusive ?? isLocked || isPremium || isUnlisted);
-
-        // Local metadata is the source of truth for lock flags (do not depend on YouTube visibility checks).
-        if(existingById.has(videoId)){
-          for(const v of allVideosDeduped){
-            if(v?.videoId !== videoId) continue;
-            v.isLocked = isLocked;
-            v.isPremium = isPremium;
-            v.isUnlisted = isUnlisted;
-            v.isPatreonExclusive = isPatreonExclusive;
-          }
-          for(const list of videosByPlaylist.values()){
-            for(const v of list){
-              if(v?.videoId !== videoId) continue;
-              v.isLocked = isLocked;
-              v.isPremium = isPremium;
-              v.isUnlisted = isUnlisted;
-              v.isPatreonExclusive = isPatreonExclusive;
-            }
-          }
-          continue;
+    function applyLocalLockMetadata(){
+      const applyToVideo = (v) => {
+        const lockMeta = localLockByVideoId.get(v?.videoId);
+        if(!lockMeta){
+          v.isLocked = false;
+          v.isPremium = false;
+          v.isUnlisted = false;
+          v.isPatreonExclusive = false;
+          return;
         }
+        v.isLocked = !!lockMeta.isLocked;
+        v.isPremium = !!lockMeta.isPremium;
+        v.isUnlisted = !!lockMeta.isUnlisted;
+        v.isPatreonExclusive = true;
+      };
 
-        const title = String(raw.title || "").trim();
-        const playlistName = String(raw.playlist || "").trim();
-        if(!title || !playlistName) continue;
-
-        let playlist = playlistByTitle.get(normalizePlaylistTitle(playlistName));
-        if(!playlist){
-          let baseId = `local:${playlistName.replace(/\s+/g," ").trim()}`;
-          let id = baseId;
-          let n = 2;
-          while(playlists.find(p => p.id === id)){
-            id = `${baseId}:${n++}`;
-          }
-          playlist = { id, title: playlistName };
-          playlists.push(playlist);
-          playlistByTitle.set(normalizePlaylistTitle(playlistName), playlist);
-        }
-
-        const v = {
-          videoId,
-          title,
-          thumb: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-          playlistId: playlist.id,
-          playlistTitle: playlist.title,
-          publishedAt: raw.published || "",
-          isLocked,
-          isPremium,
-          isUnlisted,
-          isPatreonExclusive
-        };
-
-        const list = videosByPlaylist.get(playlist.id) || [];
-        list.push(v);
-        videosByPlaylist.set(playlist.id, list);
-        allVideosDeduped.push(v);
-        existingById.add(videoId);
-      }
-
-      sortVideosNewestFirst(allVideosDeduped);
+      for(const v of allVideosDeduped) applyToVideo(v);
       for(const vids of videosByPlaylist.values()){
-        sortVideosNewestFirst(vids);
+        for(const v of vids) applyToVideo(v);
       }
-
-      const prev = playlistFilter.value;
-      playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
-        playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
-      if(playlists.some(p => p.id === prev)) playlistFilter.value = prev;
     }
 
     function videoPublishedTime(v){
@@ -1740,7 +1707,7 @@
     });
 
     // ========= YouTube Data API loading =========
-    async function loadPlaylists(extraVideos){
+    async function loadPlaylists(){
       if(!YT_API_KEY || YT_API_KEY.includes("PASTE_")){
         setStatus(false, "API key not set.", "Paste your restricted API key in index.html");
         return;
@@ -1750,6 +1717,7 @@
         return;
       }
 
+      console.log("[youtube] playlist loading started");
       setStatus(false, "Loading…", "Fetching playlists…");
 
       let nextPageToken = "";
@@ -1795,7 +1763,8 @@
         sortVideosNewestFirst(vids);
       }
 
-      mergeLocalVideos(extraVideos);
+      applyLocalLockMetadata();
+      console.log("[youtube] playlist loading completed");
       setStatus(true, "Loaded from YouTube API.", `${allVideosDeduped.length} unique videos`);
       render();
     }
@@ -1864,9 +1833,16 @@
     // ========= Boot =========
     (async function init(){
       await loadDictionary();
-      const localVideos = await loadLocalVideos();
-      try{ await loadPlaylists(localVideos); }
+      const localLocksPromise = loadLocalVideoLocks()
+        .then((lockMap) => {
+          localLockByVideoId = lockMap;
+          applyLocalLockMetadata();
+          render();
+        })
+        .catch(() => {});
+      try{ await loadPlaylists(); }
       catch(err){ setStatus(false, "Could not load from YouTube API.", err.message || String(err)); }
+      await localLocksPromise;
     })();
     })();
   </script>
