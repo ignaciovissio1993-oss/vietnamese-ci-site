@@ -817,6 +817,15 @@
       return "Daily";
     }
 
+    function normalizeVideoId(id){
+      return String(id || "").trim();
+    }
+
+    function youtubeThumbFromVideoId(videoId){
+      const id = normalizeVideoId(videoId);
+      return id ? `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg` : "";
+    }
+
     function isVideoLockedForCurrentUser(video) {
       return !!(currentViewerAccess.hasLimitedAccess && (video?.isPatreonExclusive || video?.isLocked || video?.isPremium || video?.isUnlisted));
     }
@@ -853,7 +862,7 @@
       return (t || "").trim().toLowerCase();
     }
 
-    let localLockByVideoId = new Map();
+    let localVideoById = new Map();
 
     async function loadLocalVideoLocks(){
       try{
@@ -864,30 +873,33 @@
         }
         const data = await res.json();
         if(!Array.isArray(data) || !data.length){
-          console.log("[videos.json] loaded, 0 locked video IDs found");
+          console.log("[videos.json] loaded, 0 local videos found");
           return new Map();
         }
 
-        const lockMap = new Map();
+        const localMap = new Map();
         for(const raw of data){
           if(!raw || typeof raw !== "object") continue;
-          const videoId = String(raw.videoId || "").trim();
+          const videoId = normalizeVideoId(raw.videoId);
           if(!videoId) continue;
 
-          const isLocked = !!(raw.isLocked ?? raw.locked);
-          const isPremium = !!(raw.isPremium ?? raw.premium);
-          const isUnlisted = !!(raw.isUnlisted ?? raw.unlisted);
-          if(!(isLocked || isPremium || isUnlisted)) continue;
-
-          lockMap.set(videoId, {
-            isLocked,
-            isPremium,
-            isUnlisted,
+          localMap.set(videoId, {
+            videoId,
+            title: String(raw.title || "").trim(),
+            playlist: String(raw.playlist || "").trim(),
+            level: String(raw.level || "").trim(),
+            topic: String(raw.topic || "").trim(),
+            published: String(raw.published || "").trim(),
+            thumb: String(raw.thumb || raw.thumbnail || "").trim(),
+            // videos.json is the source of truth for premium/unlisted locking
+            isLocked: true,
+            isPremium: true,
+            isUnlisted: true,
             isPatreonExclusive: true
           });
         }
-        console.log(`[videos.json] loaded, ${lockMap.size} locked video IDs found`);
-        return lockMap;
+        console.log(`[videos.json] loaded, ${localMap.size} local video entries found`);
+        return localMap;
       }catch(e){
         console.warn("[videos.json] failed to load, continuing without local locks");
         return new Map();
@@ -895,8 +907,50 @@
     }
 
     function applyLocalLockMetadata(){
+      const byId = new Map();
+      for(const v of allVideosDeduped){
+        const id = normalizeVideoId(v?.videoId);
+        if(!id) continue;
+        v.videoId = id;
+        byId.set(id, v);
+      }
+
+      for(const [videoId, localMeta] of localVideoById.entries()){
+        const existing = byId.get(videoId);
+        if(existing){
+          if(localMeta.playlist) existing.playlistTitle = localMeta.playlist;
+          if(localMeta.level) existing.level = localMeta.level;
+          if(localMeta.topic) existing.topic = localMeta.topic;
+          if(localMeta.published) existing.publishedAt = localMeta.published;
+          if(!existing.thumb) existing.thumb = localMeta.thumb || youtubeThumbFromVideoId(videoId);
+          existing.isLocked = true;
+          existing.isPremium = true;
+          existing.isUnlisted = true;
+          existing.isPatreonExclusive = true;
+          continue;
+        }
+
+        byId.set(videoId, {
+          videoId,
+          title: localMeta.title || "Untitled",
+          thumb: localMeta.thumb || youtubeThumbFromVideoId(videoId),
+          playlistId: localMeta.playlist ? `local::${localMeta.playlist}` : "local::premium",
+          playlistTitle: localMeta.playlist || "Premium",
+          level: localMeta.level || "",
+          topic: localMeta.topic || "",
+          publishedAt: localMeta.published || "",
+          duration: "",
+          isLocked: true,
+          isPremium: true,
+          isUnlisted: true,
+          isPatreonExclusive: true
+        });
+      }
+
+      allVideosDeduped = Array.from(byId.values());
+
       const applyToVideo = (v) => {
-        const lockMeta = localLockByVideoId.get(v?.videoId);
+        const lockMeta = localVideoById.get(normalizeVideoId(v?.videoId));
         if(!lockMeta){
           v.isLocked = false;
           v.isPremium = false;
@@ -910,10 +964,32 @@
         v.isPatreonExclusive = true;
       };
 
-      for(const v of allVideosDeduped) applyToVideo(v);
-      for(const vids of videosByPlaylist.values()){
-        for(const v of vids) applyToVideo(v);
+      videosByPlaylist.clear();
+      for(const v of allVideosDeduped){
+        const pid = String(v.playlistId || "").trim();
+        if(!pid) continue;
+        if(!videosByPlaylist.has(pid)) videosByPlaylist.set(pid, []);
+        videosByPlaylist.get(pid).push(v);
       }
+
+      const existingPlaylistsById = new Map(playlists.map(p => [p.id, p]));
+      for(const vids of videosByPlaylist.values()){
+        for(const v of vids){
+          applyToVideo(v);
+          const pid = String(v.playlistId || "").trim();
+          if(!pid || existingPlaylistsById.has(pid)) continue;
+          const title = String(v.playlistTitle || "Playlist").trim() || "Playlist";
+          const playlistObj = { id: pid, title };
+          playlists.push(playlistObj);
+          existingPlaylistsById.set(pid, playlistObj);
+        }
+      }
+
+      sortVideosNewestFirst(allVideosDeduped);
+      for(const vids of videosByPlaylist.values()) sortVideosNewestFirst(vids);
+
+      playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
+        playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
     }
 
     function videoPublishedTime(v){
@@ -1652,12 +1728,12 @@
 
       return base.filter(v => {
         if(text && !(v.title||"").toLowerCase().includes(text)) return false;
-        const lvl = inferLevel(v.title);
-        const top = inferTopic(v.title);
+        const lvl = v.level || inferLevel(v.title);
+        const top = v.topic || inferTopic(v.title);
         if(lf && lvl !== lf) return false;
         if(tf && top !== tf) return false;
         return true;
-      }).map(v => ({...v, level: inferLevel(v.title), topic: inferTopic(v.title)}));
+      }).map(v => ({...v, level: v.level || inferLevel(v.title), topic: v.topic || inferTopic(v.title)}));
     }
 
     function render(){
@@ -1753,8 +1829,10 @@
       const flat = [];
       for(const vids of videosByPlaylist.values()){
         vids.forEach(v => {
-          if(seen.has(v.videoId)) return;
-          seen.add(v.videoId);
+          const id = normalizeVideoId(v.videoId);
+          if(!id || seen.has(id)) return;
+          v.videoId = id;
+          seen.add(id);
           flat.push(v);
         });
       }
@@ -1835,7 +1913,7 @@
       await loadDictionary();
       const localLocksPromise = loadLocalVideoLocks()
         .then((lockMap) => {
-          localLockByVideoId = lockMap;
+          localVideoById = lockMap;
           applyLocalLockMetadata();
           render();
         })
