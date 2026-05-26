@@ -1854,7 +1854,7 @@
         window.currentMembershipAccess = currentViewerAccess;
         applyFlashcardsTabAccess(patreonUser);
       }catch(err){
-        currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
+        currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: true, hasLimitedAccess: true };
       }finally{
         applyDictionaryFlashcardAccess();
         render();
