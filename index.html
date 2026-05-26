@@ -827,7 +827,9 @@
     }
 
     function isVideoLockedForCurrentUser(video) {
-      return !!(currentViewerAccess.hasLimitedAccess && (video?.isPatreonExclusive || video?.isLocked || video?.isPremium || video?.isUnlisted));
+      const isPremiumVideo = !!(video?.isPatreonExclusive || video?.isLocked || video?.isPremium || video?.isUnlisted);
+      const shouldLockForCurrentUser = isPremiumVideo && !currentViewerAccess.isPaidPatron;
+      return !!shouldLockForCurrentUser;
     }
 
     function applyDictionaryFlashcardAccess() {
