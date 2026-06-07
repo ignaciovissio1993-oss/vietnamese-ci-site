@@ -787,7 +787,6 @@
     let categoriesLoadedForDeckId = null;
     let savingToFlashcards = false;
     let currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
-    let publicYouTubeVideoIds = new Set();
 
     // ========= Status =========
     function setStatus(ok, title, msg){
@@ -818,8 +817,19 @@
       return "Daily";
     }
 
+    function normalizeVideoId(id){
+      return String(id || "").trim();
+    }
+
+    function youtubeThumbFromVideoId(videoId){
+      const id = normalizeVideoId(videoId);
+      return id ? `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg` : "";
+    }
+
     function isVideoLockedForCurrentUser(video) {
-      return !!(currentViewerAccess.hasLimitedAccess && video?.isPatreonExclusive && !video?.isYouTubePublic);
+      const isPremiumVideo = !!(video?.isPatreonExclusive || video?.isLocked || video?.isPremium || video?.isUnlisted);
+      const shouldLockForCurrentUser = isPremiumVideo && !currentViewerAccess.isPaidPatron;
+      return !!shouldLockForCurrentUser;
     }
 
     function applyDictionaryFlashcardAccess() {
@@ -854,99 +864,134 @@
       return (t || "").trim().toLowerCase();
     }
 
-    async function loadLocalVideos(){
+    let localVideoById = new Map();
+
+    async function loadLocalVideoLocks(){
       try{
         const res = await fetch(LOCAL_VIDEOS_PATH, {cache:"no-store"});
-        if(!res.ok) return [];
+        if(!res.ok){
+          console.warn(`[videos.json] not loaded (HTTP ${res.status})`);
+          return new Map();
+        }
         const data = await res.json();
-        return Array.isArray(data) ? data : [];
-      }catch(e){
-        return [];
-      }
-    }
+        if(!Array.isArray(data) || !data.length){
+          console.log("[videos.json] loaded, 0 local videos found");
+          return new Map();
+        }
 
-    async function fetchPublicYouTubeVideoIds(videoIds){
-      const ids = Array.from(new Set((videoIds || []).map(id => String(id || "").trim()).filter(Boolean)));
-      if(!ids.length) return new Set();
+        const localMap = new Map();
+        for(const raw of data){
+          if(!raw || typeof raw !== "object") continue;
+          const videoId = normalizeVideoId(raw.videoId);
+          if(!videoId) continue;
 
-      const publicIds = new Set();
-      for(let i = 0; i < ids.length; i += 50){
-        const batch = ids.slice(i, i + 50);
-        const u = new URL("https://www.googleapis.com/youtube/v3/videos");
-        u.searchParams.set("part","status");
-        u.searchParams.set("id", batch.join(","));
-        u.searchParams.set("maxResults", String(batch.length));
-        u.searchParams.set("key", YT_API_KEY);
-
-        try{
-          const data = await ytFetch(u.toString());
-          (data.items || []).forEach(it => {
-            if(it?.status?.privacyStatus === "public" && it.id){
-              publicIds.add(it.id);
-            }
+          localMap.set(videoId, {
+            videoId,
+            title: String(raw.title || "").trim(),
+            playlist: String(raw.playlist || "").trim(),
+            level: String(raw.level || "").trim(),
+            topic: String(raw.topic || "").trim(),
+            published: String(raw.published || "").trim(),
+            thumb: String(raw.thumb || raw.thumbnail || "").trim(),
+            // videos.json is the source of truth for premium/unlisted locking
+            isLocked: true,
+            isPremium: true,
+            isUnlisted: true,
+            isPatreonExclusive: true
           });
-        }catch(err){
-          console.warn("Could not verify YouTube public visibility for local videos.", err);
         }
+        console.log(`[videos.json] loaded, ${localMap.size} local video entries found`);
+        return localMap;
+      }catch(e){
+        console.warn("[videos.json] failed to load, continuing without local locks");
+        return new Map();
       }
-
-      return publicIds;
     }
 
-    function mergeLocalVideos(localVideos){
-      if(!Array.isArray(localVideos) || !localVideos.length) return;
+    function applyLocalLockMetadata(){
+      const byId = new Map();
+      for(const v of allVideosDeduped){
+        const id = normalizeVideoId(v?.videoId);
+        if(!id) continue;
+        v.videoId = id;
+        byId.set(id, v);
+      }
 
-      const existingById = new Set(allVideosDeduped.map(v => v.videoId));
-      const playlistByTitle = new Map(playlists.map(p => [normalizePlaylistTitle(p.title), p]));
-
-      for(const raw of localVideos){
-        if(!raw || typeof raw !== "object") continue;
-        const videoId = String(raw.videoId || "").trim();
-        const title = String(raw.title || "").trim();
-        const playlistName = String(raw.playlist || "").trim();
-        if(!videoId || !title || !playlistName) continue;
-        if(existingById.has(videoId)) continue;
-
-        let playlist = playlistByTitle.get(normalizePlaylistTitle(playlistName));
-        if(!playlist){
-          let baseId = `local:${playlistName.replace(/\s+/g," ").trim()}`;
-          let id = baseId;
-          let n = 2;
-          while(playlists.find(p => p.id === id)){
-            id = `${baseId}:${n++}`;
-          }
-          playlist = { id, title: playlistName };
-          playlists.push(playlist);
-          playlistByTitle.set(normalizePlaylistTitle(playlistName), playlist);
+      for(const [videoId, localMeta] of localVideoById.entries()){
+        const existing = byId.get(videoId);
+        if(existing){
+          if(localMeta.playlist) existing.playlistTitle = localMeta.playlist;
+          if(localMeta.level) existing.level = localMeta.level;
+          if(localMeta.topic) existing.topic = localMeta.topic;
+          if(localMeta.published) existing.publishedAt = localMeta.published;
+          if(!existing.thumb) existing.thumb = localMeta.thumb || youtubeThumbFromVideoId(videoId);
+          existing.isLocked = true;
+          existing.isPremium = true;
+          existing.isUnlisted = true;
+          existing.isPatreonExclusive = true;
+          continue;
         }
 
-        const v = {
+        byId.set(videoId, {
           videoId,
-          title,
-          thumb: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-          playlistId: playlist.id,
-          playlistTitle: playlist.title,
-          publishedAt: raw.published || "",
-          isYouTubePublic: publicYouTubeVideoIds.has(videoId),
-          isPatreonExclusive: !publicYouTubeVideoIds.has(videoId)
-        };
+          title: localMeta.title || "Untitled",
+          thumb: localMeta.thumb || youtubeThumbFromVideoId(videoId),
+          playlistId: localMeta.playlist ? `local::${localMeta.playlist}` : "local::premium",
+          playlistTitle: localMeta.playlist || "Premium",
+          level: localMeta.level || "",
+          topic: localMeta.topic || "",
+          publishedAt: localMeta.published || "",
+          duration: "",
+          isLocked: true,
+          isPremium: true,
+          isUnlisted: true,
+          isPatreonExclusive: true
+        });
+      }
 
-        const list = videosByPlaylist.get(playlist.id) || [];
-        list.push(v);
-        videosByPlaylist.set(playlist.id, list);
-        allVideosDeduped.push(v);
-        existingById.add(videoId);
+      allVideosDeduped = Array.from(byId.values());
+
+      const applyToVideo = (v) => {
+        const lockMeta = localVideoById.get(normalizeVideoId(v?.videoId));
+        if(!lockMeta){
+          v.isLocked = false;
+          v.isPremium = false;
+          v.isUnlisted = false;
+          v.isPatreonExclusive = false;
+          return;
+        }
+        v.isLocked = !!lockMeta.isLocked;
+        v.isPremium = !!lockMeta.isPremium;
+        v.isUnlisted = !!lockMeta.isUnlisted;
+        v.isPatreonExclusive = true;
+      };
+
+      videosByPlaylist.clear();
+      for(const v of allVideosDeduped){
+        const pid = String(v.playlistId || "").trim();
+        if(!pid) continue;
+        if(!videosByPlaylist.has(pid)) videosByPlaylist.set(pid, []);
+        videosByPlaylist.get(pid).push(v);
+      }
+
+      const existingPlaylistsById = new Map(playlists.map(p => [p.id, p]));
+      for(const vids of videosByPlaylist.values()){
+        for(const v of vids){
+          applyToVideo(v);
+          const pid = String(v.playlistId || "").trim();
+          if(!pid || existingPlaylistsById.has(pid)) continue;
+          const title = String(v.playlistTitle || "Playlist").trim() || "Playlist";
+          const playlistObj = { id: pid, title };
+          playlists.push(playlistObj);
+          existingPlaylistsById.set(pid, playlistObj);
+        }
       }
 
       sortVideosNewestFirst(allVideosDeduped);
-      for(const vids of videosByPlaylist.values()){
-        sortVideosNewestFirst(vids);
-      }
+      for(const vids of videosByPlaylist.values()) sortVideosNewestFirst(vids);
 
-      const prev = playlistFilter.value;
       playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
         playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
-      if(playlists.some(p => p.id === prev)) playlistFilter.value = prev;
     }
 
     function videoPublishedTime(v){
@@ -1685,12 +1730,12 @@
 
       return base.filter(v => {
         if(text && !(v.title||"").toLowerCase().includes(text)) return false;
-        const lvl = inferLevel(v.title);
-        const top = inferTopic(v.title);
+        const lvl = v.level || inferLevel(v.title);
+        const top = v.topic || inferTopic(v.title);
         if(lf && lvl !== lf) return false;
         if(tf && top !== tf) return false;
         return true;
-      }).map(v => ({...v, level: inferLevel(v.title), topic: inferTopic(v.title)}));
+      }).map(v => ({...v, level: v.level || inferLevel(v.title), topic: v.topic || inferTopic(v.title)}));
     }
 
     function render(){
@@ -1740,7 +1785,7 @@
     });
 
     // ========= YouTube Data API loading =========
-    async function loadPlaylists(extraVideos){
+    async function loadPlaylists(){
       if(!YT_API_KEY || YT_API_KEY.includes("PASTE_")){
         setStatus(false, "API key not set.", "Paste your restricted API key in index.html");
         return;
@@ -1750,6 +1795,7 @@
         return;
       }
 
+      console.log("[youtube] playlist loading started");
       setStatus(false, "Loading…", "Fetching playlists…");
 
       let nextPageToken = "";
@@ -1785,8 +1831,10 @@
       const flat = [];
       for(const vids of videosByPlaylist.values()){
         vids.forEach(v => {
-          if(seen.has(v.videoId)) return;
-          seen.add(v.videoId);
+          const id = normalizeVideoId(v.videoId);
+          if(!id || seen.has(id)) return;
+          v.videoId = id;
+          seen.add(id);
           flat.push(v);
         });
       }
@@ -1795,8 +1843,8 @@
         sortVideosNewestFirst(vids);
       }
 
-      publicYouTubeVideoIds = await fetchPublicYouTubeVideoIds((extraVideos || []).map(v => v?.videoId));
-      mergeLocalVideos(extraVideos);
+      applyLocalLockMetadata();
+      console.log("[youtube] playlist loading completed");
       setStatus(true, "Loaded from YouTube API.", `${allVideosDeduped.length} unique videos`);
       render();
     }
@@ -1855,7 +1903,7 @@
         window.currentMembershipAccess = currentViewerAccess;
         applyFlashcardsTabAccess(patreonUser);
       }catch(err){
-        currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: false, hasLimitedAccess: false };
+        currentViewerAccess = { isPaidPatron: false, isFreePatron: false, isGuestUser: true, hasLimitedAccess: true };
       }finally{
         applyDictionaryFlashcardAccess();
         render();
@@ -1865,9 +1913,16 @@
     // ========= Boot =========
     (async function init(){
       await loadDictionary();
-      const localVideos = await loadLocalVideos();
-      try{ await loadPlaylists(localVideos); }
+      const localLocksPromise = loadLocalVideoLocks()
+        .then((lockMap) => {
+          localVideoById = lockMap;
+          applyLocalLockMetadata();
+          render();
+        })
+        .catch(() => {});
+      try{ await loadPlaylists(); }
       catch(err){ setStatus(false, "Could not load from YouTube API.", err.message || String(err)); }
+      await localLocksPromise;
     })();
     })();
   </script>
