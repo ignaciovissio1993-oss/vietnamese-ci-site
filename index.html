@@ -706,10 +706,9 @@
       }
     })();
     // ========= CONFIG =========
-    const YT_API_KEY = "AIzaSyDPN8gism2gUu8hA-N8_hNJjm5B3krMSMY";
-    const CHANNEL_ID = "UCvf88neE9Erym8EF_z5KQhg";
     const CAPTIONS_DIR = "./captions";
-    const LOCAL_VIDEOS_PATH = "./data/videos.json";
+    const PUBLIC_VIDEOS_PATH = "./data/public-videos.json";
+    const PREMIUM_VIDEOS_PATH = "./data/videos.json";
     const PATREON_MEMBERSHIP_URL = "https://www.patreon.com/cw/LazyVietnamese/membership";
 
     // Dictionary: will try these paths (first that exists wins)
@@ -851,147 +850,66 @@
       return `${m}:${String(r).padStart(2,"0")}`;
     }
 
-    async function ytFetch(url){
-      const res = await fetch(url);
-      if(!res.ok){
-        const text = await res.text().catch(()=> "");
-        throw new Error(`HTTP ${res.status} ${text}`.slice(0,180));
-      }
-      return res.json();
-    }
-
-    function normalizePlaylistTitle(t){
-      return (t || "").trim().toLowerCase();
-    }
-
-    let localVideoById = new Map();
-
-    async function loadLocalVideoLocks(){
-      try{
-        const res = await fetch(LOCAL_VIDEOS_PATH, {cache:"no-store"});
-        if(!res.ok){
-          console.warn(`[videos.json] not loaded (HTTP ${res.status})`);
-          return new Map();
-        }
-        const data = await res.json();
-        if(!Array.isArray(data) || !data.length){
-          console.log("[videos.json] loaded, 0 local videos found");
-          return new Map();
-        }
-
-        const localMap = new Map();
-        for(const raw of data){
-          if(!raw || typeof raw !== "object") continue;
-          const videoId = normalizeVideoId(raw.videoId);
-          if(!videoId) continue;
-
-          localMap.set(videoId, {
-            videoId,
-            title: String(raw.title || "").trim(),
-            playlist: String(raw.playlist || "").trim(),
-            level: String(raw.level || "").trim(),
-            topic: String(raw.topic || "").trim(),
-            published: String(raw.published || "").trim(),
-            thumb: String(raw.thumb || raw.thumbnail || "").trim(),
-            // videos.json is the source of truth for premium/unlisted locking
-            isLocked: true,
-            isPremium: true,
-            isUnlisted: true,
-            isPatreonExclusive: true
-          });
-        }
-        console.log(`[videos.json] loaded, ${localMap.size} local video entries found`);
-        return localMap;
-      }catch(e){
-        console.warn("[videos.json] failed to load, continuing without local locks");
-        return new Map();
-      }
-    }
-
-    function applyLocalLockMetadata(){
-      const byId = new Map();
-      for(const v of allVideosDeduped){
-        const id = normalizeVideoId(v?.videoId);
-        if(!id) continue;
-        v.videoId = id;
-        byId.set(id, v);
-      }
-
-      for(const [videoId, localMeta] of localVideoById.entries()){
-        const existing = byId.get(videoId);
-        if(existing){
-          if(localMeta.playlist) existing.playlistTitle = localMeta.playlist;
-          if(localMeta.level) existing.level = localMeta.level;
-          if(localMeta.topic) existing.topic = localMeta.topic;
-          if(localMeta.published) existing.publishedAt = localMeta.published;
-          if(!existing.thumb) existing.thumb = localMeta.thumb || youtubeThumbFromVideoId(videoId);
-          existing.isLocked = true;
-          existing.isPremium = true;
-          existing.isUnlisted = true;
-          existing.isPatreonExclusive = true;
-          continue;
-        }
-
-        byId.set(videoId, {
-          videoId,
-          title: localMeta.title || "Untitled",
-          thumb: localMeta.thumb || youtubeThumbFromVideoId(videoId),
-          playlistId: localMeta.playlist ? `local::${localMeta.playlist}` : "local::premium",
-          playlistTitle: localMeta.playlist || "Premium",
-          level: localMeta.level || "",
-          topic: localMeta.topic || "",
-          publishedAt: localMeta.published || "",
-          duration: "",
-          isLocked: true,
-          isPremium: true,
-          isUnlisted: true,
-          isPatreonExclusive: true
-        });
-      }
-
-      allVideosDeduped = Array.from(byId.values());
-
-      const applyToVideo = (v) => {
-        const lockMeta = localVideoById.get(normalizeVideoId(v?.videoId));
-        if(!lockMeta){
-          v.isLocked = false;
-          v.isPremium = false;
-          v.isUnlisted = false;
-          v.isPatreonExclusive = false;
-          return;
-        }
-        v.isLocked = !!lockMeta.isLocked;
-        v.isPremium = !!lockMeta.isPremium;
-        v.isUnlisted = !!lockMeta.isUnlisted;
-        v.isPatreonExclusive = true;
+    function catalogVideo(raw, isPremium){
+      if(!raw || typeof raw !== "object") return null;
+      const videoId = normalizeVideoId(raw.videoId);
+      if(!videoId) return null;
+      const playlistTitle = String(raw.playlist || (isPremium ? "Premium" : "Public")).trim();
+      return {
+        videoId,
+        title: String(raw.title || "Untitled").trim(),
+        thumb: String(raw.thumb || raw.thumbnail || "").trim() || youtubeThumbFromVideoId(videoId),
+        playlistId: `local::${playlistTitle || (isPremium ? "Premium" : "Public")}`,
+        playlistTitle: playlistTitle || (isPremium ? "Premium" : "Public"),
+        level: String(raw.level || "").trim(),
+        topic: String(raw.topic || "").trim(),
+        publishedAt: String(raw.published || "").trim(),
+        duration: "",
+        isLocked: isPremium,
+        isPremium,
+        isUnlisted: isPremium,
+        isPatreonExclusive: isPremium
       };
+    }
 
-      videosByPlaylist.clear();
-      for(const v of allVideosDeduped){
-        const pid = String(v.playlistId || "").trim();
-        if(!pid) continue;
-        if(!videosByPlaylist.has(pid)) videosByPlaylist.set(pid, []);
-        videosByPlaylist.get(pid).push(v);
+    async function loadVideoCatalog(){
+      setStatus(false, "Loading…", "Loading video catalog…");
+      const [publicVideos, premiumVideos] = await Promise.all([
+        tryLoadJson(PUBLIC_VIDEOS_PATH),
+        tryLoadJson(PREMIUM_VIDEOS_PATH)
+      ]);
+      if(!Array.isArray(publicVideos) || !Array.isArray(premiumVideos)){
+        throw new Error("Video catalog files must contain JSON arrays.");
       }
 
-      const existingPlaylistsById = new Map(playlists.map(p => [p.id, p]));
-      for(const vids of videosByPlaylist.values()){
-        for(const v of vids){
-          applyToVideo(v);
-          const pid = String(v.playlistId || "").trim();
-          if(!pid || existingPlaylistsById.has(pid)) continue;
-          const title = String(v.playlistTitle || "Playlist").trim() || "Playlist";
-          const playlistObj = { id: pid, title };
-          playlists.push(playlistObj);
-          existingPlaylistsById.set(pid, playlistObj);
+      const byId = new Map();
+      for(const raw of premiumVideos){
+        const video = catalogVideo(raw, true);
+        if(video) byId.set(video.videoId, video);
+      }
+      // Public catalog entries always remain public, including duplicate IDs.
+      for(const raw of publicVideos){
+        const video = catalogVideo(raw, false);
+        if(video) byId.set(video.videoId, video);
+      }
+
+      allVideosDeduped = sortVideosNewestFirst(Array.from(byId.values()));
+      videosByPlaylist.clear();
+      playlists = [];
+      const playlistsById = new Map();
+      for(const video of allVideosDeduped){
+        if(!videosByPlaylist.has(video.playlistId)) videosByPlaylist.set(video.playlistId, []);
+        videosByPlaylist.get(video.playlistId).push(video);
+        if(!playlistsById.has(video.playlistId)){
+          const playlist = {id: video.playlistId, title: video.playlistTitle};
+          playlistsById.set(video.playlistId, playlist);
+          playlists.push(playlist);
         }
       }
-
-      sortVideosNewestFirst(allVideosDeduped);
-      for(const vids of videosByPlaylist.values()) sortVideosNewestFirst(vids);
-
       playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
         playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
+      setStatus(true, "Video catalog loaded.", `${allVideosDeduped.length} videos`);
+      render();
     }
 
     function videoPublishedTime(v){
@@ -1784,100 +1702,6 @@
       render();
     });
 
-    // ========= YouTube Data API loading =========
-    async function loadPlaylists(){
-      if(!YT_API_KEY || YT_API_KEY.includes("PASTE_")){
-        setStatus(false, "API key not set.", "Paste your restricted API key in index.html");
-        return;
-      }
-      if(!CHANNEL_ID || CHANNEL_ID.includes("PASTE_")){
-        setStatus(false, "Channel ID not set.", "Paste your channel ID in index.html");
-        return;
-      }
-
-      console.log("[youtube] playlist loading started");
-      setStatus(false, "Loading…", "Fetching playlists…");
-
-      let nextPageToken = "";
-      const pls = [];
-      do{
-        const u = new URL("https://www.googleapis.com/youtube/v3/playlists");
-        u.searchParams.set("part","snippet,contentDetails");
-        u.searchParams.set("channelId", CHANNEL_ID);
-        u.searchParams.set("maxResults","50");
-        u.searchParams.set("key", YT_API_KEY);
-        if(nextPageToken) u.searchParams.set("pageToken", nextPageToken);
-
-        const data = await ytFetch(u.toString());
-        (data.items || []).forEach(it => {
-          pls.push({ id: it.id, title: it.snippet?.title || "Untitled" });
-        });
-        nextPageToken = data.nextPageToken || "";
-      } while(nextPageToken);
-
-      playlists = pls;
-      playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
-        playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
-
-      setStatus(true, "Playlists loaded.", `${playlists.length} playlists`);
-
-      videosByPlaylist.clear();
-      for(const p of playlists){
-        const vids = await loadPlaylistItems(p.id);
-        videosByPlaylist.set(p.id, vids);
-      }
-
-      const seen = new Set();
-      const flat = [];
-      for(const vids of videosByPlaylist.values()){
-        vids.forEach(v => {
-          const id = normalizeVideoId(v.videoId);
-          if(!id || seen.has(id)) return;
-          v.videoId = id;
-          seen.add(id);
-          flat.push(v);
-        });
-      }
-      allVideosDeduped = sortVideosNewestFirst(flat);
-      for(const vids of videosByPlaylist.values()){
-        sortVideosNewestFirst(vids);
-      }
-
-      applyLocalLockMetadata();
-      console.log("[youtube] playlist loading completed");
-      setStatus(true, "Loaded from YouTube API.", `${allVideosDeduped.length} unique videos`);
-      render();
-    }
-
-    async function loadPlaylistItems(playlistId){
-      let nextPageToken = "";
-      const out = [];
-      do{
-        const u = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
-        u.searchParams.set("part","snippet,contentDetails");
-        u.searchParams.set("playlistId", playlistId);
-        u.searchParams.set("maxResults","50");
-        u.searchParams.set("key", YT_API_KEY);
-        if(nextPageToken) u.searchParams.set("pageToken", nextPageToken);
-
-        const data = await ytFetch(u.toString());
-        (data.items || []).forEach(it => {
-          const vid = it.contentDetails?.videoId || it.snippet?.resourceId?.videoId;
-          if(!vid) return;
-          out.push({
-            videoId: vid,
-            title: it.snippet?.title || "Untitled",
-            thumb: it.snippet?.thumbnails?.medium?.url || it.snippet?.thumbnails?.default?.url || "",
-            playlistId,
-            playlistTitle: (playlists.find(p => p.id === playlistId)?.title) || "Playlist",
-            publishedAt: it.contentDetails?.videoPublishedAt || it.snippet?.publishedAt || ""
-          });
-        });
-        nextPageToken = data.nextPageToken || "";
-      } while(nextPageToken);
-      return out;
-    }
-
     // ========= YouTube IFrame API =========
     window.onYouTubeIframeAPIReady = function(){
       ytReady = true;
@@ -1913,16 +1737,8 @@
     // ========= Boot =========
     (async function init(){
       await loadDictionary();
-      const localLocksPromise = loadLocalVideoLocks()
-        .then((lockMap) => {
-          localVideoById = lockMap;
-          applyLocalLockMetadata();
-          render();
-        })
-        .catch(() => {});
-      try{ await loadPlaylists(); }
-      catch(err){ setStatus(false, "Could not load from YouTube API.", err.message || String(err)); }
-      await localLocksPromise;
+      try{ await loadVideoCatalog(); }
+      catch(err){ setStatus(false, "Could not load video catalog.", err.message || String(err)); }
     })();
     })();
   </script>
