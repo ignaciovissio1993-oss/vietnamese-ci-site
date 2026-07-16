@@ -192,9 +192,26 @@
       flex-direction:column;
       min-height: 210px;
       cursor:pointer;
-      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      opacity:0;
+      transform:translate3d(0, 24px, 0);
+      will-change:transform, opacity;
+      transition:
+        opacity .52s cubic-bezier(.16, 1, .3, 1),
+        transform .52s cubic-bezier(.16, 1, .3, 1),
+        box-shadow .25s ease,
+        border-color .25s ease;
+      transition-delay:var(--stagger, 0ms), var(--stagger, 0ms), 0ms, 0ms;
+      backface-visibility:hidden;
     }
-    .card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(20,14,60,.12);border-color:rgba(106,92,255,.24)}
+    .card.is-visible{
+      opacity:1;
+      transform:translate3d(0, 0, 0);
+    }
+    .card:hover{
+      transform:translate3d(0, -6px, 0) scale(1.02);
+      box-shadow:0 22px 46px rgba(20,14,60,.16);
+      border-color:rgba(106,92,255,.26);
+    }
     .card.locked{cursor:not-allowed}
     .card.locked .thumb img{filter: grayscale(.2) brightness(.75)}
     .thumb{
@@ -202,11 +219,16 @@
       background: linear-gradient(135deg, rgba(106,92,255,.12), rgba(255,87,200,.10));
       display:flex;align-items:center;justify-content:center;
       position:relative;
+      overflow:hidden;
     }
     .thumb img{
       width:100%;height:100%;object-fit:cover;display:block;
       filter:saturate(1.05);
+      transform:translateZ(0) scale(1);
+      transition:transform .35s cubic-bezier(.16, 1, .3, 1), filter .25s ease;
+      will-change:transform;
     }
+    .card:hover .thumb img{transform:translateZ(0) scale(1.05)}
     .chip{
       position:absolute;top:10px;left:10px;
       padding:6px 10px;border-radius: 999px;
@@ -257,6 +279,42 @@
       background: rgba(106,92,255,.06);
       font-weight:700;
       font-size:11px;
+    }
+    .cardSkeleton{
+      pointer-events:none;
+      cursor:default;
+      opacity:1;
+      transform:none;
+      animation:skeletonFadeIn .24s ease both;
+    }
+    .skeletonBlock,
+    .skeletonLine,
+    .skeletonPill{
+      position:relative;
+      overflow:hidden;
+      background:rgba(106,92,255,.08);
+    }
+    .skeletonBlock::after,
+    .skeletonLine::after,
+    .skeletonPill::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      transform:translateX(-100%);
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.66), transparent);
+      animation:skeletonShimmer 1.35s ease-in-out infinite;
+    }
+    .skeletonBlock{height:120px}
+    .skeletonLine{height:13px;border-radius:999px;margin:0 12px 9px}
+    .skeletonLine.titleLine{height:16px;margin-top:13px;width:82%}
+    .skeletonLine.shortLine{width:56%}
+    .skeletonPill{height:22px;width:64px;border-radius:999px;margin:2px 0 0 12px}
+    @keyframes skeletonShimmer{
+      100%{transform:translateX(100%)}
+    }
+    @keyframes skeletonFadeIn{
+      from{opacity:0}
+      to{opacity:1}
     }
     .view{display:none}
     .view.active{display:block}
@@ -563,6 +621,36 @@
       .playlistGrid{grid-template-columns: 1fr;}
       .seriesHero{align-items:flex-start;flex-direction:column}
       .seriesHero h1{font-size:24px}
+      .card{
+        transform:translate3d(0, 18px, 0);
+        transition-duration:.38s, .38s, .22s, .22s;
+      }
+      .card:hover{
+        transform:translate3d(0, -3px, 0) scale(1.01);
+      }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .card,
+      .card.is-visible,
+      .card:hover{
+        opacity:1;
+        transform:none;
+        transition:opacity .01ms linear, box-shadow .01ms linear, border-color .01ms linear;
+        transition-delay:0ms;
+        will-change:auto;
+      }
+      .thumb img,
+      .card:hover .thumb img{
+        transform:none;
+        transition:none;
+        will-change:auto;
+      }
+      .skeletonBlock::after,
+      .skeletonLine::after,
+      .skeletonPill::after,
+      .cardSkeleton{
+        animation:none;
+      }
     }
   </style>
 </head>
@@ -889,6 +977,12 @@
     let allVideosDeduped = [];
     let currentView = "watch";
     let routePlaylistId = "";
+    let catalogIsLoading = true;
+    let cardRevealObserver = null;
+    const revealedVideoCardIds = new Set();
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const CARD_STAGGER_MS = 60;
+    const MAX_CARD_STAGGER_MS = 420;
 
     let ytReady = false;
     let player = null;
@@ -955,6 +1049,63 @@
       return id ? `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg` : "";
     }
 
+    function renderVideoSkeletons(){
+      cards.innerHTML = Array.from({length: 9}, () => `
+        <div class="card cardSkeleton" aria-hidden="true">
+          <div class="skeletonBlock"></div>
+          <div class="cardBody">
+            <div class="skeletonLine titleLine"></div>
+            <div class="skeletonLine shortLine"></div>
+            <div class="skeletonPill"></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function getCardRevealObserver(){
+      if(reducedMotionQuery.matches || !("IntersectionObserver" in window)) return null;
+      if(cardRevealObserver) return cardRevealObserver;
+      cardRevealObserver = new IntersectionObserver((entries) => {
+        entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => Number(a.target.dataset.cardIndex || 0) - Number(b.target.dataset.cardIndex || 0))
+          .forEach((entry) => {
+            const el = entry.target;
+            const vid = el.getAttribute("data-vid") || "";
+            cardRevealObserver.unobserve(el);
+            if(vid) revealedVideoCardIds.add(vid);
+            requestAnimationFrame(() => el.classList.add("is-visible"));
+          });
+      }, {threshold: .16, rootMargin: "0px 0px -8% 0px"});
+      return cardRevealObserver;
+    }
+
+    function prepareCardEntrances(){
+      const cardEls = Array.from(cards.querySelectorAll(".card:not(.cardSkeleton)"));
+      if(reducedMotionQuery.matches || !("IntersectionObserver" in window)){
+        cardEls.forEach(el => {
+          const vid = el.getAttribute("data-vid") || "";
+          if(vid) revealedVideoCardIds.add(vid);
+          el.classList.add("is-visible");
+        });
+        return;
+      }
+
+      const observer = getCardRevealObserver();
+      cardEls.forEach(el => {
+        const vid = el.getAttribute("data-vid") || "";
+        if(vid && revealedVideoCardIds.has(vid)){
+          el.style.setProperty("--stagger", "0ms");
+          el.classList.add("is-visible");
+          return;
+        }
+        const index = Number(el.dataset.cardIndex || 0);
+        const stagger = Math.min(Math.max(index, 0) * CARD_STAGGER_MS, MAX_CARD_STAGGER_MS);
+        el.style.setProperty("--stagger", `${stagger}ms`);
+        observer.observe(el);
+      });
+    }
+
     function isVideoLockedForCurrentUser(video) {
       const isPremiumVideo = !!(video?.isPatreonExclusive || video?.isLocked || video?.isPremium || video?.isUnlisted);
       const shouldLockForCurrentUser = isPremiumVideo && !currentViewerAccess.isPaidPatron;
@@ -1003,6 +1154,8 @@
     }
 
     async function loadVideoCatalog(){
+      catalogIsLoading = true;
+      renderVideoSkeletons();
       setStatus(false, "Loading…", "Loading video catalog…");
       const [publicVideos, premiumVideos] = await Promise.all([
         tryLoadJson(PUBLIC_VIDEOS_PATH),
@@ -1038,6 +1191,7 @@
       }
       playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
         playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
+      catalogIsLoading = false;
       setStatus(true, "Video catalog loaded.", `${allVideosDeduped.length} videos`);
       applyRoute();
     }
@@ -1853,16 +2007,23 @@
     }
 
     function render(){
+      if(catalogIsLoading && !allVideosDeduped.length){
+        document.getElementById("mainTitle").textContent = routePlaylistId ? pfTitle() : "Watch";
+        document.getElementById("subTitle").textContent = "Loading playlists…";
+        renderVideoSkeletons();
+        return;
+      }
+
       const items = getFiltered();
       document.getElementById("mainTitle").textContent = routePlaylistId ? pfTitle() : "Watch";
       document.getElementById("subTitle").textContent = `${items.length} video(s)`;
 
-      cards.innerHTML = items.map(v => {
+      cards.innerHTML = items.map((v, index) => {
         const lvl = v.level ? `<span class="tag">${escapeHtml(v.level)}</span>` : "";
         const top = v.topic ? `<span class="tag">${escapeHtml(v.topic)}</span>` : "";
         const locked = isVideoLockedForCurrentUser(v);
         return `
-          <div class="card${locked ? ` locked` : ``}" data-vid="${v.videoId}">
+          <div class="card${locked ? ` locked` : ``}" data-vid="${v.videoId}" data-card-index="${index}">
             <div class="thumb">
               ${v.thumb ? `<img src="${escapeHtml(v.thumb)}" alt="">` : ""}
               <div class="chip">${escapeHtml(v.playlistTitle)}</div>
@@ -1883,6 +2044,7 @@
           openVideo(v || {videoId: vid, title: "Video"});
         });
       });
+      prepareCardEntrances();
     }
 
     q.addEventListener("input", render);
@@ -1937,7 +2099,11 @@
     (async function init(){
       await loadDictionary();
       try{ await loadVideoCatalog(); }
-      catch(err){ setStatus(false, "Could not load video catalog.", err.message || String(err)); }
+      catch(err){
+        catalogIsLoading = false;
+        render();
+        setStatus(false, "Could not load video catalog.", err.message || String(err));
+      }
     })();
     })();
   </script>
