@@ -37,46 +37,72 @@
     }
 
     a{color:inherit;text-decoration:none}
-    .app-wrap{max-width:1200px;margin:24px auto;padding:0 16px 50px}
+    .app-shell{min-height:100%;padding-left:112px}
+    .app-wrap{max-width:1200px;margin:0 auto;padding:24px 16px 50px}
 
-    .tabs{
-      margin-top:18px;
+    .sidebar{
+      position:fixed;
+      inset:0 auto 0 0;
+      z-index:30;
+      width:96px;
+      padding:18px 12px;
+      border-right:1px solid rgba(106,92,255,.14);
+      background:rgba(255,255,255,.76);
+      backdrop-filter:blur(16px);
+      box-shadow:8px 0 30px rgba(20,14,60,.07);
       display:flex;
-      gap:18px;
-      justify-content:center;
-      align-items:flex-end;
-      padding-bottom:6px;
-      border-bottom:1px solid rgba(106,92,255,.18);
-    }
-    .tab{
-      position:relative;
-      display:inline-flex;
+      flex-direction:column;
       align-items:center;
+      gap:14px;
+    }
+    .sideBrand{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      color:#25436c;
+      font-weight:950;
+      letter-spacing:.4px;
+      background:linear-gradient(135deg, #dff3ff, #f5e5ff 55%, #ffe8f3);
+      border:1px solid rgba(106,92,255,.14);
+      box-shadow:0 12px 30px rgba(20,14,60,.10);
+    }
+    .sideNav{
+      width:100%;
+      display:flex;
+      flex-direction:column;
       gap:8px;
-      padding:6px 2px;
-      border:0;
-      background: transparent;
-      font-weight:700;
-      color:rgba(29,27,43,.65);
-      cursor:pointer;
+      margin-top:8px;
     }
-    .tab:hover{color:rgba(29,27,43,.9)}
-    .tab.active{color:rgba(29,27,43,.98)}
-    .tab.is-locked{color:rgba(29,27,43,.55)}
-    .tab.active::after{
-      content:"";
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:-7px;
-      height:2px;
-      border-radius:999px;
-      background: linear-gradient(90deg, #6a5cff, #a7d8ff);
+    .sideLink{
+      min-height:68px;
+      border-radius:18px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      color:rgba(29,27,43,.62);
+      font-size:12px;
+      font-weight:850;
+      transition:transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
     }
+    .sideLink svg{width:22px;height:22px;stroke-width:2.2}
+    .sideLink:hover{
+      transform:translateY(-1px);
+      color:rgba(29,27,43,.92);
+      background:rgba(255,255,255,.70);
+    }
+    .sideLink.active{
+      color:#34297f;
+      background:linear-gradient(180deg, rgba(106,92,255,.13), rgba(167,216,255,.18));
+      box-shadow:0 10px 24px rgba(20,14,60,.08);
+    }
+    .sideLink.is-locked{color:rgba(29,27,43,.42)}
     .accessMsg{
       display:none;
-      margin-top:8px;
-      text-align:center;
+      margin:0 0 12px;
       font-size:12px;
       color:rgba(29,27,43,.7);
     }
@@ -166,7 +192,9 @@
       flex-direction:column;
       min-height: 210px;
       cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
+    .card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(20,14,60,.12);border-color:rgba(106,92,255,.24)}
     .card.locked{cursor:not-allowed}
     .card.locked .thumb img{filter: grayscale(.2) brightness(.75)}
     .thumb{
@@ -230,6 +258,57 @@
       font-weight:700;
       font-size:11px;
     }
+    .view{display:none}
+    .view.active{display:block}
+    .seriesHero{
+      margin-top:16px;
+      padding:18px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:16px;
+    }
+    .seriesHero h1{margin:0;font-size:28px;line-height:1.1}
+    .seriesHero p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    .playlistGrid{
+      padding:14px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .playlistCard{
+      border:1px solid rgba(106,92,255,.14);
+      border-radius:22px;
+      overflow:hidden;
+      background:rgba(255,255,255,.82);
+      box-shadow:0 14px 34px rgba(20,14,60,.08);
+      min-height:286px;
+      display:flex;
+      flex-direction:column;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .playlistCard:hover{
+      transform:translateY(-5px);
+      box-shadow:0 24px 48px rgba(20,14,60,.14);
+      border-color:rgba(106,92,255,.26);
+    }
+    .playlistCover{height:190px;background:#eef2ff;overflow:hidden}
+    .playlistCover img{width:100%;height:100%;object-fit:cover;display:block}
+    .playlistBody{padding:14px 16px 16px}
+    .playlistBody h2{margin:0;font-size:18px;line-height:1.2}
+    .playlistBody p{margin:8px 0 0;color:var(--muted);font-size:13px;font-weight:700}
+    .backLink{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      padding:9px 12px;
+      background:rgba(255,255,255,.78);
+      font-weight:850;
+      color:rgba(29,27,43,.72);
+    }
+    .backLink:hover{color:rgba(29,27,43,.96);box-shadow:0 10px 24px rgba(20,14,60,.08)}
 
     /* Modal */
     .modalBack{
@@ -460,24 +539,56 @@
 
     @media (max-width: 980px){
       .series-cards{grid-template-columns: repeat(2, minmax(0,1fr));}
+      .playlistGrid{grid-template-columns: repeat(2, minmax(0,1fr));}
       .playerGrid{grid-template-columns: 1fr}
       .capBody{height: min(44vh, 420px)}
     }
     @media (max-width: 560px){
+      .app-shell{padding-left:0;padding-bottom:78px}
+      .app-wrap{padding:14px 12px 32px}
+      .sidebar{
+        inset:auto 10px 10px 10px;
+        width:auto;
+        height:66px;
+        padding:8px;
+        border:1px solid rgba(106,92,255,.14);
+        border-radius:22px;
+        flex-direction:row;
+      }
+      .sideBrand{display:none}
+      .sideNav{margin:0;flex-direction:row;gap:6px}
+      .sideLink{min-height:50px;flex:1;border-radius:16px;font-size:11px}
+      .sideLink svg{width:20px;height:20px}
       .series-cards{grid-template-columns: 1fr;}
-      .tabs{justify-content:flex-start}
+      .playlistGrid{grid-template-columns: 1fr;}
+      .seriesHero{align-items:flex-start;flex-direction:column}
+      .seriesHero h1{font-size:24px}
     }
   </style>
 </head>
 
 <body>
-  <div class="app-wrap">
-    <div class="tabs" aria-label="Main">
-      <a class="tab active" href="/">Videos</a>
-      <a class="tab" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/?patreon_user_id=">Flashcards</a>
+  <nav class="sidebar" aria-label="Main">
+    <a class="sideBrand" href="#/watch" aria-label="Vietnamese CI">VI</a>
+    <div class="sideNav">
+      <a class="sideLink active" id="watchNavLink" href="#/watch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m10 9 5 3-5 3Z"></path></svg>
+        <span>Watch</span>
+      </a>
+      <a class="sideLink" id="seriesNavLink" href="#/series">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="4" y="4" width="16" height="5" rx="1.5"></rect><rect x="4" y="10.5" width="16" height="5" rx="1.5"></rect><rect x="4" y="17" width="16" height="3" rx="1.5"></rect></svg>
+        <span>Series</span>
+      </a>
+      <a class="sideLink" id="flashcardsLink" data-base-href="/features/flashcards/" href="/features/flashcards/?patreon_user_id=">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+        <span>Flashcards</span>
+      </a>
     </div>
+  </nav>
+  <div class="app-shell">
+  <div class="app-wrap">
     <div class="accessMsg" id="memberAccessMsg" aria-live="polite"></div>
-    <div id="seriesView">
+    <div id="watchView" class="view active">
       <div class="series-grid">
 
         <!-- Filters panel (now ABOVE videos) -->
@@ -536,6 +647,17 @@
 
       </div>
     </div>
+    <div id="seriesView" class="view">
+      <section class="panel seriesHero">
+        <div>
+          <h1>Series</h1>
+          <p>Browse playlists grouped automatically from the video catalog.</p>
+        </div>
+        <div class="muted" id="seriesCount">Loading playlists...</div>
+      </section>
+      <section class="playlistGrid" id="playlistCards"></section>
+    </div>
+  </div>
   </div>
 
   <!-- Modal Player -->
@@ -725,6 +847,12 @@
     const topicFilter = document.getElementById("topicFilter");
     const clearBtn = document.getElementById("clearBtn");
     const cards = document.getElementById("cards");
+    const watchView = document.getElementById("watchView");
+    const seriesView = document.getElementById("seriesView");
+    const playlistCards = document.getElementById("playlistCards");
+    const seriesCount = document.getElementById("seriesCount");
+    const watchNavLink = document.getElementById("watchNavLink");
+    const seriesNavLink = document.getElementById("seriesNavLink");
 
     const statusBox = document.getElementById("statusBox");
     const statusDot = document.getElementById("statusDot");
@@ -759,6 +887,8 @@
     let playlists = [];
     let videosByPlaylist = new Map();
     let allVideosDeduped = [];
+    let currentView = "watch";
+    let routePlaylistId = "";
 
     let ytReady = false;
     let player = null;
@@ -909,7 +1039,7 @@
       playlistFilter.innerHTML = `<option value="">Playlists (all)</option>` +
         playlists.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join("");
       setStatus(true, "Video catalog loaded.", `${allVideosDeduped.length} videos`);
-      render();
+      applyRoute();
     }
 
     function videoPublishedTime(v){
@@ -1625,9 +1755,75 @@
       }
     }
 
-    // ========= Rendering =========
+    // ========= Navigation + Rendering =========
+    function encodeRouteId(id){
+      return encodeURIComponent(id || "");
+    }
+
+    function decodeRouteId(id){
+      try{
+        return decodeURIComponent(id || "");
+      }catch(_err){
+        return "";
+      }
+    }
+
+    function getRoute(){
+      const hash = window.location.hash || "#/watch";
+      const parts = hash.replace(/^#\/?/, "").split("/");
+      if(parts[0] === "series" && parts[1]){
+        return {view:"watch", playlistId:decodeRouteId(parts.slice(1).join("/"))};
+      }
+      if(parts[0] === "series") return {view:"series", playlistId:""};
+      return {view:"watch", playlistId:""};
+    }
+
+    function applyRoute(){
+      const route = getRoute();
+      currentView = route.view;
+      routePlaylistId = route.playlistId;
+      watchView.classList.toggle("active", currentView === "watch");
+      seriesView.classList.toggle("active", currentView === "series");
+      watchNavLink.classList.toggle("active", currentView === "watch" && !routePlaylistId);
+      seriesNavLink.classList.toggle("active", currentView === "series" || !!routePlaylistId);
+      render();
+      renderPlaylists();
+    }
+
+    function playlistCoverFor(title){
+      const t = (title || "").toLowerCase();
+      if(/food|pho|banh|coffee|cafe/.test(t)) return "./assets/playlist-covers/food.svg";
+      if(/game|gaming|minecraft|play/.test(t)) return "./assets/playlist-covers/gaming.svg";
+      if(/grammar|alphabet|pronunciation|vowel|tone/.test(t)) return "./assets/playlist-covers/grammar.svg";
+      if(/culture|tet|lantern|temple|history|vietnam/.test(t)) return "./assets/playlist-covers/culture.svg";
+      if(/bob|betty|character/.test(t)) return "./assets/playlist-covers/character.svg";
+      if(/florence|city|travel|buenos|place/.test(t)) return "./assets/playlist-covers/city.svg";
+      if(/story|stories|personal|chitchat|chat/.test(t)) return "./assets/playlist-covers/street.svg";
+      if(/beginner|conversation|public|a0|a1/.test(t)) return "./assets/playlist-covers/cafe.svg";
+      return "./assets/playlist-covers/general.svg";
+    }
+
+    function renderPlaylists(){
+      if(!playlistCards) return;
+      seriesCount.textContent = `${playlists.length} playlist(s)`;
+      playlistCards.innerHTML = playlists.map(p => {
+        const count = (videosByPlaylist.get(p.id) || []).length;
+        return `
+          <a class="playlistCard" href="#/series/${encodeRouteId(p.id)}">
+            <div class="playlistCover">
+              <img src="${playlistCoverFor(p.title)}" alt="">
+            </div>
+            <div class="playlistBody">
+              <h2>${escapeHtml(p.title)}</h2>
+              <p>${count} video${count === 1 ? "" : "s"}</p>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
     function pfTitle(){
-      const pf = playlistFilter.value;
+      const pf = routePlaylistId || playlistFilter.value;
       if(!pf) return "All Series";
       const p = playlists.find(x => x.id === pf);
       return p ? p.title : "Playlist";
@@ -1635,7 +1831,7 @@
 
     function getFiltered(){
       const text = (q.value||"").trim().toLowerCase();
-      const pf = playlistFilter.value;
+      const pf = routePlaylistId || playlistFilter.value;
       const lf = levelFilter.value;
       const tf = topicFilter.value;
 
@@ -1658,7 +1854,7 @@
 
     function render(){
       const items = getFiltered();
-      document.getElementById("mainTitle").textContent = pfTitle();
+      document.getElementById("mainTitle").textContent = routePlaylistId ? pfTitle() : "Watch";
       document.getElementById("subTitle").textContent = `${items.length} video(s)`;
 
       cards.innerHTML = items.map(v => {
@@ -1701,6 +1897,9 @@
       topicFilter.value = "";
       render();
     });
+    window.addEventListener("hashchange", applyRoute);
+    if(!window.location.hash) window.location.hash = "#/watch";
+    applyRoute();
 
     // ========= YouTube IFrame API =========
     window.onYouTubeIframeAPIReady = function(){

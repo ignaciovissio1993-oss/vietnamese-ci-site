@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Watercolor city illustration">
+  <defs><linearGradient id="c" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#dff2ff"/><stop offset=".55" stop-color="#fff2d8"/><stop offset="1" stop-color="#f4e6ff"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#c)"/>
+  <path d="M96 392c135-50 238-50 310 0 71 49 151 49 240 0 75-42 149-42 222 0v70H96z" fill="#728fd8" opacity=".22"/>
+  <rect x="158" y="198" width="126" height="190" rx="10" fill="#fff" opacity=".72"/>
+  <rect x="334" y="138" width="156" height="250" rx="12" fill="#fff7eb" opacity=".78"/>
+  <rect x="552" y="178" width="94" height="210" rx="10" fill="#eefbff" opacity=".85"/>
+  <rect x="690" y="112" width="116" height="276" rx="12" fill="#fff" opacity=".66"/>
+  <path d="M346 138h132l-66-60zM690 112h116l-58-56z" fill="#7ab7b2" opacity=".8"/>
+  <path d="M186 246h70M186 296h70M366 198h92M366 248h92M718 172h60M718 222h60M718 272h60" stroke="#365a75" stroke-width="10" stroke-linecap="round" opacity=".25"/>
+  <circle cx="214" cy="134" r="32" fill="#f7b85b" opacity=".65"/>
+</svg>

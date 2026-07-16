@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Vietnamese food illustration">
+  <defs><linearGradient id="h" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff3d6"/><stop offset=".6" stop-color="#e8f8ff"/><stop offset="1" stop-color="#ffe5ee"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#h)"/>
+  <ellipse cx="422" cy="342" rx="226" ry="82" fill="#fff" opacity=".88"/>
+  <ellipse cx="422" cy="314" rx="186" ry="58" fill="#f7d49b"/>
+  <path d="M270 302c74 24 153 24 238 0M310 332c68 18 136 18 204 0" stroke="#8b5e45" stroke-width="10" stroke-linecap="round" opacity=".5"/>
+  <path d="M260 220h330" stroke="#6a5cff" stroke-width="12" stroke-linecap="round" opacity=".32"/>
+  <rect x="638" y="250" width="96" height="132" rx="22" fill="#fff"/><rect x="656" y="284" width="60" height="72" rx="12" fill="#7a4d38" opacity=".72"/>
+  <path d="M734 288h28c22 0 22 44 0 44h-28" stroke="#fff" stroke-width="16" fill="none"/>
+  <path d="M196 218c40-42 83-42 128 0M536 188c56-47 113-47 171 0" stroke="#3fa887" stroke-width="10" stroke-linecap="round" fill="none" opacity=".58"/>
+  <path d="M160 430h638" stroke="#25436c" stroke-width="14" stroke-linecap="round" opacity=".14"/>
+</svg>

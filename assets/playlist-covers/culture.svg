@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Vietnamese culture illustration">
+  <defs><linearGradient id="f" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff0d9"/><stop offset=".55" stop-color="#ffe4ee"/><stop offset="1" stop-color="#e2f7ff"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#f)"/>
+  <path d="M224 318h512v116H224z" fill="#fff" opacity=".7"/>
+  <path d="M190 318h580L480 150z" fill="#d94135" opacity=".78"/>
+  <path d="M320 318h320l-160-92z" fill="#f6b85d" opacity=".9"/>
+  <rect x="358" y="340" width="54" height="94" rx="8" fill="#7ab7b2"/><rect x="548" y="340" width="54" height="94" rx="8" fill="#7ab7b2"/>
+  <path d="M198 128h564" stroke="#25436c" stroke-width="8" stroke-linecap="round" opacity=".22"/>
+  <g fill="#f35d57" opacity=".75"><ellipse cx="278" cy="174" rx="34" ry="44"/><ellipse cx="480" cy="174" rx="34" ry="44"/><ellipse cx="682" cy="174" rx="34" ry="44"/></g>
+  <path d="M278 128v92M480 128v92M682 128v92" stroke="#25436c" stroke-width="5" opacity=".25"/>
+  <path d="M122 442c108-54 223-54 344 0 104 46 226 46 366 0v28H122z" fill="#3fa887" opacity=".28"/>
+</svg>

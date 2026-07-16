@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Vietnamese learning series illustration">
+  <defs><linearGradient id="i" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e4f7ff"/><stop offset=".52" stop-color="#f1e8ff"/><stop offset="1" stop-color="#fff1d9"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#i)"/>
+  <rect x="174" y="126" width="612" height="286" rx="36" fill="#fff" opacity=".74"/>
+  <path d="M242 220h250M242 278h358M242 336h214" stroke="#25436c" stroke-width="16" stroke-linecap="round" opacity=".2"/>
+  <circle cx="686" cy="256" r="72" fill="#7ab7b2" opacity=".72"/>
+  <path d="M650 256h72M686 220v72" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
+  <path d="M142 438c94-48 189-48 286 0 84 42 177 42 278 0 48-20 91-25 130-15v40H142z" fill="#6a5cff" opacity=".14"/>
+  <text x="248" y="174" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#6a5cff" opacity=".68">VI</text>
+</svg>
